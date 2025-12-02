@@ -257,6 +257,7 @@ fun OrderFinish(
                                     Toast.makeText(context, "Заказ оформлен", Toast.LENGTH_SHORT)
                                         .show()
                                     orderVm.deleteAllItems()
+                                    menuVm.updateOrderWas()
                                     onBackPressed()
                                 }
                             },

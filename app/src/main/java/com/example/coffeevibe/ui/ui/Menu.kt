@@ -116,6 +116,7 @@ fun MenuScreen(
     val listState2 = rememberLazyGridState()
     val isOrderHas by menuViewModel.isOrderHas.collectAsState()
     val numAndPrice by menuViewModel.orderNP.collectAsState()
+    val orderWas by menuViewModel.isOrderWas.collectAsState()
     val cartItems by orderVm.itemList.collectAsState()
     val scope = rememberCoroutineScope()
 
@@ -140,6 +141,11 @@ fun MenuScreen(
         ) {
             showSheet = it
         }
+    }
+    LaunchedEffect(orderWas){
+        menuViewModel.loadMenu()
+        menuViewModel.loadOrders()
+        menuViewModel.updateOrderWas()
     }
 
     CoffeeVibeTheme(content = {
