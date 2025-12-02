@@ -382,7 +382,8 @@ fun OrderPlaced(
             }
             .height(if (expanded) 180.dp else 55.dp)
             .clip(RoundedCornerShape(10.dp)),
-        colors = CardDefaults.cardColors(containerColor = Color.LightGray)
+        colors = if (selectedPlace == "Выбрать место получения") CardDefaults.cardColors(containerColor = Color.LightGray)
+        else CardDefaults.cardColors(containerColor = colorScheme.primary)
     ) {
         Column(
             modifier = Modifier
@@ -397,7 +398,7 @@ fun OrderPlaced(
             ) {
                 Text(
                     text = selectedPlace,
-                    color = colorScheme.onBackground,
+                    color = if (selectedPlace == "Выбрать место получения") colorScheme.onBackground else colorScheme.background,
                     fontFamily = FontFamily(Font(R.font.roboto_condensed_black)),
                     fontSize = 16.sp
                 )
@@ -405,7 +406,7 @@ fun OrderPlaced(
                 Icon(
                     Icons.Filled.ArrowDropDown,
                     contentDescription = "Login",
-                    tint = colorScheme.onBackground,
+                    tint = if (selectedPlace == "Выбрать место получения") colorScheme.onBackground else colorScheme.background
                 )
             }
             if (expanded) {

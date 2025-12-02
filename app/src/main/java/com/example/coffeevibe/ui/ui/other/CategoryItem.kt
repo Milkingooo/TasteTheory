@@ -44,7 +44,7 @@ fun SettingsSubCategory(name: String,
             Icon(
                 icon,
                 contentDescription = "Reset1",
-                modifier = Modifier.size(35.dp),
+                modifier = Modifier.size(25.dp),
                 tint = colorScheme.onBackground
             )
             Spacer(modifier = Modifier.size(16.dp))
@@ -52,8 +52,8 @@ fun SettingsSubCategory(name: String,
                 text = name,
                 color = colorScheme.onBackground,
                 textAlign = TextAlign.Left,
-                fontSize = 20.sp,
-                fontFamily = FontFamily(Font(R.font.roboto_condensed_medium))
+                fontSize = 18.sp,
+                fontFamily = FontFamily(Font(R.font.roboto_condensed_black))
             )
         }
 //        HorizontalDivider()

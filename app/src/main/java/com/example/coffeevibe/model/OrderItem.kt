@@ -5,5 +5,5 @@ data class OrderItem(
     var quantity: Int = 1,
     val name: String,
     val price: Int,
-    val image: String
+    val image: String,
 )

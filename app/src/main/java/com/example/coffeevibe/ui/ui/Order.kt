@@ -1,9 +1,17 @@
 package com.example.coffeevibe.ui.ui
 
-import android.util.Log
 import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.animate
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,37 +22,41 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Fastfood
 import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material.icons.filled.Remove
-import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -64,6 +76,9 @@ import com.example.coffeevibe.repository.CartRepository
 import com.example.coffeevibe.ui.theme.CoffeeVibeTheme
 import com.example.coffeevibe.utils.AuthUtils
 import com.example.coffeevibe.viewmodel.OrderViewModel
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun CartScreen(
@@ -97,7 +112,7 @@ fun CartScreen(
                                         .show()
                                 }
                             },
-                            containerColor = if (orderItems.isNotEmpty() && AuthUtils.isUserAuth()) colorScheme.secondary else colorScheme.surface,
+                            containerColor = if (orderItems.isNotEmpty() && AuthUtils.isUserAuth()) colorScheme.secondary else Color.Gray,
                             modifier = Modifier
                                 .fillMaxWidth()
 //                                .wrapContentHeight()
@@ -180,24 +195,37 @@ fun CartScreen(
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
                     items(orderItems, key = { it.id }) {
-                        CartItem(
-                            name = it.name,
-                            price = it.price,
-                            image = it.image,
-                            quantity = it.quantity,
-                            onPlus = {
-                                if (it.quantity <= 9) {
-                                    orderVm.updateItem(it, it.quantity + 1)
-                                } else haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                            },
-                            onMinus = {
-                                if (it.price > 1) {
-                                    orderVm.updateItem(it, it.quantity - 1)
-                                } else {
-                                    orderVm.deleteItem(it)
+                        var isVisible by remember { mutableStateOf(true) }
+                        val coroutineScope = rememberCoroutineScope()
+
+                        AnimatedVisibility(
+                            visible = isVisible,
+                            exit = shrinkVertically() + fadeOut())
+                        {
+                            CartItem(
+                                name = it.name,
+                                price = it.price,
+                                image = it.image,
+                                quantity = it.quantity,
+                                onPlus = {
+                                    if (it.quantity <= 9) {
+                                        orderVm.updateItem(it, it.quantity + 1)
+                                    } else haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                },
+                                onMinus = {
+                                    if (it.price > 1) {
+                                        orderVm.updateItem(it, it.quantity - 1)
+                                    } else {
+                                        isVisible = false
+
+                                        coroutineScope.launch {
+                                            delay(500)
+                                            orderVm.deleteItem(it)
+                                        }
+                                    }
                                 }
-                            }
-                        )
+                            )
+                        }
                     }
                 }
             }
@@ -228,6 +256,21 @@ fun CartItem(
     onPlus: () -> Unit,
     onMinus: () -> Unit
 ) {
+
+    var scale by remember { mutableFloatStateOf(1f) }
+
+    LaunchedEffect(quantity) {
+        scale = 1.2f
+
+        animate(
+            initialValue = 1.2f,
+            targetValue = 1f,
+            animationSpec = tween(150)
+        ) { value, _ ->
+                scale = value
+            }
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -290,7 +333,8 @@ fun CartItem(
                     Text(
                         text = quantity.toString(),
                         color = colorScheme.onBackground,
-                        fontFamily = FontFamily(Font(R.font.roboto_condensed_bold))
+                        fontFamily = FontFamily(Font(R.font.roboto_condensed_bold)),
+                        modifier = Modifier.scale(scale)
                     )
 
                     IconButton(onClick = {
@@ -307,6 +351,48 @@ fun CartItem(
                     }
                 }
             }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SwipeToDismissListItems(
+    name: String,
+    price: Int,
+    image: String,
+    quantity: Int,
+    onPlus: () -> Unit,
+    onMinus: () -> Unit
+) {
+    val dismissState = rememberSwipeToDismissBoxState()
+    var isVisible by remember { mutableStateOf(true) }
+    val scope = rememberCoroutineScope()
+    if (isVisible) {
+        SwipeToDismissBox(
+            state = dismissState,
+            backgroundContent = {
+                val color by
+                animateColorAsState(
+                    when (dismissState.targetValue) {
+                        SwipeToDismissBoxValue.Settled -> Color.LightGray
+                        SwipeToDismissBoxValue.StartToEnd -> Color.Green
+                        SwipeToDismissBoxValue.EndToStart -> Color.Red
+                    }, label = ""
+                )
+                Box(Modifier.fillMaxSize().background(color))
+            }
+        ) {
+            CartItem(
+                name,
+                price,
+                image,
+                quantity,
+                onPlus,
+                onMinus = {
+                    isVisible = false
+                }
+            )
         }
     }
 }

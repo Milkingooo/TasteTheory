@@ -39,6 +39,8 @@ import com.example.coffeevibe.repository.CartRepository
 import com.example.coffeevibe.ui.activities.OrderActivity
 import com.example.coffeevibe.ui.theme.CoffeeVibeTheme
 import com.example.coffeevibe.ui.ui.other.ProfileScreen
+import com.example.coffeevibe.ui.ui.other.UserOrdersScreen
+import com.example.coffeevibe.viewmodel.LoginViewModel
 import com.example.coffeevibe.viewmodel.MenuViewModel
 import com.example.coffeevibe.viewmodel.OrderViewModel
 
@@ -47,7 +49,8 @@ fun MainScreen(
     inFinishOrder: () -> Unit,
     onLogin: () -> Unit,
     menuViewModel: MenuViewModel,
-    orderViewModel: OrderViewModel
+    orderViewModel: OrderViewModel,
+    loginVm: LoginViewModel
 ) {
     val navController = rememberNavController()
 
@@ -88,7 +91,38 @@ fun MainScreen(
                 ) {
                     //AccountScreen({ onLogin() })
                     ProfileScreen(
-                        logOut = { onLogin() }
+                        logOut = { onLogin() },
+                        inUserOrders = {
+                            navController.navigate("orders")
+                        },
+                        inAboutScreen = {
+                            navController.navigate("about")
+                        },
+                        loginVm = loginVm,
+                        inAdminPanelScreen = {
+                            navController.navigate("admin")
+                        }
+                    )
+                }
+                composable(Screen.Orders.route){
+                    UserOrdersScreen(
+                        onBackPressed = {
+                            navController.navigate("account")
+                        }
+                    )
+                }
+                composable(Screen.About.route){
+                    AboutAppScreen(
+                        onBackPressed = {
+                            navController.navigate("account")
+                        }
+                    )
+                }
+                composable(Screen.Admin.route){
+                    AdminPanelScreen(
+                        onBackPressed = {
+                            navController.navigate("account")
+                        }
                     )
                 }
 
@@ -173,4 +207,7 @@ sealed class Screen(val route: String) {
     object Menu : Screen("menu")
     object Cart : Screen("cart")
     object Account : Screen("account")
+    object Orders : Screen("orders")
+    object About : Screen("about")
+    object Admin : Screen("admin")
 }

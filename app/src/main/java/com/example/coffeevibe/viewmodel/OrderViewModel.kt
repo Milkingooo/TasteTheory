@@ -15,6 +15,7 @@ import com.example.coffeevibe.model.OrderItem
 import com.example.coffeevibe.model.OrderItemUi
 import com.example.coffeevibe.repository.CartRepository
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -64,7 +65,7 @@ class OrderViewModel(private val repository: CartRepository, context: Context) :
                         image = image
                     )
                     repository.addItem(newItem)
-                    menuVm.loadData()
+                    menuVm.loadMenu()
                 } catch (e: Exception) {
                     Log.e("OrderListViewModel", "Error adding password: ${e.message}", e)
                 }
@@ -76,7 +77,7 @@ class OrderViewModel(private val repository: CartRepository, context: Context) :
         viewModelScope.launch {
             try {
                 cartDao.deleteItem(item)
-                menuVm.loadData()
+                menuVm.loadMenu()
             } catch (e: Exception) {
                 Log.e("OrderListViewModel", "Error deleting item: ${e.message}", e)
             }
@@ -90,6 +91,7 @@ class OrderViewModel(private val repository: CartRepository, context: Context) :
     fun deleteItemById(id: Int) {
         viewModelScope.launch {
             try {
+                delay(300)
                 cartDao.deleteItemById(id)
                 Log.d("OrderListViewModel", "Item deleted: $id")
             } catch (e: Exception) {

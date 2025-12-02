@@ -41,7 +41,8 @@ class MenuViewModel(val context: Context) : ViewModel() {
     private val _orderNP = MutableStateFlow<List<CreateOrderItem>>(emptyList())
     val orderNP: StateFlow<List<CreateOrderItem>> = _orderNP.asStateFlow()
 
-
+//    private val _userOrders = MutableStateFlow<List<CreateOrderItem>>(emptyList())
+//    val userOrders: StateFlow<List<CreateOrderItem>> = _userOrders.asStateFlow()
 
     init {
         loadData()
@@ -49,7 +50,7 @@ class MenuViewModel(val context: Context) : ViewModel() {
         getOrderNumAndPrice()
     }
 
-    fun loadData() {
+    private fun loadData() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val snapshot = firestore.collection("Good").get().await()
@@ -101,6 +102,14 @@ class MenuViewModel(val context: Context) : ViewModel() {
                 _isOrderHas.value = false
             }
         }
+    }
+
+    fun loadOrders() {
+        getOrderNumAndPrice()
+    }
+
+    fun loadMenu() {
+        loadData()
     }
 
     private fun getOrderNumAndPrice() {

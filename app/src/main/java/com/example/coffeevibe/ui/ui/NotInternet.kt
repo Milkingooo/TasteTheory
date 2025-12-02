@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.SignalCellularConnectedNoInternet0Bar
 import androidx.compose.material.icons.filled.SignalWifiConnectedNoInternet4
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -71,7 +72,7 @@ fun NotInternet(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Icon(
-                Icons.Filled.SignalWifiConnectedNoInternet4,
+                Icons.Filled.SignalCellularConnectedNoInternet0Bar,
                 contentDescription = "Localized description",
                 tint = colorScheme.onBackground,
                 modifier = Modifier
@@ -80,39 +81,40 @@ fun NotInternet(
             )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    text = "No internet connection",
+                    text = "Нет подключения к интернету",
                     color = colorScheme.onBackground,
-                    fontFamily = FontFamily(Font(R.font.roboto_condensed_bold)),
+                    fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
                     fontSize = 20.sp,
                     textAlign = TextAlign.Left
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "Please check your internet connection and restart the app",
+                    text = "Пожалуйста, проверьте интернет-соединение и попробуйте \n ещё раз",
                     color = colorScheme.onBackground,
-                    fontFamily = FontFamily(Font(R.font.roboto_condensed_bold)),
+                    fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
                     fontSize = 20.sp,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.padding(horizontal = 16.dp)
                 )
                 Spacer(modifier = Modifier.height(24.dp))
 
-//                Button(
-//                    onClick = { onRetryClicked() },
-//                    colors = ButtonDefaults.buttonColors(backgroundColor = colorScheme.primary),
-//                    modifier = Modifier
-//                        .width(150.dp)
-//                        .padding(16.dp),
-//                    shape = RoundedCornerShape(16.dp),
-//                ) {
-//                    Text(
-//                        text = "Retry",
-//                        color = colorScheme.onBackground,
-//                        fontFamily = FontFamily(Font(R.font.roboto_condensed_bold)),
-//                        fontSize = 20.sp,
-//                        textAlign = TextAlign.Left
-//                    )
-//                }
+                Button(
+                    onClick = { onRetryClicked() },
+                    colors = ButtonDefaults.buttonColors(backgroundColor = colorScheme.primary),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        //.width(150.dp)
+                        .padding(16.dp),
+                    shape = RoundedCornerShape(8.dp),
+                ) {
+                    Text(
+                        text = "Повтроить",
+                        color = colorScheme.background,
+                        fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
+                        fontSize = 20.sp,
+                        textAlign = TextAlign.Center,
+                    )
+                }
             }
         }
     })

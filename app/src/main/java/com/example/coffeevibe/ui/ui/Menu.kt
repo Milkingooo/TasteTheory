@@ -10,21 +10,20 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.scrollable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.consumeWindowInsets
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -32,7 +31,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -41,6 +40,7 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -93,9 +93,11 @@ import com.example.coffeevibe.utils.CashApplication
 import com.example.coffeevibe.utils.NetworkUtils
 import com.example.coffeevibe.viewmodel.MenuViewModel
 import com.example.coffeevibe.viewmodel.OrderViewModel
-import com.google.android.material.carousel.Carousel
 import kotlinx.coroutines.launch
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
+import androidx.compose.runtime.LaunchedEffect
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MenuScreen(
     orderVm: OrderViewModel,
@@ -144,9 +146,25 @@ fun MenuScreen(
         Scaffold(
         ) { innerPadding ->
             if (!networkAvailable) {
-                NotInternet { }
+                NotInternet {
+                    menuViewModel.loadMenu()
+                    menuViewModel.loadOrders()
+                }
             } else {
 
+//                PullToRefreshBox(
+//                    modifier = Modifier.padding(it),
+//                    state = state,
+//                    isRefreshing = isRefreshing,
+//                    onRefresh = onRefresh,
+//                    indicator = {
+//                        PullToRefreshDefaults.LoadingIndicator(
+//                            state = state,
+//                            isRefreshing = isRefreshing,
+//                            modifier = Modifier.align(Alignment.TopCenter),
+//                        )
+//                    },
+//                ) {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -257,38 +275,44 @@ fun MenuScreen(
                         if (filteredGoods.isNotEmpty()) {
                             if (isOrderHas) {
                                 item(span = { GridItemSpan(2) }) {
-                                    Spacer(modifier = Modifier.height(8.dp))
+                                    Spacer(modifier = Modifier.height(24.dp))
 
                                     val pagerState = rememberPagerState(pageCount = {
                                         numAndPrice.size
                                     })
-                                    HorizontalPager(state = pagerState) {
-                                        UserOrderItem(
+                                    Column {
+                                        HorizontalPager(state = pagerState,
+                                            contentPadding = PaddingValues(end = 16.dp),
+                                            pageSpacing = 6.dp
+                                        ) {
+                                            UserOrderItem(
                                                 number = numAndPrice[it].number,
                                                 price = numAndPrice[it].price,
                                                 pickupTime = numAndPrice[it].pickupTime
                                             )
+                                        }
+                                        Spacer(modifier = Modifier.height(6.dp))
+                                        Row(
+                                            Modifier
+                                                .wrapContentHeight()
+                                                .fillMaxWidth()
+                                                .align(Alignment.CenterHorizontally)
+                                                .padding(bottom = 8.dp),
+                                            horizontalArrangement = Arrangement.Center
+                                        ) {
+                                            repeat(pagerState.pageCount) { iteration ->
+                                                val color =
+                                                    if (pagerState.currentPage == iteration) Color.DarkGray else Color.LightGray
+                                                Box(
+                                                    modifier = Modifier
+                                                        .padding(2.dp)
+                                                        .clip(CircleShape)
+                                                        .background(color)
+                                                        .size(8.dp)
+                                                )
+                                            }
+                                        }
                                     }
-//                                    Row(
-//                                        modifier = Modifier
-//                                            .horizontalScroll(rememberScrollState())
-//                                            .fillMaxWidth(),
-//                                        horizontalArrangement = Arrangement.Center
-//                                    ) {
-//                                        repeat(numAndPrice.size) {
-////                                            OrderNumber(
-////                                                number = numAndPrice[it].number,
-////                                                price = numAndPrice[it].price,
-////                                                pickupTime = numAndPrice[it].pickupTime,
-////                                            )
-//                                            UserOrderItem(
-//                                                number = numAndPrice[it].number,
-//                                                price = numAndPrice[it].price,
-//                                                pickupTime = numAndPrice[it].pickupTime
-//                                            )
-//
-//                                        }
-//                                    }
                                 }
                             }
                             var currentIndex = 0
@@ -359,6 +383,7 @@ fun MenuScreen(
                 }
             }
         }
+//            }
     })
 }
 
