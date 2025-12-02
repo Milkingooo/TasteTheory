@@ -41,6 +41,7 @@ import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -50,6 +51,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -95,9 +97,12 @@ import com.example.coffeevibe.viewmodel.MenuViewModel
 import com.example.coffeevibe.viewmodel.OrderViewModel
 import kotlinx.coroutines.launch
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableIntStateOf
+import kotlinx.coroutines.delay
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun MenuScreen(
     orderVm: OrderViewModel,
@@ -119,6 +124,19 @@ fun MenuScreen(
     val orderWas by menuViewModel.isOrderWas.collectAsState()
     val cartItems by orderVm.itemList.collectAsState()
     val scope = rememberCoroutineScope()
+
+    var isRefreshing by remember { mutableStateOf(false) }
+    val state = rememberPullToRefreshState()
+    val coroutineScope = rememberCoroutineScope()
+    val onRefresh: () -> Unit = {
+        isRefreshing = true
+        coroutineScope.launch {
+            delay(1000)
+            isRefreshing = false
+            menuViewModel.loadMenu()
+            menuViewModel.loadOrders()
+        }
+    }
 
     val filteredGoods = if (searchQuery.isBlank()) {
         goods
@@ -268,113 +286,129 @@ fun MenuScreen(
 
                     Spacer(modifier = Modifier.height(4.dp))
 
-                    LazyVerticalGrid(
-                        columns = GridCells.Adaptive(minSize = 128.dp),
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp),
-                        horizontalArrangement = Arrangement.spacedBy(16.dp),
-                        state = listState2,
+                    PullToRefreshBox(
+                        modifier = Modifier.padding(4.dp).weight(1f),
+                        state = state,
+                        isRefreshing = isRefreshing,
+                        onRefresh = onRefresh,
+                        indicator = {
+                            PullToRefreshDefaults.LoadingIndicator(
+                                state = state,
+                                isRefreshing = isRefreshing,
+                                containerColor = colorScheme.secondary,
+                                color = colorScheme.background,
+                                modifier = Modifier.align(Alignment.TopCenter),
+                            )
+                        },
                     ) {
-                        if (filteredGoods.isNotEmpty()) {
-                            if (isOrderHas) {
-                                item(span = { GridItemSpan(2) }) {
-                                    Spacer(modifier = Modifier.height(24.dp))
+                        LazyVerticalGrid(
+                            columns = GridCells.Adaptive(minSize = 128.dp),
+                            modifier = Modifier
+//                                .weight(1f)
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp),
+                            verticalArrangement = Arrangement.spacedBy(16.dp),
+                            horizontalArrangement = Arrangement.spacedBy(16.dp),
+                            state = listState2,
+                        ) {
+                            if (filteredGoods.isNotEmpty()) {
+                                if (isOrderHas) {
+                                    item(span = { GridItemSpan(2) }) {
+                                        Spacer(modifier = Modifier.height(24.dp))
 
-                                    val pagerState = rememberPagerState(pageCount = {
-                                        numAndPrice.size
-                                    })
-                                    Column {
-                                        HorizontalPager(state = pagerState,
-                                            contentPadding = PaddingValues(end = 16.dp),
-                                            pageSpacing = 6.dp
-                                        ) {
-                                            UserOrderItem(
-                                                number = numAndPrice[it].number,
-                                                price = numAndPrice[it].price,
-                                                pickupTime = numAndPrice[it].pickupTime
-                                            )
-                                        }
-                                        Spacer(modifier = Modifier.height(6.dp))
-                                        Row(
-                                            Modifier
-                                                .wrapContentHeight()
-                                                .fillMaxWidth()
-                                                .align(Alignment.CenterHorizontally)
-                                                .padding(bottom = 8.dp),
-                                            horizontalArrangement = Arrangement.Center
-                                        ) {
-                                            repeat(pagerState.pageCount) { iteration ->
-                                                val color =
-                                                    if (pagerState.currentPage == iteration) Color.DarkGray else Color.LightGray
-                                                Box(
-                                                    modifier = Modifier
-                                                        .padding(2.dp)
-                                                        .clip(CircleShape)
-                                                        .background(color)
-                                                        .size(8.dp)
+                                        val pagerState = rememberPagerState(pageCount = {
+                                            numAndPrice.size
+                                        })
+                                        Column {
+                                            HorizontalPager(
+                                                state = pagerState,
+                                                contentPadding = PaddingValues(end = 16.dp),
+                                                pageSpacing = 6.dp
+                                            ) {
+                                                UserOrderItem(
+                                                    number = numAndPrice[it].number,
+                                                    price = numAndPrice[it].price,
+                                                    pickupTime = numAndPrice[it].pickupTime
                                                 )
+                                            }
+                                            Spacer(modifier = Modifier.height(6.dp))
+                                            Row(
+                                                Modifier
+                                                    .wrapContentHeight()
+                                                    .fillMaxWidth()
+                                                    .align(Alignment.CenterHorizontally)
+                                                    .padding(bottom = 8.dp),
+                                                horizontalArrangement = Arrangement.Center
+                                            ) {
+                                                repeat(pagerState.pageCount) { iteration ->
+                                                    val color =
+                                                        if (pagerState.currentPage == iteration) Color.DarkGray else Color.LightGray
+                                                    Box(
+                                                        modifier = Modifier
+                                                            .padding(2.dp)
+                                                            .clip(CircleShape)
+                                                            .background(color)
+                                                            .size(8.dp)
+                                                    )
+                                                }
                                             }
                                         }
                                     }
                                 }
-                            }
-                            var currentIndex = 0
+                                var currentIndex = 0
 
-                            categories.forEach { (category, filteredGoods) ->
+                                categories.forEach { (category, filteredGoods) ->
 
-                                categoryIndexMap[category] = currentIndex
+                                    categoryIndexMap[category] = currentIndex
 
-                                item(span = { GridItemSpan(2) }, key = category) {
-                                    Text(
-                                        text = category,
-                                        color = colorScheme.onBackground,
-                                        fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
-                                        fontSize = 28.sp,
-                                        textAlign = TextAlign.Left,
-                                    )
+                                    item(span = { GridItemSpan(2) }, key = category) {
+                                        Text(
+                                            text = category,
+                                            color = colorScheme.onBackground,
+                                            fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
+                                            fontSize = 28.sp,
+                                            textAlign = TextAlign.Left,
+                                        )
+                                    }
+                                    currentIndex++
+
+                                    items(filteredGoods, key = { it.id }) { item ->
+                                        ListItem(
+                                            name = item.name,
+                                            price = item.price,
+                                            image = item.image,
+                                            onInfo = {
+                                                //showInfo = true
+                                                showSheet = true
+                                                selectedDescription = item.description
+                                                selectedImage = item.image
+                                                selectedName = item.name
+                                            },
+                                            onAdd = {
+                                                orderVm.addItem(
+                                                    id = item.id,
+                                                    name = item.name,
+                                                    price = item.price,
+                                                    image = item.image,
+                                                    quantity = 1
+                                                )
+                                            },
+                                            onDelete = {
+                                                orderVm.deleteItemById(item.id)
+                                            },
+                                            isSelected = cartItems.any { cartItem ->
+                                                cartItem.idItem == item.id
+                                            },
+                                            available = item.status
+                                        )
+                                    }
+                                    currentIndex += filteredGoods.size + 1
                                 }
-                                currentIndex++
 
-                                items(filteredGoods, key = { it.id }) { item ->
-                                    ListItem(
-                                        name = item.name,
-                                        price = item.price,
-                                        image = item.image,
-                                        onInfo = {
-                                            //showInfo = true
-                                            showSheet = true
-                                            selectedDescription = item.description
-                                            selectedImage = item.image
-                                            selectedName = item.name
-                                        },
-                                        onAdd = {
-                                            orderVm.addItem(
-                                                id = item.id,
-                                                name = item.name,
-                                                price = item.price,
-                                                image = item.image,
-                                                quantity = 1
-                                            )
-                                        },
-                                        onDelete = {
-                                            orderVm.deleteItemById(item.id)
-                                        },
-                                        isSelected = cartItems.any { cartItem ->
-                                            cartItem.idItem == item.id
-                                        },
-                                        available = item.status
-                                    )
-                                }
-                                currentIndex += filteredGoods.size + 1
                             }
 
                         }
-
                     }
-
                     if (showInfo) {
                         MinimalDialog(
                             onDismissRequest = {
@@ -388,22 +422,12 @@ fun MenuScreen(
 
                 }
             }
+
         }
 //            }
     })
 }
 
-
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    val context = LocalContext.current
-    val passwordDb = CartDatabase.getDatabase(context)
-    val passwordDao = passwordDb.cartDao()
-    val repository = CartRepository(passwordDao)
-    val orderViewModel = OrderViewModel(repository, context)
-    MenuScreen(orderVm = orderViewModel, menuViewModel = MenuViewModel(context))
-}
 
 @Composable
 fun ListItem(

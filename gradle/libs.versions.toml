@@ -30,6 +30,7 @@ comGoogleDevtoolsKspGradlePlugin = "2.1.20-Beta2-1.0.29"
 coreSplashscreen = "1.2.0-alpha02"
 foundationAndroid = "1.7.2"
 material = "1.13.0"
+material3 = "1.5.0-alpha09"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -69,6 +70,7 @@ com-google-devtools-ksp-gradle-plugin = { group = "com.google.devtools.ksp", nam
 androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "coreSplashscreen" }
 androidx-foundation-android = { group = "androidx.compose.foundation", name = "foundation-android", version.ref = "foundationAndroid" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
