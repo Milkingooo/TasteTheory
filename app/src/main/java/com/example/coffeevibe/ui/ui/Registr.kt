@@ -199,6 +199,20 @@ fun Registr(
                 },
                 modifier = Modifier.fillMaxWidth()
             )
+            Spacer(modifier = Modifier.height(6.dp))
+
+            Text(
+                text = "Я соглашаюсь с условиями обработки персональных данных",
+                textAlign = TextAlign.Center,
+                fontSize = 14.sp,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        inLogin()
+                    },
+                color = colorScheme.onBackground,
+                fontFamily = FontFamily(Font(R.font.roboto_condensed_medium))
+            )
 
             Spacer(modifier = Modifier.height(24.dp))
 

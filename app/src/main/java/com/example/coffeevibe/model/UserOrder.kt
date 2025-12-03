@@ -1,8 +1,10 @@
 package com.example.coffeevibe.model
 
-data class CreateOrderItem(
+data class UserOrder(
     val price: Int,
     val number: String,
     val pickupTime: String,
+    val date: String,
+    val location: String,
     val state: String
 )

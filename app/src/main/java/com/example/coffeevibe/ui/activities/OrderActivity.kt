@@ -16,7 +16,6 @@ import com.example.coffeevibe.database.CartDatabase
 import com.example.coffeevibe.repository.CartRepository
 import com.example.coffeevibe.ui.activities.ui.theme.CoffeeVibeTheme
 import com.example.coffeevibe.ui.ui.OrderFinish
-import com.example.coffeevibe.ui.ui.OrderFinishPreview
 import com.example.coffeevibe.viewmodel.MenuViewModel
 import com.example.coffeevibe.viewmodel.OrderFinishViewModel
 import com.example.coffeevibe.viewmodel.OrderViewModel

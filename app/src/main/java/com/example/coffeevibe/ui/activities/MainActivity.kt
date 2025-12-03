@@ -27,6 +27,7 @@ class MainActivity : ComponentActivity() {
             val repository = CartRepository(passwordDao)
             val orderViewModel = OrderViewModel(repository, applicationContext)
             val loginVm = LoginViewModel(applicationContext)
+            val menuVm = MenuViewModel(context = applicationContext)
 
             MainScreen(
                 onLogin = {
@@ -35,7 +36,7 @@ class MainActivity : ComponentActivity() {
                 inFinishOrder = {
                     startActivity(Intent(this, OrderActivity::class.java))
                 },
-                menuViewModel = MenuViewModel(context = applicationContext),
+                menuViewModel = menuVm,
                 orderViewModel = orderViewModel,
                 loginVm = loginVm
             )

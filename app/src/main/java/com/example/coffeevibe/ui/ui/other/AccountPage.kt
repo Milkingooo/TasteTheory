@@ -4,6 +4,7 @@ import android.icu.number.Scale
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
@@ -26,11 +27,13 @@ import androidx.compose.material.icons.automirrored.filled.FormatListBulleted
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.AdminPanelSettings
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.SupportAgent
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -60,17 +63,19 @@ import com.example.coffeevibe.viewmodel.LoginViewModel
 @Composable
 fun ProfileScreen(
     logOut: () -> Unit,
-    inUserOrders: () -> Unit,
     inAboutScreen: () -> Unit,
+    inAccountPage: () -> Unit,
     inAdminPanelScreen: () -> Unit,
+    inSettings: () -> Unit,
+    inSupport: () -> Unit,
     loginVm: LoginViewModel
 ) {
     var name by remember { mutableStateOf("") }
     var isUserLoggedIn by remember { mutableStateOf(false) }
     isUserLoggedIn = loginVm.isLogin()
 
-    loginVm.giveUserName {
-        name = it
+    loginVm.giveUserNameEmail { nameDb, _ ->
+        name = nameDb
     }
 
     CoffeeVibeTheme(content = {
@@ -91,7 +96,7 @@ fun ProfileScreen(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
-                        text = "Аккаунт",
+                        text = "Профиль",
                         color = colorScheme.onBackground,
                         fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
                         fontSize = 28.sp,
@@ -99,27 +104,15 @@ fun ProfileScreen(
                     )
                 }
 
-                Spacer(modifier = Modifier.height(4.dp))
-
-                // Фото профиля
-                Image(
-                    painter = painterResource(id = R.drawable.max),
-                    contentDescription = "Фото профиля",
-                    modifier = Modifier
-                        .size(110.dp)
-                         .clip(CircleShape)
-                        .background(colorScheme.background),
-                    contentScale = androidx.compose.ui.layout.ContentScale.Crop
-                )
-
                 Spacer(modifier = Modifier.height(12.dp))
 
                 // Имя
                 Text(
                     text = name,
-                    fontSize = 20.sp,
+                    fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
-                    color = colorScheme.onBackground
+                    color = colorScheme.onBackground,
+                    textAlign = TextAlign.Left
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -127,42 +120,32 @@ fun ProfileScreen(
                 SettingsSubCategory("Аккаунт",
                     icon = Icons.Filled.AccountCircle,
                     action = {
-
+                        inAccountPage()
                     })
 
-                SettingsSubCategory("История заказов",
-                    icon = Icons.AutoMirrored.Filled.FormatListBulleted,
+                SettingsSubCategory("Приложение",
+                    icon = Icons.Filled.Settings,
                     action = {
-                        inUserOrders()
+                        inSettings()
                     })
-                SettingsSubCategory("Поддержка",
+
+                SettingsSubCategory("Помощь",
                     icon = Icons.Filled.SupportAgent,
                     //BitmapPainter(ImageBitmap.imageResource(R.drawable.settings_48)),
                     action = {
+                        inSupport()
+                    })
 
-                    })
-                SettingsSubCategory("Настройки",
-                    icon = Icons.Filled.Settings,
-                    action = {})
-                SettingsSubCategory("О приложении",
-                    icon = Icons.Filled.Info,
-                    action = {
-                        inAboutScreen()
-                    })
+//                SettingsSubCategory("О приложении",
+//                    icon = Icons.Filled.Info,
+//                    action = { inAboutScreen() })
+
                 SettingsSubCategory("Администрирование",
                     icon = Icons.Filled.AdminPanelSettings,
-                    action = {
-                        inAdminPanelScreen()
-                    })
+                    action = { inAdminPanelScreen() })
 
                 Spacer(modifier = Modifier.height(25.dp))
 
-                var toggled by remember {
-                    mutableStateOf(false)
-                }
-                val animatedPadding by animateDpAsState(8.dp, label = "padding")
-
-                // Кнопки действий
                 Button(
                     onClick = {
                         logOut()
@@ -172,7 +155,7 @@ fun ProfileScreen(
                     shape = RoundedCornerShape(10.dp),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(animatedPadding)
+                        .padding(16.dp)
                         .height(52.dp)
                 ) {
                     Text(
@@ -184,17 +167,11 @@ fun ProfileScreen(
                         )
                     )
                 }
+
             }
         }
 
     })
-}
-
-@Preview(showBackground = true)
-@Composable
-fun ProfilePreview() {
-    val loginVm = LoginViewModel(LocalContext.current)
-    ProfileScreen({}, {},{},{}, loginVm = loginVm)
 }
 
 

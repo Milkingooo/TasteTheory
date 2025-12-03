@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Icon
@@ -39,6 +40,8 @@ import com.example.coffeevibe.repository.CartRepository
 import com.example.coffeevibe.ui.activities.OrderActivity
 import com.example.coffeevibe.ui.theme.CoffeeVibeTheme
 import com.example.coffeevibe.ui.ui.other.ProfileScreen
+import com.example.coffeevibe.ui.ui.other.SettingsScreen
+import com.example.coffeevibe.ui.ui.other.SupportScreen
 import com.example.coffeevibe.ui.ui.other.UserOrdersScreen
 import com.example.coffeevibe.viewmodel.LoginViewModel
 import com.example.coffeevibe.viewmodel.MenuViewModel
@@ -61,69 +64,61 @@ fun MainScreen(
                 startDestination = Screen.Menu.route,
                 modifier = Modifier.weight(1f)
             ) {
-                composable(Screen.Menu.route,
-//                    enterTransition = { fadeIn() },
-//                    exitTransition = { fadeOut() },
-//                    popEnterTransition = { fadeIn() },
-//                    popExitTransition = { fadeOut() }
-                )
-                { MenuScreen( orderVm = orderViewModel,
-                    menuViewModel = menuViewModel) }
-                composable(Screen.Cart.route,
-//                    enterTransition = { fadeIn() },
-//                    exitTransition = { fadeOut() },
-//                    popEnterTransition = { fadeIn() },
-//                    popExitTransition = { fadeOut() }
-                ) {
+                composable(Screen.Menu.route) {
+                    MenuScreen( orderVm = orderViewModel,
+                        menuViewModel = menuViewModel,
+                        navController = navController)
+                }
+
+                composable(Screen.Cart.route) {
                     CartScreen(
                         onCreateOrder = {
                             inFinishOrder()
-                            navController.navigate("menu")
+                            navController.popBackStack()
                         },
                         orderVm = orderViewModel
                     )
                 }
-                composable(Screen.Account.route,
-//                    enterTransition = { fadeIn() },
-//                    exitTransition = { fadeOut() },
-//                    popEnterTransition = { fadeIn() },
-//                    popExitTransition = { fadeOut() }
-                ) {
+
+                composable(Screen.Account.route)
+                {
                     //AccountScreen({ onLogin() })
                     ProfileScreen(
                         logOut = { onLogin() },
-                        inUserOrders = {
-                            navController.navigate("orders")
-                        },
                         inAboutScreen = {
                             navController.navigate("about")
                         },
                         loginVm = loginVm,
                         inAdminPanelScreen = {
                             navController.navigate("admin")
+                        },
+                        inAccountPage = {
+                            navController.navigate("accountSettings")
+                        },
+                        inSettings = {
+                            navController.navigate("settings")
+                        },
+                        inSupport = {
+                            navController.navigate("support")
                         }
                     )
                 }
-                composable(Screen.Orders.route){
-                    UserOrdersScreen(
-                        onBackPressed = {
-                            navController.navigate("account")
-                        }
-                    )
+                composable(Screen.Orders.route){ UserOrdersScreen(menuViewModel = menuViewModel) }
+
+                composable(Screen.About.route){ AboutAppScreen( onBackPressed = { navController.navigate("account") }) }
+
+                composable(Screen.Admin.route){ AdminPanelScreen( onBackPressed = { navController.navigate("account") }) }
+
+                composable(Screen.AccountSettings.route){
+                    AccountScreen( onBackPressed = { navController.navigate("account") })
                 }
-                composable(Screen.About.route){
-                    AboutAppScreen(
-                        onBackPressed = {
-                            navController.navigate("account")
-                        }
-                    )
+
+                composable(Screen.Settings.route) {
+                    SettingsScreen( onBackPressed = { navController.navigate("account") })
                 }
-                composable(Screen.Admin.route){
-                    AdminPanelScreen(
-                        onBackPressed = {
-                            navController.navigate("account")
-                        }
-                    )
+
+                composable(Screen.Support.route) {
+                    SupportScreen( onBackPressed = { navController.navigate("account") })
                 }
 
             }
@@ -192,9 +187,14 @@ object NavBarItems {
             route = "cart"
         ),
         BarItem(
+            image = Icons.Filled.History,
+            route = "orders"
+        ),
+        BarItem(
             image = Icons.Filled.AccountCircle,
             route = "account"
         )
+
     )
 }
 
@@ -206,8 +206,11 @@ data class BarItem(
 sealed class Screen(val route: String) {
     object Menu : Screen("menu")
     object Cart : Screen("cart")
-    object Account : Screen("account")
     object Orders : Screen("orders")
+    object Account : Screen("account")
+    object AccountSettings : Screen("accountSettings")
     object About : Screen("about")
     object Admin : Screen("admin")
+    object Settings : Screen("settings")
+    object Support : Screen("support")
 }

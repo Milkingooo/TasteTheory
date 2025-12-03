@@ -54,6 +54,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.compose.rememberNavController
 import com.example.coffeevibe.R
 import com.example.coffeevibe.database.CartDatabase
 import com.example.coffeevibe.model.Location
@@ -63,6 +64,8 @@ import com.example.coffeevibe.utils.AuthUtils
 import com.example.coffeevibe.viewmodel.MenuViewModel
 import com.example.coffeevibe.viewmodel.OrderFinishViewModel
 import com.example.coffeevibe.viewmodel.OrderViewModel
+import java.sql.Timestamp
+import java.time.Instant
 
 @Composable
 fun OrderFinish(
@@ -78,9 +81,20 @@ fun OrderFinish(
     var showInfo by rememberSaveable { mutableStateOf(false) }
     var progressState by remember { mutableStateOf(false) }
     val isUserAuth = AuthUtils.isUserAuth()
+    val timestamp = Timestamp.from(Instant.now())
     val totalPrice by orderVm.total.collectAsState()
     val context = LocalContext.current
+    val navController = rememberNavController()
+
     menuVm.getLocations { locations = it }
+
+    val pickupTimeText = when (pickupTime){
+        0 -> Timestamp.from(timestamp.toInstant().plusSeconds(5 * 60))
+        1 -> Timestamp.from(timestamp.toInstant().plusSeconds(15 * 60))
+        2 -> Timestamp.from(timestamp.toInstant().plusSeconds(30 * 60))
+        3 -> Timestamp.from(timestamp.toInstant().plusSeconds(60 * 60))
+        else -> timestamp.toInstant()
+    }
 
     CoffeeVibeTheme(content = {
         Scaffold(
@@ -242,24 +256,25 @@ fun OrderFinish(
 
                         Button(
                             onClick = {
-                                if (placeSelected != 0) {
-                                    progressState = true
+                                showInfo = true
+//                                if (placeSelected != 0) {
+//                                    progressState = true
+//
+//                                    orderFinishVm.createOrder(
+//                                        idUser = AuthUtils.getUserId()!!,
+//                                        idAddress = placeSelected,
+//                                        totalPrice = totalPrice,
+//                                        items = items,
+//                                        idPickupTime = pickupTime
+//                                    ){
+//                                        progressState = false
+//                                    }
+//                                    Toast.makeText(context, "Заказ оформлен", Toast.LENGTH_SHORT).show()
+//                                    menuVm.updateOrderWas()
+//                                    orderVm.deleteAllItems()
+//                                    onBackPressed()
+//                                }
 
-                                    orderFinishVm.createOrder(
-                                        idUser = AuthUtils.getUserId()!!,
-                                        idAddress = placeSelected,
-                                        totalPrice = totalPrice,
-                                        items = items,
-                                        idPickupTime = pickupTime
-                                    ){
-                                        progressState = false
-                                    }
-                                    Toast.makeText(context, "Заказ оформлен", Toast.LENGTH_SHORT)
-                                        .show()
-                                    orderVm.deleteAllItems()
-                                    menuVm.updateOrderWas()
-                                    onBackPressed()
-                                }
                             },
                             colors = if (isUserAuth && placeSelected != 0) {
                                 ButtonDefaults.buttonColors(
@@ -285,7 +300,7 @@ fun OrderFinish(
                                 )
                             } else {
                                 Text(
-                                    "Заказать",
+                                    "Подтвердить",
                                     fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
                                     color = colorScheme.background,
                                     fontSize = 18.sp
@@ -299,8 +314,41 @@ fun OrderFinish(
             }
 
             if (showInfo) {
-                MinimalDialog(
-                    onDismissRequest = { showInfo = false },
+                //val locName = locations[placeSelected].address
+
+                MinimalDialogFinish(
+                    state = showInfo,
+                    onClose = { showInfo = false },
+                    address = placeSelected.toString(),
+                    totalPrice = totalPrice,
+                    items = items,
+                    pickupTime = pickupTime.toString(),
+                    continueOrder = {
+                        showInfo = false
+                        if (placeSelected != 0) {
+                            progressState = true
+
+                            orderFinishVm.createOrder(
+                                idUser = AuthUtils.getUserId()!!,
+                                idAddress = placeSelected,
+                                totalPrice = totalPrice,
+                                items = items,
+                                idPickupTime = pickupTime
+                            ){
+                                progressState = false
+                            }
+                            Toast.makeText(context, "Заказ оформлен", Toast.LENGTH_SHORT).show()
+                            menuVm.updateOrderWas(true)
+                            menuVm.loadMenu()
+                            menuVm.loadOrders()
+                            orderVm.deleteAllItems()
+                            onBackPressed()
+
+                            navController.previousBackStackEntry
+                                ?.savedStateHandle
+                                ?.set("refresh", true)
+                        }
+                    }
                 )
             }
         }
@@ -351,19 +399,6 @@ fun FilterChipItem(
             null
         },
     )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun OrderFinishPreview() {
-    val context = LocalContext.current
-    val passwordDb = CartDatabase.getDatabase(context)
-    val passwordDao = passwordDb.cartDao()
-    val repository = CartRepository(passwordDao)
-    val orderViewModel = OrderViewModel(repository, context)
-    val menuVm = MenuViewModel(context)
-    val orderFinVm = OrderFinishViewModel()
-    OrderFinish({}, orderViewModel, menuVm = menuVm, orderFinishVm = orderFinVm)
 }
 
 @Composable

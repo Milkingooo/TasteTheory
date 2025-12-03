@@ -138,6 +138,9 @@ fun CartScreen(
                                 Spacer(modifier = Modifier.weight(1f))
                                 Text(
                                     text = "$totalPrice₽",
+                                    modifier = Modifier
+                                        .width(130.dp)
+                                        .weight(1f),
                                     color = colorScheme.background,
                                     fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
                                     fontSize = 16.sp,
@@ -231,20 +234,6 @@ fun CartScreen(
             }
         }
     })
-}
-
-@Preview
-@Composable
-fun CartPreview() {
-    val context = LocalContext.current
-    val passwordDb = CartDatabase.getDatabase(context)
-    val passwordDao = passwordDb.cartDao()
-    val repository = CartRepository(passwordDao)
-    val orderViewModel = OrderViewModel(repository, context)
-    CartScreen(
-        onCreateOrder = {},
-        orderVm = orderViewModel
-    )
 }
 
 @Composable

@@ -113,21 +113,21 @@ class LoginViewModel(val context: Context) : ViewModel() {
         auth.signOut()
     }
 
-    fun giveUserName(getName: (String) -> Unit) {
+    fun giveUserNameEmail(getNameEmail: (String, String) -> Unit) {
         db.collection("Client")
             .whereEqualTo("Id", auth.currentUser?.uid)
             .get()
             .addOnSuccessListener {
                 for (document in it) {
-                    getName(document.getString("Name").toString())
-                    Log.d("Name", document.getString("Name").toString())
+                    getNameEmail(document.getString("Name").toString(), document.getString("Email").toString())
+                    Log.d("NameEmail", document.getString("Name").toString() + " " + document.getString("Email").toString())
                     break
                 }
             }
             .addOnFailureListener {
                 Toast.makeText(context, "Error getting user name", Toast.LENGTH_SHORT).show()
                 Log.d("Name", "Error getting user name")
-                getName("Нет имени :(")
+                getNameEmail("Нет имени!", "Нет почты!")
             }
     }
 

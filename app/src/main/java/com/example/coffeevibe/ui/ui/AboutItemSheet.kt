@@ -113,5 +113,5 @@ fun AboutItemSheet(state: Boolean = false,
 @Preview(showBackground = true)
 @Composable
 fun AboutItemSheetPreview() {
-    AboutItemSheet(true, "","", "", {})
+    AboutItemSheet(true, "","Абоба", "пвапвапвпвпв", {})
 }

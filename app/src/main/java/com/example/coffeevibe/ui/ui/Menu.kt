@@ -1,5 +1,6 @@
 package com.example.coffeevibe.ui.ui
 
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.expandHorizontally
@@ -52,7 +53,10 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
@@ -68,6 +72,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -76,9 +81,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
@@ -86,8 +91,6 @@ import coil.imageLoader
 import coil.request.ImageRequest
 import coil.transform.RoundedCornersTransformation
 import com.example.coffeevibe.R
-import com.example.coffeevibe.database.CartDatabase
-import com.example.coffeevibe.repository.CartRepository
 import com.example.coffeevibe.ui.theme.CoffeeVibeTheme
 import com.example.coffeevibe.ui.ui.other.AssistChipMenu
 import com.example.coffeevibe.ui.ui.other.UserOrderItem
@@ -95,18 +98,15 @@ import com.example.coffeevibe.utils.CashApplication
 import com.example.coffeevibe.utils.NetworkUtils
 import com.example.coffeevibe.viewmodel.MenuViewModel
 import com.example.coffeevibe.viewmodel.OrderViewModel
-import kotlinx.coroutines.launch
-import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
-import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableIntStateOf
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun MenuScreen(
     orderVm: OrderViewModel,
     menuViewModel: MenuViewModel,
+    navController: NavController
 ) {
     val context = LocalContext.current
     val networkAvailable by NetworkUtils.isNetworkAvailable(context).collectAsState(initial = true)
@@ -124,6 +124,18 @@ fun MenuScreen(
     val orderWas by menuViewModel.isOrderWas.collectAsState()
     val cartItems by orderVm.itemList.collectAsState()
     val scope = rememberCoroutineScope()
+
+    val savedStateHandle = navController.currentBackStackEntry?.savedStateHandle
+
+    savedStateHandle?.getLiveData<Boolean>("refresh")?.observe(androidx.lifecycle.compose.LocalLifecycleOwner.current) {
+        if (it) {
+            Toast.makeText(context, "Пришло", Toast.LENGTH_SHORT).show()
+            menuViewModel.loadOrders()
+            menuViewModel.loadMenu()
+
+            savedStateHandle.remove<Boolean>("refresh")
+        }
+    }
 
     var isRefreshing by remember { mutableStateOf(false) }
     val state = rememberPullToRefreshState()
@@ -160,10 +172,11 @@ fun MenuScreen(
             showSheet = it
         }
     }
-    LaunchedEffect(orderWas){
+
+    if (orderWas) {
         menuViewModel.loadMenu()
         menuViewModel.loadOrders()
-        menuViewModel.updateOrderWas()
+        menuViewModel.updateOrderWas(false)
     }
 
     CoffeeVibeTheme(content = {
@@ -176,19 +189,6 @@ fun MenuScreen(
                 }
             } else {
 
-//                PullToRefreshBox(
-//                    modifier = Modifier.padding(it),
-//                    state = state,
-//                    isRefreshing = isRefreshing,
-//                    onRefresh = onRefresh,
-//                    indicator = {
-//                        PullToRefreshDefaults.LoadingIndicator(
-//                            state = state,
-//                            isRefreshing = isRefreshing,
-//                            modifier = Modifier.align(Alignment.TopCenter),
-//                        )
-//                    },
-//                ) {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -328,7 +328,8 @@ fun MenuScreen(
                                                 UserOrderItem(
                                                     number = numAndPrice[it].number,
                                                     price = numAndPrice[it].price,
-                                                    pickupTime = numAndPrice[it].pickupTime
+                                                    pickupTime = numAndPrice[it].pickupTime,
+                                                    state = numAndPrice[it].state
                                                 )
                                             }
                                             Spacer(modifier = Modifier.height(6.dp))
@@ -422,9 +423,7 @@ fun MenuScreen(
 
                 }
             }
-
         }
-//            }
     })
 }
 

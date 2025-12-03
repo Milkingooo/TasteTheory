@@ -151,43 +151,43 @@ data class TabItems(
 
 val tabItems = listOf(
     TabItems(
-        title = "Home",
+        title = "Главная",
         unSelectedIcon = Icons.Outlined.Home,
         selectedIcon = Icons.Filled.Home,
         screen = { MainAdminScreen() }
     ),
     TabItems(
-        title = "Products",
+        title = "Товары",
         unSelectedIcon = Icons.Outlined.Fastfood,
         selectedIcon = Icons.Filled.Fastfood,
         screen = {  }
     ),
     TabItems(
-        title = "Orders",
+        title = "Заказы",
         unSelectedIcon = Icons.Outlined.ShoppingCart,
         selectedIcon = Icons.Filled.ShoppingCart,
         screen = { }
     ),
     TabItems(
-        title = "Content",
+        title = "Контент",
         unSelectedIcon = Icons.Outlined.Money,
         selectedIcon = Icons.Filled.Money,
         screen = { }
     ),
     TabItems(
-        title = "Users",
+        title = "Пользователи",
         unSelectedIcon = Icons.Outlined.People,
         selectedIcon = Icons.Filled.People,
         screen = { }
     ),
     TabItems(
-        title = "Safety",
+        title = "Безопасность",
         unSelectedIcon = Icons.Outlined.Security,
         selectedIcon = Icons.Filled.Security,
         screen = { }
     ),
     TabItems(
-        title = "Support",
+        title = "Поддержка",
         unSelectedIcon = Icons.Outlined.SupportAgent,
         selectedIcon = Icons.Filled.SupportAgent,
         screen = { }
