@@ -5,12 +5,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -19,6 +21,8 @@ import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Password
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme.colorScheme
@@ -54,6 +58,7 @@ fun Registr(
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var isInCorrect by remember { mutableStateOf(false) }
+    val isAgree = remember { mutableStateOf(false) }
     val loginVm = LoginViewModel(LocalContext.current)
     val context = LocalContext.current
     var progressState by remember { mutableStateOf(false) }
@@ -201,23 +206,37 @@ fun Registr(
             )
             Spacer(modifier = Modifier.height(6.dp))
 
-            Text(
-                text = "Я соглашаюсь с условиями обработки персональных данных",
-                textAlign = TextAlign.Center,
-                fontSize = 14.sp,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable {
-                        inLogin()
-                    },
-                color = colorScheme.onBackground,
-                fontFamily = FontFamily(Font(R.font.roboto_condensed_medium))
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Checkbox(
+                    checked = isAgree.value,
+                    onCheckedChange = { isAgree.value = it },
+                    colors = CheckboxDefaults.colors(
+                        checkedColor = colorScheme.secondary,
+                        uncheckedColor = colorScheme.onBackground,
+                        checkmarkColor = colorScheme.background
+                    )
+                )
+
+                Spacer(modifier = Modifier.width(10.dp))
+
+                Text(
+                    text = "Я даю согласие на обработку персональных данных",
+                    fontSize = 14.sp,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            inLogin()
+                        },
+                    color = colorScheme.onBackground,
+                    fontFamily = FontFamily(Font(R.font.roboto_condensed_medium))
+                )
+            }
 
             Spacer(modifier = Modifier.height(24.dp))
 
             Button(
-
                 onClick = {
                     if (password.trim().length < 6) {
                         isInCorrect = true
@@ -226,7 +245,15 @@ fun Registr(
                             "Пароль должен быть больше 6 символов",
                             Toast.LENGTH_SHORT
                         ).show()
-                    } else {
+                    }
+                    else if (!isAgree.value) {
+                        Toast.makeText(
+                            context,
+                            "Подтвердите согласие",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                    else {
                         loginVm.signUp(
                             email = email,
                             password = password,
@@ -250,7 +277,7 @@ fun Registr(
                     containerColor = colorScheme.primary,
                     contentColor = colorScheme.onBackground
                 ),
-                shape = RoundedCornerShape(16.dp),
+                shape = RoundedCornerShape(10.dp),
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(52.dp)

@@ -225,7 +225,7 @@ fun LoginScreen(
                     containerColor = colorScheme.primary,
                     contentColor = colorScheme.onBackground
                 ),
-                shape = RoundedCornerShape(16.dp),
+                shape = RoundedCornerShape(10.dp),
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(52.dp)
