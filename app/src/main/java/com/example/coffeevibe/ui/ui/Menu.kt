@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -37,24 +38,33 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material3.BottomSheetScaffold
+import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
+import androidx.compose.material3.rememberBottomSheetScaffoldState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -69,6 +79,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -125,18 +136,6 @@ fun MenuScreen(
     val cartItems by orderVm.itemList.collectAsState()
     val scope = rememberCoroutineScope()
 
-    val savedStateHandle = navController.currentBackStackEntry?.savedStateHandle
-
-    savedStateHandle?.getLiveData<Boolean>("refresh")?.observe(androidx.lifecycle.compose.LocalLifecycleOwner.current) {
-        if (it) {
-            Toast.makeText(context, "Пришло", Toast.LENGTH_SHORT).show()
-            menuViewModel.loadOrders()
-            menuViewModel.loadMenu()
-
-            savedStateHandle.remove<Boolean>("refresh")
-        }
-    }
-
     var isRefreshing by remember { mutableStateOf(false) }
     val state = rememberPullToRefreshState()
     val coroutineScope = rememberCoroutineScope()
@@ -159,7 +158,6 @@ fun MenuScreen(
     }
 
     val categories = filteredGoods.groupBy { it.category }.toSortedMap()
-
     val categoryIndexMap = remember { mutableStateMapOf<String, Int>() }
 
     if (showSheet) {
@@ -180,16 +178,17 @@ fun MenuScreen(
         menuViewModel.updateOrderWas(false)
     }
 
+    val scaffoldState = rememberBottomSheetScaffoldState()
+
     CoffeeVibeTheme(content = {
-        Scaffold(
-        ) { innerPadding ->
+        Scaffold()
+        { innerPadding ->
             if (!networkAvailable) {
                 NotInternet {
                     menuViewModel.loadMenu()
                     menuViewModel.loadOrders()
                 }
             } else {
-
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -384,7 +383,7 @@ fun MenuScreen(
                                     currentIndex++
 
                                     items(filteredGoods, key = { it.id }) { item ->
-                                        ListItem(
+                                        ListItem2(
                                             name = item.name,
                                             price = item.price,
                                             image = item.image,
@@ -428,7 +427,7 @@ fun MenuScreen(
 
 
 @Composable
-fun ListItem(
+fun ListItem2(
     name: String,
     price: Int,
     image: String,
@@ -444,7 +443,7 @@ fun ListItem(
             modifier = Modifier
                 .width(175.dp)
                 .height(270.dp)
-                .shadow(1.dp, RoundedCornerShape(10.dp))
+                .shadow(2.dp, RoundedCornerShape(12.dp))
                 .clickable {
                     onInfo()
                 },
@@ -542,7 +541,7 @@ fun ListItem(
                         modifier = Modifier
                             .width(45.dp)
                             .height(45.dp)
-                            .clip(shape = RoundedCornerShape(17.dp))
+                            .clip(shape = RoundedCornerShape(16.dp))
                             .background(color = if (available == "Недоступен") Color.LightGray else colorScheme.secondary),
                         enabled = available != "Недоступен"
                     ) {

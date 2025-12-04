@@ -49,11 +49,13 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MediumExtendedFloatingActionButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Shapes
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberSwipeToDismissBoxState
+import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -79,6 +81,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.graphics.shapes.RoundedPolygon
+import androidx.graphics.shapes.pill
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.coffeevibe.R
@@ -90,6 +94,7 @@ import com.example.coffeevibe.ui.ui.other.OrderBottomBar
 import com.example.coffeevibe.ui.ui.other.YandexCheckoutBar
 import com.example.coffeevibe.utils.AuthUtils
 import com.example.coffeevibe.viewmodel.OrderViewModel
+import com.google.android.material.shape.MaterialShapes
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -184,7 +189,8 @@ fun CartScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(start = 16.dp, end = 16.dp, bottom = 8.dp, top = 8.dp)
-                        .height(52.dp)
+                        .height(52.dp),
+
                 ) {
                     Row(
                         horizontalArrangement = Arrangement.SpaceBetween,
