@@ -10,6 +10,7 @@ import com.example.coffeevibe.model.MenuItem
 import com.example.coffeevibe.model.UserOrder
 import com.example.coffeevibe.utils.AuthUtils
 import com.google.firebase.Firebase
+import com.google.firebase.Timestamp
 import com.google.firebase.app
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
@@ -41,6 +42,9 @@ class MenuViewModel(val context: Context) : ViewModel() {
     private var _isOrdersLoad = MutableStateFlow(false)
     var isOrdersLoad: StateFlow<Boolean> = _isOrdersLoad
 
+    private var _isMenuLoad = MutableStateFlow(false)
+    var isMenuLoad: StateFlow<Boolean> = _isMenuLoad
+
     private val _userOrders = MutableStateFlow<List<UserOrder>>(emptyList())
     val userOrders: StateFlow<List<UserOrder>> = _userOrders.asStateFlow()
 
@@ -52,6 +56,7 @@ class MenuViewModel(val context: Context) : ViewModel() {
         getOrderNumAndPrice()
         subscribeToOrders()
         subscribeToMenu()
+        getUserOrders()
     }
 
     fun updateOrderWas(state: Boolean) {
@@ -90,6 +95,7 @@ class MenuViewModel(val context: Context) : ViewModel() {
                 }
                 if (items != null) {
                     _orderNP.value = items
+                    isUserSingleOrder()
                 }
                 else {
                     _orderNP.value = emptyList()
@@ -136,7 +142,52 @@ class MenuViewModel(val context: Context) : ViewModel() {
         listenerRegistration?.remove()
     }
 
+    fun deleteAllOrdersBeforeToday() {
+        val today = Timestamp.now()
+
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val orders = firestore.collection("Order")
+                    .whereLessThan("PickupTime", today)
+                    .get()
+                    .await()
+
+                val batch = firestore.batch()
+
+                Log.d("MyViewModel", orders.toString())
+                for (orderDoc in orders.documents) {
+
+                    val orderItems = firestore.collection("OrderItem")
+                        .whereEqualTo("IdOrder", orderDoc.id)
+                        .get()
+                        .await()
+
+                    for (itemDoc in orderItems.documents) {
+                        batch.delete(itemDoc.reference)
+                    }
+
+                    batch.delete(orderDoc.reference)
+                }
+
+                // Коммитим всё одним запросом
+                batch.commit().await()
+
+                withContext(Dispatchers.Main) {
+                    loadOrders()
+                    loadUserOrders()
+                }
+
+                Log.d("MyViewModel", "Batch delete completed")
+
+            } catch (e: Exception) {
+                Log.e("MyViewModel", "Batch delete error", e)
+            }
+        }
+    }
+
     private fun loadData() {
+        _isMenuLoad.value = true
+
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val snapshot = firestore.collection("Good")
@@ -159,6 +210,7 @@ class MenuViewModel(val context: Context) : ViewModel() {
                     }
                 }
                 Log.d("MyViewModel", "Loaded data: $items")
+                _isMenuLoad.value = false
                 withContext(Dispatchers.Main) {
                     if (!_dataList.value.containsAll(items) || _dataList.value.size != items.size) {
                         _dataList.value = items
@@ -262,6 +314,8 @@ class MenuViewModel(val context: Context) : ViewModel() {
         getUserOrders()
     }
     private fun getUserOrders() {
+        _isOrdersLoad.value = true
+
         viewModelScope.launch {
             val snapshot = firestore
                 .collection("Order")
@@ -279,13 +333,13 @@ class MenuViewModel(val context: Context) : ViewModel() {
                         location = getLocationNameById(item.data?.get("IdLocation")),
                         date = item.data?.get("Date").toString()
                     )
-
                 } catch (e: Exception) {
                     Log.e("MyViewModel", "Error loading user orders", e)
                     null
                 }
             }
             withContext(Dispatchers.Main){
+                _isOrdersLoad.value = false
                 _userOrders.value = items
             }
         }

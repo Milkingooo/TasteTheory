@@ -21,11 +21,11 @@ class OrderFinishViewModel : ViewModel() {
                     items: List<CartEntity>,
                     idPickupTime: Int,
                     onCompleted: () -> Unit) {
-        val idOrder = Random.nextInt(0, 9999).toString()
+        val idOrder = Random.nextInt(0, 9999)
         val timestamp = Timestamp.from(Instant.now())
 
         try {
-            firestore.collection("Order").document(idOrder).set(
+            firestore.collection("Order").document(idOrder.toString()).set(
                 mapOf(
                     "Date" to timestamp,
                     "IdClient" to idUser,

@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.count
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -53,6 +54,10 @@ class OrderViewModel(private val repository: CartRepository, context: Context) :
         }
     }
 
+    fun getCartItemsCount(): Int {
+        return itemList.value.count()
+    }
+
     fun addItem(id: Int, name: String, price: Int, quantity: Int, image: String) {
         if (_itemList.value.none { it.idItem == id }) {
             viewModelScope.launch {
@@ -66,6 +71,7 @@ class OrderViewModel(private val repository: CartRepository, context: Context) :
                     )
                     repository.addItem(newItem)
                     menuVm.loadMenu()
+                    getCartItemsCount()
                 } catch (e: Exception) {
                     Log.e("OrderListViewModel", "Error adding password: ${e.message}", e)
                 }
@@ -78,6 +84,7 @@ class OrderViewModel(private val repository: CartRepository, context: Context) :
             try {
                 cartDao.deleteItem(item)
                 menuVm.loadMenu()
+                getCartItemsCount()
             } catch (e: Exception) {
                 Log.e("OrderListViewModel", "Error deleting item: ${e.message}", e)
             }

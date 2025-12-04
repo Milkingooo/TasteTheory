@@ -31,4 +31,7 @@ interface CartDao {
 
     @Query("SELECT * FROM cartItems WHERE id = :id LIMIT 1")
     fun getItemById(id: Int): CartEntity
+
+    @Query("SELECT COUNT(DISTINCT id) AS unique_items_count FROM cartItems;")
+    suspend fun getCartItemsCount() : Int
 }

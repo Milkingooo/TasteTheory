@@ -79,6 +79,7 @@ fun OrderFinish(
     var placeSelected by remember { mutableIntStateOf(0) }
     var pickupTime by remember { mutableIntStateOf(0) }
     var showInfo by rememberSaveable { mutableStateOf(false) }
+    var success by rememberSaveable { mutableStateOf(false) }
     var progressState by remember { mutableStateOf(false) }
     val isUserAuth = AuthUtils.isUserAuth()
     val timestamp = Timestamp.from(Instant.now())
@@ -302,7 +303,7 @@ fun OrderFinish(
                                 Text(
                                     "Подтвердить",
                                     fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
-                                    color = colorScheme.background,
+                                    color = colorScheme.surface,
                                     fontSize = 18.sp
                                 )
                             }
@@ -313,16 +314,24 @@ fun OrderFinish(
                 }
             }
 
+            if(success){
+                MinimalDialogFinishSuccess(
+                    state = success,
+                    goBack = {
+                        success = false
+                        onBackPressed()
+                    }
+                )
+            }
+
             if (showInfo) {
                 //val locName = locations[placeSelected].address
 
                 MinimalDialogFinish(
                     state = showInfo,
                     onClose = { showInfo = false },
-                    address = placeSelected.toString(),
                     totalPrice = totalPrice,
                     items = items,
-                    pickupTime = pickupTime.toString(),
                     continueOrder = {
                         showInfo = false
                         if (placeSelected != 0) {
@@ -337,16 +346,13 @@ fun OrderFinish(
                             ){
                                 progressState = false
                             }
-                            Toast.makeText(context, "Заказ оформлен", Toast.LENGTH_SHORT).show()
+                            //Toast.makeText(context, "Заказ оформлен", Toast.LENGTH_SHORT).show()
                             menuVm.updateOrderWas(true)
                             menuVm.loadMenu()
                             menuVm.loadOrders()
                             orderVm.deleteAllItems()
-                            onBackPressed()
 
-                            navController.previousBackStackEntry
-                                ?.savedStateHandle
-                                ?.set("refresh", true)
+                            success = true
                         }
                     }
                 )

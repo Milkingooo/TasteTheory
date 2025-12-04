@@ -59,8 +59,8 @@ fun UserOrdersScreen(
     menuViewModel: MenuViewModel
 ) {
     val orders by menuViewModel.userOrders.collectAsState()
+    val isLoading by menuViewModel.isOrdersLoad.collectAsState()
 
-    menuViewModel.loadUserOrders()
     val sortedOrders = orders.sortedByDescending { it.date }
 
     var isRefreshing by remember { mutableStateOf(false) }
@@ -91,6 +91,19 @@ fun UserOrdersScreen(
                 )
 
         }) { innerPadding ->
+            if (isLoading) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding)
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ){
+                    IndeterminateCircularIndicator()
+                }
+            }
+            else {
                 PullToRefreshBox(
                     modifier = Modifier
                         .fillMaxSize()
@@ -109,11 +122,11 @@ fun UserOrdersScreen(
                         )
                     },
                 ) {
-                LazyColumn(
-                    modifier = Modifier
-                        .padding(top = 16.dp, start = 16.dp, end = 16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                ) {
+                    LazyColumn(
+                        modifier = Modifier
+                            .padding(top = 16.dp, start = 16.dp, end = 16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                    ) {
 //                    sortedOrders.forEach { (date, orders) ->
 //
 //                        item {
@@ -134,15 +147,16 @@ fun UserOrdersScreen(
 //                            )
 //                        }
 
-                    items(sortedOrders, key = { it.number }) { order ->
-                        UserOrder(
-                            price = order.price,
-                            number = order.number,
-                            dateOrder = order.date
-                        )
+                        items(sortedOrders, key = { it.number }) { order ->
+                            UserOrder(
+                                price = order.price,
+                                number = order.number,
+                                dateOrder = order.date
+                            )
+                        }
                     }
                 }
-                }
+            }
         }
     })
 }

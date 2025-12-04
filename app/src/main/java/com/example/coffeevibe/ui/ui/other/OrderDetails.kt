@@ -42,7 +42,9 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.CircularWavyProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -135,20 +137,13 @@ fun SegmentedButtonSingleSelectSample(
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun IndeterminateCircularIndicator() {
-    var loading by remember { mutableStateOf(false) }
-
-    Button(onClick = { loading = true }, enabled = !loading) {
-        Text("Start loading")
-    }
-
-    if (!loading) return
-
-    CircularProgressIndicator(
+    CircularWavyProgressIndicator(
         modifier = Modifier.width(64.dp),
         color = colorScheme.secondary,
-        trackColor = colorScheme.surfaceVariant,
+        trackColor = colorScheme.surfaceVariant
     )
 }
 

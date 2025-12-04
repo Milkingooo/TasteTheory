@@ -104,6 +104,7 @@ import coil.transform.RoundedCornersTransformation
 import com.example.coffeevibe.R
 import com.example.coffeevibe.ui.theme.CoffeeVibeTheme
 import com.example.coffeevibe.ui.ui.other.AssistChipMenu
+import com.example.coffeevibe.ui.ui.other.IndeterminateCircularIndicator
 import com.example.coffeevibe.ui.ui.other.UserOrderItem
 import com.example.coffeevibe.utils.CashApplication
 import com.example.coffeevibe.utils.NetworkUtils
@@ -133,6 +134,7 @@ fun MenuScreen(
     val isOrderHas by menuViewModel.isOrderHas.collectAsState()
     val numAndPrice by menuViewModel.orderNP.collectAsState()
     val orderWas by menuViewModel.isOrderWas.collectAsState()
+    val isLoading by menuViewModel.isMenuLoad.collectAsState()
     val cartItems by orderVm.itemList.collectAsState()
     val scope = rememberCoroutineScope()
 
@@ -178,7 +180,6 @@ fun MenuScreen(
         menuViewModel.updateOrderWas(false)
     }
 
-    val scaffoldState = rememberBottomSheetScaffoldState()
 
     CoffeeVibeTheme(content = {
         Scaffold()
@@ -188,7 +189,20 @@ fun MenuScreen(
                     menuViewModel.loadMenu()
                     menuViewModel.loadOrders()
                 }
-            } else {
+            }
+            else if (isLoading) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding)
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ){
+                    IndeterminateCircularIndicator()
+                }
+            }
+            else {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -249,8 +263,9 @@ fun MenuScreen(
                             )
                         }
                         IconButton(onClick = {
-                            isSearching = !isSearching
-                            searchQuery = ""
+//                            isSearching = !isSearching
+//                            searchQuery = ""
+                            menuViewModel.deleteAllOrdersBeforeToday()
                         }) {
                             Icon(
                                 Icons.Filled.Search,

@@ -1,9 +1,5 @@
 package com.example.coffeevibe.ui.ui
 
-import android.content.Context
-import android.content.Intent
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -17,27 +13,19 @@ import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemColors
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat.startActivity
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import androidx.wear.compose.material.MaterialTheme.colors
-import com.example.coffeevibe.database.CartDatabase
-import com.example.coffeevibe.repository.CartRepository
-import com.example.coffeevibe.ui.activities.OrderActivity
 import com.example.coffeevibe.ui.theme.CoffeeVibeTheme
 import com.example.coffeevibe.ui.ui.other.ProfileScreen
 import com.example.coffeevibe.ui.ui.other.SettingsScreen
@@ -122,13 +110,13 @@ fun MainScreen(
                 }
 
             }
-            BottomNavigationBar(navController = navController)
+            BottomNavigationBar(navController = navController, orderVm = orderViewModel)
         }
     })
 }
 
 @Composable
-fun BottomNavigationBar(navController: NavController) {
+fun BottomNavigationBar(navController: NavController, orderVm: OrderViewModel) {
     CoffeeVibeTheme(content = {
         NavigationBar(
             containerColor = colorScheme.background,
@@ -151,10 +139,31 @@ fun BottomNavigationBar(navController: NavController) {
                         }
                     },
                     icon = {
-                        Icon(
-                            imageVector = navItem.image,
-                            contentDescription = "Local description",
-                        )
+//                        if (navItem.route == "cart") {
+//                            BadgedBox(
+//                                badge = {
+//                                    if (orderVm.getCartItemsCount() > 0) {
+//                                        Badge(
+//                                            containerColor = Color.Red,
+//                                            contentColor = Color.White
+//                                        ) {
+//                                            Text("${orderVm.getCartItemsCount()}")
+//                                        }
+//                                    }
+//                                }
+//                            ) {
+                                Icon(
+                                    imageVector = navItem.image,
+                                    contentDescription = "Local description",
+                                )
+//                            }
+//                        }
+//                        else {
+//                            Icon(
+//                                imageVector = navItem.image,
+//                                contentDescription = "Local description",
+//                            )
+//                        }
                     },
                     label = {
 

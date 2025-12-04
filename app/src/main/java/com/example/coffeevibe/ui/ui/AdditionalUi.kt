@@ -1,5 +1,6 @@
 package com.example.coffeevibe.ui.ui
 
+import android.graphics.drawable.Icon
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -18,12 +19,18 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.CircularWavyProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
@@ -67,10 +74,8 @@ import java.text.SimpleDateFormat
 fun MinimalDialogFinish(
     state: Boolean = false,
     onClose: (Boolean) -> Unit,
-    address: String,
     totalPrice: Int,
     items: List<CartEntity>,
-    pickupTime: String,
     continueOrder: () -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState(true)
@@ -134,26 +139,6 @@ fun MinimalDialogFinish(
 
                         item {
                             Spacer(modifier = Modifier.height(16.dp))
-
-//                            Text(
-//                                text = "Место получения: $address",
-//                                color = colorScheme.onBackground,
-//                                fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
-//                                fontSize = 16.sp,
-//                                modifier = Modifier.fillMaxWidth()
-//                            )
-//
-//                            Spacer(modifier = Modifier.height(3.dp))
-//
-//                            Text(
-//                                text = "Время получения: $pickupTime",
-//                                color = colorScheme.onBackground,
-//                                fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
-//                                fontSize = 16.sp,
-//                                modifier = Modifier.fillMaxWidth()
-//                            )
-//
-//                            Spacer(modifier = Modifier.height(3.dp))
 
                             Text(
                                 text = "Оплата при получении",
@@ -229,6 +214,79 @@ fun MinimalDialogFinish(
                                 }
                             }
                         }
+                    }
+                }
+            }
+        }
+    })
+}
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+fun MinimalDialogFinishSuccess(
+    state: Boolean = false,
+    goBack: () -> Unit
+) {
+    val sheetState = rememberModalBottomSheetState(true)
+    var showBottomSheet by remember { mutableStateOf(state) }
+
+    CoffeeVibeTheme(content = {
+        if (showBottomSheet) {
+            ModalBottomSheet(
+                onDismissRequest = {
+                    showBottomSheet = false
+                    goBack()
+                },
+                sheetState = sheetState,
+                containerColor = colorScheme.surface,
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.Center,
+                ) {
+                    Icon(
+                        Icons.Filled.Check,
+                        contentDescription = "success",
+                        tint = colorScheme.secondary,
+                        modifier = Modifier
+                            .width(100.dp)
+                            .height(100.dp)
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Text(
+                        text = "Ваш заказ успешно оформлен!",
+                        fontFamily = FontFamily(Font(R.font.roboto_condensed_black)),
+                        color = colorScheme.onBackground,
+                        textAlign = TextAlign.Center,
+                        fontSize = 20.sp
+                    )
+
+                    Spacer(modifier = Modifier.height(50.dp))
+
+                    Button(
+                        onClick = {
+                            goBack()
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = colorScheme.secondary,
+                            contentColor = colorScheme.onBackground
+                        ),
+                        shape = RoundedCornerShape(10.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(52.dp)
+                    ) {
+                            Text(
+                                "На главный",
+                                fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
+                                color = colorScheme.background,
+                                fontSize = 18.sp
+                            )
                     }
                 }
             }
