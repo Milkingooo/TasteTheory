@@ -144,7 +144,7 @@ fun OrderFinish(
                     modifier = Modifier
                         .fillMaxWidth()
                         .wrapContentHeight(),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     item {
                         Spacer(modifier = Modifier.height(16.dp))
@@ -256,8 +256,8 @@ fun OrderFinish(
 
                         Button(
                             onClick = {
-                                showInfo = true
-//                                if (placeSelected != 0) {
+                                if (placeSelected != 0) {
+                                    showInfo = true
 //                                    progressState = true
 //
 //                                    orderFinishVm.createOrder(
@@ -273,7 +273,7 @@ fun OrderFinish(
 //                                    menuVm.updateOrderWas()
 //                                    orderVm.deleteAllItems()
 //                                    onBackPressed()
-//                                }
+                                }
 
                             },
                             colors = if (isUserAuth && placeSelected != 0) {
@@ -291,7 +291,7 @@ fun OrderFinish(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(52.dp),
-                            enabled = isUserAuth
+                            enabled = isUserAuth && placeSelected != 0
                         ) {
                             if (progressState) {
                                 CircularProgressIndicator(

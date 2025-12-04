@@ -371,6 +371,15 @@ fun MenuScreen(
                                             textAlign = TextAlign.Left,
                                         )
                                     }
+//                                    stickyHeader {
+//                                        Text(
+//                                            text = category,
+//                                            color = colorScheme.onBackground,
+//                                            fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
+//                                            fontSize = 28.sp,
+//                                            textAlign = TextAlign.Left,
+//                                        )
+//                                    }
                                     currentIndex++
 
                                     items(filteredGoods, key = { it.id }) { item ->
@@ -410,17 +419,6 @@ fun MenuScreen(
 
                         }
                     }
-                    if (showInfo) {
-                        MinimalDialog(
-                            onDismissRequest = {
-                                showInfo = false
-                                selectedDescription = ""
-                                selectedImage = ""
-                                selectedName = ""
-                            },
-                        )
-                    }
-
                 }
             }
         }

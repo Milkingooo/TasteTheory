@@ -25,6 +25,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.Font
@@ -57,7 +58,8 @@ fun AboutItemSheet(state: Boolean = false,
                 onClose(showBottomSheet)
             },
             sheetState = sheetState,
-            containerColor = colorScheme.background,
+            containerColor = colorScheme.surface,
+            contentColor = colorScheme.onSurface
         ) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -87,7 +89,7 @@ fun AboutItemSheet(state: Boolean = false,
                     Text(
                         text = name,
                         fontFamily = FontFamily(Font(R.font.roboto_condensed_black)),
-                        color = MaterialTheme.colorScheme.onBackground,
+                        color = colorScheme.onBackground,
                         textAlign = TextAlign.Center,
                         fontSize = 20.sp
                     )
@@ -97,10 +99,9 @@ fun AboutItemSheet(state: Boolean = false,
                     Text(
                         text = description,
                         fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
-                        color = MaterialTheme.colorScheme.onBackground,
+                        color = colorScheme.onBackground,
                         textAlign = TextAlign.Center,
                         fontSize = 20.sp,
-
                     )
 
                     Spacer(modifier = Modifier.height(36.dp))

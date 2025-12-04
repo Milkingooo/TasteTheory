@@ -15,13 +15,17 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -29,16 +33,23 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material.icons.filled.ShoppingBasket
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.MediumExtendedFloatingActionButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
@@ -74,12 +85,16 @@ import com.example.coffeevibe.R
 import com.example.coffeevibe.database.CartDatabase
 import com.example.coffeevibe.repository.CartRepository
 import com.example.coffeevibe.ui.theme.CoffeeVibeTheme
+import com.example.coffeevibe.ui.ui.other.CartItemNew
+import com.example.coffeevibe.ui.ui.other.OrderBottomBar
+import com.example.coffeevibe.ui.ui.other.YandexCheckoutBar
 import com.example.coffeevibe.utils.AuthUtils
 import com.example.coffeevibe.viewmodel.OrderViewModel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun CartScreen(
     onCreateOrder: () -> Unit,
@@ -91,81 +106,30 @@ fun CartScreen(
     val context = LocalContext.current
 
     CoffeeVibeTheme(content = {
+//        Scaffold(
+//            contentWindowInsets = WindowInsets(0,0,0,0),
+//            bottomBar = {
+//                OrderBottomBar(
+//                    totalPrice = totalPrice,
+//                    orderAvailable = orderItems.isNotEmpty() && AuthUtils.isUserAuth(),
+//                    onCreateOrder = {
+//                        if (orderItems.isNotEmpty() && AuthUtils.isUserAuth()) {
+//                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+//                            onCreateOrder()
+//                        }
+//                    }
+//                )
+//            }
+//        ) { innerPadding ->
+//            Column(
+//                modifier = Modifier
+//                    .fillMaxSize()
+//                    .padding(innerPadding)
+//                    .consumeWindowInsets(innerPadding)
+//            ) {
         Scaffold(
-            bottomBar = {
-                BottomAppBar(
-                    actions = { },
-                    floatingActionButton = {
-                        FloatingActionButton(
-                            onClick = {
-                                if (orderItems.isNotEmpty() && AuthUtils.isUserAuth()) {
-                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                    onCreateOrder()
-                                } else if (!AuthUtils.isUserAuth()) {
-                                    Toast.makeText(
-                                        context,
-                                        "Пожалуйста авторизируйтесь",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                } else {
-                                    Toast.makeText(context, "Корзина пуста", Toast.LENGTH_SHORT)
-                                        .show()
-                                }
-                            },
-                            containerColor = if (orderItems.isNotEmpty() && AuthUtils.isUserAuth()) colorScheme.secondary else Color.Gray,
-                            modifier = Modifier
-                                .fillMaxWidth()
-//                                .wrapContentHeight()
-                                .clip(RoundedCornerShape(16.dp)),
-                            ) {
-                            Row(
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier.padding(12.dp)
-                            ) {
-                                Icon(
-                                    Icons.Filled.Payments,
-                                    "Localized description",
-                                    tint = colorScheme.background
-                                )
-                                Spacer(modifier = Modifier.weight(1f))
-                                Text(
-                                    text = "К оформлению",
-                                    color = colorScheme.background,
-                                    fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
-                                    fontSize = 16.sp,
-                                )
-                                Spacer(modifier = Modifier.weight(1f))
-                                Text(
-                                    text = "$totalPrice₽",
-                                    modifier = Modifier
-                                        .width(130.dp)
-                                        .weight(1f),
-                                    color = colorScheme.background,
-                                    fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
-                                    fontSize = 16.sp,
-                                )
-                            }
-                        }
-                    },
-                    modifier = Modifier
-                        .background(color = colorScheme.background)
-                        .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
-//                        .wrapContentHeight()
-                        .padding(start = 12.dp),
-                    containerColor = colorScheme.background,
-                )
-            },
-            modifier = Modifier
-//                .fillMaxSize()
-                .background(colorScheme.background)
-        ) { innerPadding ->
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(colorScheme.background)
-                    .consumeWindowInsets(innerPadding)
-            ) {
+            contentWindowInsets = WindowInsets(0, 0, 0, 0),
+            topBar = {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -191,21 +155,84 @@ fun CartScreen(
                     }
                 }
 
-                LazyColumn(
+            },
+            bottomBar = {
+                Button(
+                    onClick = {
+                        if (orderItems.isNotEmpty() && AuthUtils.isUserAuth()) {
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            onCreateOrder()
+                        } else if (!AuthUtils.isUserAuth()) {
+                            Toast.makeText(
+                                context,
+                                "Пожалуйста авторизируйтесь",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        } else {
+                            Toast.makeText(context, "Корзина пуста", Toast.LENGTH_SHORT)
+                                .show()
+                        }
+                    },
+                    colors = if (orderItems.isNotEmpty() && AuthUtils.isUserAuth())
+                        ButtonDefaults.buttonColors(
+                            containerColor = colorScheme.secondary
+                        )
+                        else ButtonDefaults.buttonColors(
+                        containerColor = Color.Gray
+                    ),
+                    shape = RoundedCornerShape(10.dp),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(start = 16.dp, end = 16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                        .padding(start = 16.dp, end = 16.dp, bottom = 8.dp, top = 8.dp)
+                        .height(52.dp)
+                ) {
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            Icons.Filled.ShoppingBasket,
+                            "Localized description",
+                            tint = colorScheme.background
+                        )
+                        Spacer(modifier = Modifier.weight(1f))
+                        Text(
+                            text = "К оформлению",
+                            color = colorScheme.background,
+                            fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
+                            fontSize = 16.sp,
+                            modifier = Modifier
+                                .width(130.dp)
+                        )
+                        Spacer(modifier = Modifier.weight(1f))
+                        Text(
+                            text = "$totalPrice₽",
+                            modifier = Modifier
+                                .width(100.dp)
+                                .weight(1f),
+                            color = colorScheme.background,
+                            fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
+                            fontSize = 16.sp,
+                            textAlign = TextAlign.Right
+                        )
+                    }
+                }
+            }
+        ) { innerPadding ->
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding)
+                        .padding(top = 16.dp, start = 16.dp, end = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     items(orderItems, key = { it.id }) {
                         var isVisible by remember { mutableStateOf(true) }
                         val coroutineScope = rememberCoroutineScope()
 
-                        AnimatedVisibility(
-                            visible = isVisible,
-                            exit = shrinkVertically() + fadeOut())
+                        Column(modifier = Modifier.animateItem())
                         {
-                            CartItem(
+                            CartItemNew(
                                 name = it.name,
                                 price = it.price,
                                 image = it.image,
@@ -231,7 +258,6 @@ fun CartScreen(
                         }
                     }
                 }
-            }
         }
     })
 }
@@ -340,48 +366,6 @@ fun CartItem(
                     }
                 }
             }
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun SwipeToDismissListItems(
-    name: String,
-    price: Int,
-    image: String,
-    quantity: Int,
-    onPlus: () -> Unit,
-    onMinus: () -> Unit
-) {
-    val dismissState = rememberSwipeToDismissBoxState()
-    var isVisible by remember { mutableStateOf(true) }
-    val scope = rememberCoroutineScope()
-    if (isVisible) {
-        SwipeToDismissBox(
-            state = dismissState,
-            backgroundContent = {
-                val color by
-                animateColorAsState(
-                    when (dismissState.targetValue) {
-                        SwipeToDismissBoxValue.Settled -> Color.LightGray
-                        SwipeToDismissBoxValue.StartToEnd -> Color.Green
-                        SwipeToDismissBoxValue.EndToStart -> Color.Red
-                    }, label = ""
-                )
-                Box(Modifier.fillMaxSize().background(color))
-            }
-        ) {
-            CartItem(
-                name,
-                price,
-                image,
-                quantity,
-                onPlus,
-                onMinus = {
-                    isVisible = false
-                }
-            )
         }
     }
 }

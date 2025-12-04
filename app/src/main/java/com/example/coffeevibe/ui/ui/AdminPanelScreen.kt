@@ -306,7 +306,10 @@ fun AdminPanelScreen(
                     }
                 }
 
-                PrimaryScrollableTabRow(selectedTabIndex = selectedTabIndex, containerColor = colorScheme.background) {
+                PrimaryScrollableTabRow(
+                    selectedTabIndex = selectedTabIndex,
+                    containerColor = colorScheme.background,
+                    edgePadding = 0.dp) {
                     tabItems.fastForEachIndexed { index, item ->
                         Tab(
                             selected = index == selectedTabIndex,

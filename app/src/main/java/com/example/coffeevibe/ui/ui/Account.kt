@@ -34,6 +34,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -52,12 +53,12 @@ fun AccountScreen(
     val context = LocalContext.current
     val loginVm = LoginViewModel(context)
 
-    var password by remember { mutableStateOf("") }
+    var phone by remember { mutableStateOf("") }
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     val isInCorrectName by remember { mutableStateOf(false) }
     val isInCorrectEmail by remember { mutableStateOf(false) }
-    val isInCorrectPassword by remember { mutableStateOf(false) }
+    val isInCorrectPhone by remember { mutableStateOf(false) }
 
     var isUserLoggedIn by remember { mutableStateOf(false) }
     isUserLoggedIn = loginVm.isLogin()
@@ -126,7 +127,19 @@ fun AccountScreen(
                         email = it
                     },
                     isInCorrect = isInCorrectEmail,
-                    placeholder = "Ваша почта"
+                    placeholder = "Ваша почта",
+                    keyboardType = KeyboardType.Email
+                )
+
+                TextFieldWithName(
+                    title = "Телефон",
+                    value = phone,
+                    exitValue = {
+                        phone = it
+                    },
+                    isInCorrect = isInCorrectPhone,
+                    placeholder = "+7 (800) 555-35-35",
+                    keyboardType = KeyboardType.Phone
                 )
 
                 SwitchWithThumbIconSample(

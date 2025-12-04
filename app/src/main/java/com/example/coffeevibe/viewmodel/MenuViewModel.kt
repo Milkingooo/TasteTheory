@@ -139,7 +139,9 @@ class MenuViewModel(val context: Context) : ViewModel() {
     private fun loadData() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val snapshot = firestore.collection("Good").get().await()
+                val snapshot = firestore.collection("Good")
+                    .get()
+                    .await()
                 val items = snapshot.documents.mapNotNull { item ->
                     try {
                         MenuItem(

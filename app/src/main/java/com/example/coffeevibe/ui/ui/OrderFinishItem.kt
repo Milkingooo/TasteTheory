@@ -1,6 +1,7 @@
 package com.example.coffeevibe.ui.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -21,11 +22,14 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.coffeevibe.R
+import com.example.coffeevibe.ui.ui.other.QuantityControl
 
 @Composable
 fun OrderFinishItem(
@@ -38,19 +42,17 @@ fun OrderFinishItem(
         modifier = Modifier
             .fillMaxWidth()
             .height(116.dp)
-            .background(colorScheme.surface, RoundedCornerShape(16.dp))
-            .padding(top = 16.dp, bottom = 16.dp),
-        colors = CardDefaults.cardColors(containerColor = colorScheme.surface),
-        shape = RoundedCornerShape(16.dp)
+            .background(colorScheme.background, RoundedCornerShape(10.dp)),
+        colors = CardDefaults.cardColors(containerColor = colorScheme.background),
+        shape = RoundedCornerShape(10.dp)
     ) {
         Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 16.dp, end = 16.dp),
-            verticalAlignment = Alignment.CenterVertically,
+                .padding(horizontal = 8.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.Start,
+            verticalAlignment = Alignment.Top
         ) {
-            Spacer(modifier = Modifier.width(10.dp))
-
             AsyncImage(
                 model =
                 ImageRequest.Builder(LocalContext.current).data(data = image)
@@ -59,27 +61,40 @@ fun OrderFinishItem(
                     }).build(),
                 contentDescription = null, // Описание для доступности
                 modifier = Modifier
-                    .width(80.dp)
-                    .height(80.dp)
+                    .width(75.dp)
+                    .height(75.dp)
                     .clip(shape = RoundedCornerShape(16.dp)),
                 contentScale = ContentScale.Crop,
             )
 
-            Spacer(modifier = Modifier.width(24.dp))
+            Spacer(modifier = Modifier.width(16.dp))
 
-            Column{
-                Text(text = name,
-                    color = colorScheme.onBackground,
-                    fontFamily = FontFamily(Font(R.font.roboto_condensed_bold)))
-                Text(text = "$price₽ x $quantity",
-                    color = colorScheme.onBackground,
-                    )
+            Column(
+                verticalArrangement = Arrangement.spacedBy(2.dp)
+            ) {
                 Text(
-                    text = "${price * quantity}₽",
+                    text = name,
                     color = colorScheme.onBackground,
+                    modifier = Modifier.width(150.dp),
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    fontSize = 16.sp
                 )
-            }
 
+                Text(
+                    text = "$price ₽ x $quantity шт",
+                    color = colorScheme.onBackground,
+                    fontSize = 16.sp)
+
+                Text(
+                    text = "${price * quantity} ₽",
+                    color = colorScheme.onBackground,
+                    //modifier = Modifier.width(150.dp),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    fontFamily = FontFamily(Font(R.font.roboto_condensed_bold))
+                    )
+                }
         }
     }
 }
