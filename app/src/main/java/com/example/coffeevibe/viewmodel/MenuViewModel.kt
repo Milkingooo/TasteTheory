@@ -193,6 +193,7 @@ class MenuViewModel(val context: Context) : ViewModel() {
     }
 
     fun loadOrders() {
+        isUserSingleOrder()
         getOrderNumAndPrice()
     }
 

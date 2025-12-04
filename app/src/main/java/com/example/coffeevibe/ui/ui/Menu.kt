@@ -176,6 +176,7 @@ fun MenuScreen(
     if (orderWas) {
         menuViewModel.loadMenu()
         menuViewModel.loadOrders()
+        menuViewModel.loadUserOrders()
         menuViewModel.updateOrderWas(false)
     }
 
