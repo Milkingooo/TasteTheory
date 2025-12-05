@@ -50,6 +50,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -150,13 +151,25 @@ fun OrderFinish(
                     item {
                         Spacer(modifier = Modifier.height(16.dp))
 
-                        Text(
-                            text = "Заберу здесь",
-                            color = colorScheme.onBackground,
-                            fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
-                            fontSize = 20.sp,
-                            modifier = Modifier.fillMaxWidth()
-                        )
+                        Row() {
+                            Text(
+                                text = "Заберу здесь",
+                                color = colorScheme.onBackground,
+                                fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
+                                fontSize = 20.sp,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+
+                            Spacer(modifier = Modifier.width(8.dp))
+
+                            Text(
+                                text = "*",
+                                color = colorScheme.error,
+                                fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
+                                fontStyle = FontStyle.Italic,
+                                fontSize = 20.sp
+                            )
+                        }
 
                         Spacer(modifier = Modifier.height(8.dp))
 
@@ -210,6 +223,16 @@ fun OrderFinish(
                             )
 
                         }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Text(
+                            text = "Способ оплаты",
+                            color = colorScheme.onBackground,
+                            fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
+                            fontSize = 20.sp,
+                            modifier = Modifier.fillMaxWidth()
+                        )
 
                         Spacer(modifier = Modifier.height(16.dp))
 

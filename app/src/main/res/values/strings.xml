@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">42 кофейня</string>
+    <string name="app_name">Sinty</string>
     <string name="title_activity_login">LoginActivity</string>
     <string name="title_activity_cart">CartActivity</string>
     <string name="title_activity_reg">RegActivity</string>

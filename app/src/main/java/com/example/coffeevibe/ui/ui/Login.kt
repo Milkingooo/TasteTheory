@@ -1,5 +1,6 @@
 package com.example.coffeevibe.ui.ui
 
+import android.content.Intent
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -41,6 +42,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.coffeevibe.R
+import com.example.coffeevibe.ui.activities.ManagerActivity
 import com.example.coffeevibe.ui.theme.CoffeeVibeTheme
 import com.example.coffeevibe.viewmodel.LoginViewModel
 import kotlinx.coroutines.MainScope
@@ -50,6 +52,7 @@ import kotlinx.coroutines.launch
 fun LoginScreen(
     inReg: () -> Unit,
     onLogin: () -> Unit,
+    inManager: () -> Unit,
 ) {
     var password by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
@@ -209,13 +212,18 @@ fun LoginScreen(
                             isLogin = {
                                 progressState = true
 
-                                if (it) {
-                                    isInCorrect = false
-                                    onLogin()
-                                    progressState = false
-                                } else {
-                                    isInCorrect = true
-                                    progressState = false
+                                loginVm.checkRoles { role ->
+                                    if (role == 1) {
+                                        inManager()
+                                        progressState = false
+                                    } else if (it && (role == 0 || role == 2)) {
+                                        isInCorrect = false
+                                        onLogin()
+                                        progressState = false
+                                    } else {
+                                        isInCorrect = true
+                                        progressState = false
+                                    }
                                 }
                             }
                         )
@@ -263,9 +271,4 @@ fun LoginScreen(
     })
 }
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    LoginScreen({}, {})
-}
 

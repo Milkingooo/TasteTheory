@@ -73,7 +73,9 @@ class LoginViewModel(val context: Context) : ViewModel() {
                         "Name" to name,
                         "Email" to email,
                         "Password" to password,
-                        "Id" to id
+                        "Id" to id,
+                        "IsAdmin" to false,
+                        "IsManager" to false
                     )
                 )
                 .addOnSuccessListener {
@@ -133,6 +135,49 @@ class LoginViewModel(val context: Context) : ViewModel() {
 
     fun isLogin(): Boolean {
         return auth.currentUser != null
+    }
+
+    fun checkRoles(roleCode: (Int) -> Unit) {
+        viewModelScope.launch {
+            val (isAdmin, isManager) = checkUserRole()
+
+            if (isAdmin) {
+                roleCode(0)
+            }
+            if (isManager) {
+                roleCode(1)
+            }
+            else {
+                roleCode(2)
+            }
+        }
+    }
+    suspend fun checkUserRole(): Pair<Boolean, Boolean> {
+        val currentUser = FirebaseAuth.getInstance().currentUser
+            ?: return Pair(false, false)   // Если не авторизован
+
+        val uid: String = auth.currentUser?.uid.toString()
+
+        return try {
+            Log.d("RoleCheck", "Checking user role for UID: $uid")
+
+            val snapshot = db.collection("Client")
+                .whereEqualTo("Id", uid)
+                .get()
+                .await()
+
+            snapshot.documents.firstOrNull()?.let { doc ->
+
+                val isAdmin = doc.getBoolean("IsAdmin") ?: false
+                val isManager = doc.getBoolean("IsManager") ?: false
+
+                Log.d("RoleCheck", "User role: Admin: $isAdmin, Manager: $isManager")
+                Pair(isAdmin, isManager)
+            } ?: Pair(false, false)
+        } catch (e: Exception) {
+            Log.e("RoleCheck", "Error checking user role", e)
+            Pair(false, false)
+        }
     }
 
     private fun catchException(e: Exception) {

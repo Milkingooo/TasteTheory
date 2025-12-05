@@ -7,15 +7,14 @@ import androidx.lifecycle.viewModelScope
 import com.example.coffeevibe.model.CreateOrderItem
 import com.example.coffeevibe.model.Location
 import com.example.coffeevibe.model.MenuItem
+import com.example.coffeevibe.model.OrderManagerItem
+import com.example.coffeevibe.model.OrderManagerOrderItem
 import com.example.coffeevibe.model.UserOrder
 import com.example.coffeevibe.utils.AuthUtils
 import com.google.firebase.Firebase
 import com.google.firebase.Timestamp
-import com.google.firebase.app
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.firestore
-import com.google.firebase.firestore.snapshots
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -50,6 +49,8 @@ class MenuViewModel(val context: Context) : ViewModel() {
 
     private var listenerRegistration: ListenerRegistration? = null
 
+
+
     init {
         loadData()
         isUserSingleOrder()
@@ -62,6 +63,7 @@ class MenuViewModel(val context: Context) : ViewModel() {
     fun updateOrderWas(state: Boolean) {
         _isOrderWas.value = state
     }
+
 
     private fun subscribeToOrders() {
         listenerRegistration = firestore

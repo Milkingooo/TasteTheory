@@ -2,6 +2,7 @@ package com.example.coffeevibe.ui.ui.other
 
 import android.annotation.SuppressLint
 import android.graphics.Color
+import android.util.Log
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animate
 import androidx.compose.animation.core.tween
@@ -29,11 +30,13 @@ import androidx.compose.foundation.text.input.OutputTransformation
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.filled.Receipt
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
@@ -45,8 +48,11 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.CircularWavyProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.OutlinedCard
@@ -91,6 +97,9 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.coffeevibe.R
 import com.example.coffeevibe.model.Location
+import com.example.coffeevibe.model.OrderManagerItem
+import com.example.coffeevibe.model.OrderManagerOrderItem
+import com.example.coffeevibe.ui.theme.Shapes
 import com.example.coffeevibe.ui.ui.OrderNumber
 import java.sql.Date
 import java.text.SimpleDateFormat
@@ -100,37 +109,79 @@ import java.text.SimpleDateFormat
 fun SegmentedButtonSingleSelectSample(
     segments: List<String>,
     actions: (Int) -> Unit,
-    title: String
+    title: String,
+    orientationHorizontal: Boolean = true
 ) {
     var selectedIndex by remember { mutableIntStateOf(0) }
 
-    Row(
-        modifier = Modifier.padding(8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text(
-            text = title,
-            textAlign = TextAlign.Left,
-            fontSize = 20.sp,
-            color = colorScheme.onBackground,
-            fontFamily = FontFamily(Font(R.font.roboto_condensed_bold))
-        )
+    if (orientationHorizontal) {
+        Row(
+            modifier = Modifier.padding(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = title,
+                textAlign = TextAlign.Left,
+                fontSize = 20.sp,
+                color = colorScheme.onBackground,
+                fontFamily = FontFamily(Font(R.font.roboto_condensed_bold))
+            )
 
-        Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.weight(1f))
 
-        SingleChoiceSegmentedButtonRow {
-            segments.forEachIndexed { index, label ->
-                SegmentedButton(
-                    shape = SegmentedButtonDefaults.itemShape(index = index, count = segments.size),
-                    onClick = {
-                        selectedIndex = index
-                        actions(selectedIndex)
-                    },
-                    selected = index == selectedIndex,
-                    colors = SegmentedButtonDefaults.colors(colorScheme.primary)
-                ) {
-                    Text(label)
+            SingleChoiceSegmentedButtonRow {
+                segments.forEachIndexed { index, label ->
+                    SegmentedButton(
+                        shape = SegmentedButtonDefaults.itemShape(
+                            index = index,
+                            count = segments.size
+                        ),
+                        onClick = {
+                            selectedIndex = index
+                            actions(selectedIndex)
+                        },
+                        selected = index == selectedIndex,
+                        colors = SegmentedButtonDefaults.colors(colorScheme.primary)
+                    ) {
+                        Text(label)
+                    }
+                }
+            }
+        }
+    }
+    else {
+        Column(
+            modifier = Modifier.padding(8.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = title,
+                textAlign = TextAlign.Left,
+                fontSize = 20.sp,
+                color = colorScheme.onBackground,
+                fontFamily = FontFamily(Font(R.font.roboto_condensed_bold))
+            )
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            SingleChoiceSegmentedButtonRow {
+                segments.forEachIndexed { index, label ->
+                    SegmentedButton(
+                        shape = SegmentedButtonDefaults.itemShape(
+                            index = index,
+                            count = segments.size
+                        ),
+                        onClick = {
+                            selectedIndex = index
+                            actions(selectedIndex)
+                        },
+                        selected = index == selectedIndex,
+                        colors = SegmentedButtonDefaults.colors(colorScheme.primary)
+                    ) {
+                        Text(label)
+                    }
                 }
             }
         }
@@ -167,8 +218,8 @@ fun UserOrderItem(
         onClick = { /* Do something */ },
         modifier = Modifier
             .fillMaxWidth()
-            .height(68.dp),
-        colors = CardDefaults.cardColors(containerColor = colorScheme.background),
+            .height(82.dp),
+        colors = CardDefaults.cardColors(containerColor = colorScheme.surface),
         shape = RoundedCornerShape(16.dp),
 
     ) {
@@ -180,6 +231,12 @@ fun UserOrderItem(
             horizontalArrangement = Arrangement.SpaceAround
         ) {
             Column {
+                Text(
+                    text = "Ваш заказ",
+                    color = colorScheme.onBackground,
+                    fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
+                    fontSize = 18.sp
+                )
                 Text(
                     text = "К оплате: $price₽",
                     color = colorScheme.onBackground,
@@ -565,104 +622,113 @@ fun QuantityControl(
 }
 
 @Composable
-fun OrderBottomBar(
-    totalPrice: Int,
-    orderAvailable: Boolean,
-    onCreateOrder: () -> Unit
+fun ManagerOrdersListItem(
+    order: OrderManagerItem,
+    onUpdate: (Int) -> Unit
 ) {
-    val navigationBars = WindowInsets.navigationBars.asPaddingValues()
+    val parts = order.pickupTime.toString().split("=") // Разбиваем строку на части
+    val seconds = parts[1].split(",")[0].toLong() // Извлекаем секунды
+    val nanoseconds = parts[2].split(")")[0].toLong() // Извлекаем наносекунды
+    val milliseconds = seconds * 1000 + nanoseconds / 1_000_000
+    val date = Date(milliseconds)
+    val format = SimpleDateFormat("HH:mm")
+    val format2 = SimpleDateFormat("EEE, dd MMM yyyy HH:mm")
+    val timeString = format.format(date)
 
-    BottomAppBar(
-        containerColor = MaterialTheme.colorScheme.surface,
-        tonalElevation = 8.dp,
+    OutlinedCard(
+        onClick = { /* Do something */ },
         modifier = Modifier
             .fillMaxWidth()
-//            .padding(bottom = navigationBars.calculateBottomPadding())
-            .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
-    ) {
-        Button(
-            onClick = { onCreateOrder() },
-            enabled = orderAvailable,
-            modifier = Modifier
-                .padding(horizontal = 16.dp, vertical = 12.dp)
-                .fillMaxWidth()
-                .height(56.dp),
-            shape = RoundedCornerShape(10.dp)
+            .wrapContentHeight()
+            .animateContentSize(),
+        colors = CardDefaults.cardColors(containerColor = androidx.compose.ui.graphics.Color.White),
+        shape = RoundedCornerShape(16.dp),
+
+        ) {
+        Column(
+            modifier = Modifier.padding(10.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth()
+                horizontalArrangement = Arrangement.SpaceAround
             ) {
-                Icon(
-                    Icons.Filled.Payments,
-                    contentDescription = null
-                )
+                Column {
+                    Text(
+                        text = "Заберут к  $timeString",
+                        color = colorScheme.onBackground,
+                        fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
+                        fontSize = 20.sp
+                    )
+                    Text(
+                        text = "К оплате: ${order.totalPrice}₽",
+                        color = colorScheme.onBackground,
+                        fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
+                        fontSize = 20.sp
+                    )
+                }
                 Text(
-                    text = "К оформлению",
-                    style = MaterialTheme.typography.titleMedium
-                )
-                Text(
-                    text = "$totalPrice₽",
-                    style = MaterialTheme.typography.titleMedium
+                    text = order.id.toString(),
+                    color = colorScheme.onBackground,
+                    fontFamily = FontFamily(Font(R.font.roboto_condensed_black)),
+                    fontSize = 36.sp
                 )
             }
-        }
-    }
-}
 
-@Composable
-fun YandexCheckoutBar(
-    totalPrice: Int,
-    enabled: Boolean,
-    onClick: () -> Unit
-) {
-    val navPadding = WindowInsets.navigationBars
-        .asPaddingValues()
-        .calculateBottomPadding()
+            Spacer(modifier = Modifier.height(12.dp))
 
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(
-//                bottom = navPadding + 8.dp,
-                start = 12.dp,
-                end = 12.dp
-            )
-            .clip(RoundedCornerShape(20.dp)),
-        shape = RoundedCornerShape(20.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 12.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 14.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-
-            // Левая часть – итог
-            Text(
-                text = "Итого: $totalPrice ₽",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
+            val buttons = listOf("Создан", "Готов", "Выдан")
+            SegmentedButtonSingleSelectSample(
+                title = "Выберите действие",
+                segments = buttons,
+                actions = {
+                    onUpdate(it)
+                },
+                orientationHorizontal = false
             )
 
-            // Правая часть – кнопка
-            Button(
-                onClick = onClick,
-                enabled = enabled,
-                modifier = Modifier.height(44.dp),
-                shape = RoundedCornerShape(14.dp)
-            ) {
-                Text(
-                    text = "К оплате",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-        }
+            Spacer(modifier = Modifier.height(12.dp))
+
+//            Log.d("OrderDetails", "Order items: ${order.orderItems}")
+//            //[]
+
+            order.orderItems.forEach { item ->
+                    ListItem(
+                        headlineContent = {
+                            Text(
+                                text = item.name,
+                                color = colorScheme.onBackground,
+                                fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
+                                fontSize = 16.sp
+                            )
+                        },
+                        supportingContent = {
+                            Text(
+                                text = "Количество: ${item.quantity}",
+                                color = colorScheme.onBackground,
+                                fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
+                                fontSize = 16.sp
+                            )
+                        },
+                        leadingContent = {
+                            Icon(
+                                Icons.Filled.Receipt,
+                                contentDescription = "Localized description",
+                                tint = colorScheme.onBackground
+                            )
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(10.dp)
+                            .clip(Shapes.small),
+                        colors = ListItemDefaults.colors(containerColor = colorScheme.surface),
+                    )
+                    HorizontalDivider(modifier = Modifier.padding(10.dp))
+                }
+             }
     }
 }
-

@@ -20,6 +20,10 @@ class LoginActivity : ComponentActivity() {
                 onLogin = {
                     startActivity(Intent(this, MainActivity::class.java))
                     finish()
+                },
+                inManager = {
+                    startActivity(Intent(this, ManagerActivity::class.java))
+                    finish()
                 }
             )
         }

@@ -1,5 +1,5 @@
 [versions]
-agp = "8.7.3"
+agp = "8.13.1"
 firebaseBom = "33.8.0"
 kotlin = "2.0.0"
 coreKtx = "1.10.1"
@@ -31,6 +31,9 @@ coreSplashscreen = "1.2.0-alpha02"
 foundationAndroid = "1.7.2"
 material = "1.13.0"
 material3 = "1.5.0-alpha09"
+appcompat = "1.7.1"
+activity = "1.12.0"
+constraintlayout = "2.2.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -71,6 +74,9 @@ androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscree
 androidx-foundation-android = { group = "androidx.compose.foundation", name = "foundation-android", version.ref = "foundationAndroid" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
+androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

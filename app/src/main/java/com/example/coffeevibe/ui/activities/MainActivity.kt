@@ -2,6 +2,7 @@ package com.example.coffeevibe.ui.activities
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -28,6 +29,13 @@ class MainActivity : ComponentActivity() {
             val orderViewModel = OrderViewModel(repository, applicationContext)
             val loginVm = LoginViewModel(applicationContext)
             val menuVm = MenuViewModel(context = applicationContext)
+
+            loginVm.checkRoles {
+                if (it == 1) {
+                    startActivity(Intent(this, ManagerActivity::class.java))
+                    finish()
+                }
+            }
 
             MainScreen(
                 onLogin = {

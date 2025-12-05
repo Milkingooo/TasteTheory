@@ -263,9 +263,8 @@ fun MenuScreen(
                             )
                         }
                         IconButton(onClick = {
-//                            isSearching = !isSearching
-//                            searchQuery = ""
-                            menuViewModel.deleteAllOrdersBeforeToday()
+                            isSearching = !isSearching
+                            searchQuery = ""
                         }) {
                             Icon(
                                 Icons.Filled.Search,

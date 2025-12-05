@@ -90,8 +90,6 @@ import com.example.coffeevibe.database.CartDatabase
 import com.example.coffeevibe.repository.CartRepository
 import com.example.coffeevibe.ui.theme.CoffeeVibeTheme
 import com.example.coffeevibe.ui.ui.other.CartItemNew
-import com.example.coffeevibe.ui.ui.other.OrderBottomBar
-import com.example.coffeevibe.ui.ui.other.YandexCheckoutBar
 import com.example.coffeevibe.utils.AuthUtils
 import com.example.coffeevibe.viewmodel.OrderViewModel
 import com.google.android.material.shape.MaterialShapes

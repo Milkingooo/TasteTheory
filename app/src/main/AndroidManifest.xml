@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+
     <application
         android:name=".utils.CashApplication"
         android:allowBackup="true"
@@ -13,14 +14,12 @@
         android:theme="@style/Theme.CoffeeVibe"
         tools:targetApi="31">
         <activity
+            android:name=".ui.activities.ManagerActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.activities.OrderActivity"
             android:exported="false"
             android:label="@string/title_activity_order"
-            android:theme="@style/Theme.CoffeeVibe" />
-        <activity
-            android:name=".ui.activities.ui.theme.AccountActivity"
-            android:exported="false"
-            android:label="@string/title_activity_account"
             android:theme="@style/Theme.CoffeeVibe" />
         <activity
             android:name=".ui.activities.RegActivity"

@@ -53,12 +53,12 @@ fun AccountScreen(
     val context = LocalContext.current
     val loginVm = LoginViewModel(context)
 
-    var phone by remember { mutableStateOf("") }
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
     val isInCorrectName by remember { mutableStateOf(false) }
     val isInCorrectEmail by remember { mutableStateOf(false) }
-    val isInCorrectPhone by remember { mutableStateOf(false) }
+    val isInCorrectPassword by remember { mutableStateOf(false) }
 
     var isUserLoggedIn by remember { mutableStateOf(false) }
     isUserLoggedIn = loginVm.isLogin()
@@ -132,22 +132,39 @@ fun AccountScreen(
                 )
 
                 TextFieldWithName(
-                    title = "Телефон",
-                    value = phone,
+                    title = "Пароль",
+                    value = password,
                     exitValue = {
-                        phone = it
+                        password = it
                     },
-                    isInCorrect = isInCorrectPhone,
-                    placeholder = "+7 (800) 555-35-35",
-                    keyboardType = KeyboardType.Phone
-                )
-
-                SwitchWithThumbIconSample(
-                    "Вход по СМС"
+                    isInCorrect = isInCorrectPassword,
+                    placeholder = "*********",
+                    keyboardType = KeyboardType.Password
                 )
 
                 BaseButton(
                     title = "Сбросить пароль",
+                    click = { },
+                    color = ButtonDefaults.buttonColors(colorScheme.primary),
+                )
+
+//                TextFieldWithName(
+//                    title = "Телефон",
+//                    value = phone,
+//                    exitValue = {
+//                        phone = it
+//                    },
+//                    isInCorrect = isInCorrectPhone,
+//                    placeholder = "+7 (800) 555-35-35",
+//                    keyboardType = KeyboardType.Phone
+//                )
+//
+//                SwitchWithThumbIconSample(
+//                    "Вход по СМС"
+//                )
+
+                BaseButton(
+                    title = "Сохранить",
                     click = { },
                     color = ButtonDefaults.buttonColors(colorScheme.primary),
                 )
