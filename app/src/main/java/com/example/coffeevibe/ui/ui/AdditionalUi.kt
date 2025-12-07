@@ -90,7 +90,7 @@ fun MinimalDialogFinish(
 //    val format2 = SimpleDateFormat("HH:mm")
 //    val timeString = format2.format(date)
 
-    CoffeeVibeTheme(content = {
+    CoffeeVibeTheme(context2 = LocalContext.current,content = {
         if (showBottomSheet) {
             ModalBottomSheet(
                 onDismissRequest = {
@@ -230,7 +230,7 @@ fun MinimalDialogFinishSuccess(
     val sheetState = rememberModalBottomSheetState(true)
     var showBottomSheet by remember { mutableStateOf(state) }
 
-    CoffeeVibeTheme(content = {
+    CoffeeVibeTheme(context2 = LocalContext.current,content = {
         if (showBottomSheet) {
             ModalBottomSheet(
                 onDismissRequest = {
@@ -296,7 +296,7 @@ fun MinimalDialogFinishSuccess(
 
 @Composable
 fun MinimalDialog(onDismissRequest: () -> Unit) {
-    CoffeeVibeTheme(content = {
+    CoffeeVibeTheme(context2 = LocalContext.current,content = {
         Dialog(onDismissRequest = { onDismissRequest() }
         ) {
             Surface(

@@ -27,6 +27,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -44,7 +45,7 @@ import com.google.android.material.shape.MaterialShapes
 fun AboutAppScreen(
     onBackPressed: () -> Unit
 ) {
-    CoffeeVibeTheme(content = {
+    CoffeeVibeTheme(context2 = LocalContext.current,content = {
         Scaffold() { paddingValues ->
             Column(
                 modifier = Modifier

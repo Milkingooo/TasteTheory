@@ -98,7 +98,7 @@ fun OrderFinish(
         else -> timestamp.toInstant()
     }
 
-    CoffeeVibeTheme(content = {
+    CoffeeVibeTheme(context2 = LocalContext.current,content = {
         Scaffold(
             modifier = Modifier
                 .background(colorScheme.background),

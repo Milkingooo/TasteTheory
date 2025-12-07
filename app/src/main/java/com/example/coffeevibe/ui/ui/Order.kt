@@ -108,7 +108,7 @@ fun CartScreen(
     val totalPrice by orderVm.total.collectAsState()
     val context = LocalContext.current
 
-    CoffeeVibeTheme(content = {
+    CoffeeVibeTheme(context2 = LocalContext.current,content = {
 //        Scaffold(
 //            contentWindowInsets = WindowInsets(0,0,0,0),
 //            bottomBar = {

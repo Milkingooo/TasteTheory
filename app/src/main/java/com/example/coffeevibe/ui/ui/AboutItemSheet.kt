@@ -50,7 +50,7 @@ fun AboutItemSheet(state: Boolean = false,
     val sheetState = rememberModalBottomSheetState(true)
     var showBottomSheet by remember { mutableStateOf(state) }
 
-    CoffeeVibeTheme(content = {
+    CoffeeVibeTheme(context2 = LocalContext.current,content = {
     if (showBottomSheet) {
         ModalBottomSheet(
             onDismissRequest = {

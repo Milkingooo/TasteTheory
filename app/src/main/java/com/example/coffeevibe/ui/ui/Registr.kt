@@ -63,7 +63,7 @@ fun Registr(
     val context = LocalContext.current
     var progressState by remember { mutableStateOf(false) }
 
-    CoffeeVibeTheme(content = {
+    CoffeeVibeTheme(context2 = LocalContext.current,content = {
         Column(
             modifier = Modifier
                 .fillMaxSize()

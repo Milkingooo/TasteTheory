@@ -110,9 +110,10 @@ fun SegmentedButtonSingleSelectSample(
     segments: List<String>,
     actions: (Int) -> Unit,
     title: String,
-    orientationHorizontal: Boolean = true
+    orientationHorizontal: Boolean = true,
+    inputIndex: Int = 0
 ) {
-    var selectedIndex by remember { mutableIntStateOf(0) }
+    var selectedIndex by remember { mutableIntStateOf(inputIndex) }
 
     if (orientationHorizontal) {
         Row(
@@ -340,9 +341,11 @@ fun TextFieldWithName(
 
 @Composable
 fun SwitchWithThumbIconSample(
-    title: String
+    title: String,
+    isChecked: Boolean = false,
+    actions: () -> Unit
 ) {
-    var checked by remember { mutableStateOf(false) }
+    var checked by remember { mutableStateOf(isChecked) }
 
     Row(
         modifier = Modifier.padding(8.dp),
@@ -362,7 +365,9 @@ fun SwitchWithThumbIconSample(
         Switch(
             modifier = Modifier.semantics { contentDescription = "Demo with icon" },
             checked = checked,
-            onCheckedChange = { checked = it },
+            onCheckedChange = {
+                checked = it
+                actions() },
             thumbContent = {
                 if (checked) {
                     // Icon isn't focusable, no need for content description
@@ -624,7 +629,8 @@ fun QuantityControl(
 @Composable
 fun ManagerOrdersListItem(
     order: OrderManagerItem,
-    onUpdate: (Int) -> Unit
+    onUpdate: (Int) -> Unit,
+    state: String
 ) {
     val parts = order.pickupTime.toString().split("=") // Разбиваем строку на части
     val seconds = parts[1].split(",")[0].toLong() // Извлекаем секунды
@@ -632,9 +638,16 @@ fun ManagerOrdersListItem(
     val milliseconds = seconds * 1000 + nanoseconds / 1_000_000
     val date = Date(milliseconds)
     val format = SimpleDateFormat("HH:mm")
-    val format2 = SimpleDateFormat("EEE, dd MMM yyyy HH:mm")
     val timeString = format.format(date)
 
+    var inputIndex by remember { mutableIntStateOf(0) }
+
+    inputIndex = when (state) {
+        "Создан" -> 0
+        "Готов" -> 1
+        "Выдан" -> 2
+        else -> 0
+    }
     OutlinedCard(
         onClick = { /* Do something */ },
         modifier = Modifier
@@ -688,7 +701,8 @@ fun ManagerOrdersListItem(
                 actions = {
                     onUpdate(it)
                 },
-                orientationHorizontal = false
+                orientationHorizontal = false,
+                inputIndex = inputIndex
             )
 
             Spacer(modifier = Modifier.height(12.dp))

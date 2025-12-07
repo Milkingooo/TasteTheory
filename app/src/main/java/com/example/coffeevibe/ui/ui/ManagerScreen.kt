@@ -78,7 +78,7 @@ fun ManagerMainScreen(
         }
     }
 
-    CoffeeVibeTheme(content = {
+    CoffeeVibeTheme(context2 = LocalContext.current,content = {
         Scaffold(
             contentWindowInsets = WindowInsets(0, 0, 0, 0),
             topBar = {
@@ -171,7 +171,8 @@ fun ManagerMainScreen(
                                         1 -> managerViewModel.updateOrderState(order.id, "Готов")
                                         2 -> managerViewModel.updateOrderState(order.id, "Выдан")
                                     }
-                                }
+                                },
+                                state = order.state
                             )
                         }
                     }

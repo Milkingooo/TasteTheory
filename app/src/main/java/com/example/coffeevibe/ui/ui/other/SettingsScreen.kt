@@ -27,6 +27,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
@@ -34,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.coffeevibe.R
 import com.example.coffeevibe.ui.theme.CoffeeVibeTheme
+import com.example.coffeevibe.utils.ThemeManager
 
 @Composable
 fun SettingsScreen(
@@ -41,7 +43,7 @@ fun SettingsScreen(
 ) {
     val options = listOf("Русский", "English")
 
-    CoffeeVibeTheme(content = {
+    CoffeeVibeTheme(context2 = LocalContext.current, content = {
         Scaffold() { innerPadding ->
 
             Column(
@@ -83,9 +85,15 @@ fun SettingsScreen(
 
                 Spacer(modifier = Modifier.size(16.dp))
 
-                SwitchWithThumbIconSample("Уведомления")
+                SwitchWithThumbIconSample("Уведомления", actions = {})
 
-                SwitchWithThumbIconSample("Темная тема")
+                val themeManager = ThemeManager(LocalContext.current)
+
+                SwitchWithThumbIconSample(
+                    "Темная тема",
+                    isChecked = themeManager.isDarkTheme(),
+                    actions = { themeManager.setIsDarkTheme(!themeManager.isDarkTheme()) })
+
 
                 SegmentedButtonSingleSelectSample(
                     segments = options,

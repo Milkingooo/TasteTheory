@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -45,7 +46,7 @@ fun MainScreen(
 ) {
     val navController = rememberNavController()
 
-    CoffeeVibeTheme(content = {
+    CoffeeVibeTheme(context2 = LocalContext.current,content = {
         Column{
             NavHost(
                 navController,
@@ -117,11 +118,11 @@ fun MainScreen(
 
 @Composable
 fun BottomNavigationBar(navController: NavController, orderVm: OrderViewModel) {
-    CoffeeVibeTheme(content = {
+    CoffeeVibeTheme(context2 = LocalContext.current,content = {
         NavigationBar(
             containerColor = colorScheme.background,
             modifier = Modifier
-                .shadow(10.dp, shape = RoundedCornerShape(30.dp))
+                .shadow(10.dp, shape = RoundedCornerShape(30.dp), ambientColor = colorScheme.onSurface)
         ) {
             val backStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = backStackEntry?.destination?.route

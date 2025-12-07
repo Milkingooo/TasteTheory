@@ -68,7 +68,7 @@ fun AccountScreen(
         email = emailDb
     }
 
-    CoffeeVibeTheme(content = {
+    CoffeeVibeTheme(context2 = LocalContext.current,content = {
         Scaffold() { innerPadding ->
 
             Column(
@@ -185,46 +185,4 @@ fun AccountPreview() {
     AccountScreen(
         {}
     )
-}
-
-
-
-@Composable
-fun SettingsCategoryWithButton(name: String,
-                        action: () -> Unit,
-                        icon: ImageVector) {
-    CoffeeVibeTheme(content = {
-        val colorScheme = MaterialTheme.colorScheme
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            Text(
-                text = name,
-                color = colorScheme.onBackground,
-                textAlign = TextAlign.Left,
-                fontSize = 20.sp,
-                fontFamily = FontFamily(Font(R.font.roboto_condensed_medium))
-            )
-            Spacer(modifier = Modifier.weight(1f))
-            Button(
-                onClick = {
-                    action()
-                },
-               shape = RoundedCornerShape(8.dp),
-            ) {
-                Text(
-                    text = "Обновить",
-                    color = colorScheme.onBackground,
-                    textAlign = TextAlign.Left,
-                    fontSize = 16.sp,
-                    fontFamily = FontFamily(Font(R.font.roboto_condensed_medium))
-                )
-            }
-        }
-    })
 }

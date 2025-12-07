@@ -78,7 +78,7 @@ fun ProfileScreen(
         name = nameDb
     }
 
-    CoffeeVibeTheme(content = {
+    CoffeeVibeTheme(context2 = LocalContext.current, content = {
         Scaffold() { paddingValues ->
             Column(
                 modifier = Modifier

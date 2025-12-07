@@ -181,7 +181,7 @@ fun MenuScreen(
     }
 
 
-    CoffeeVibeTheme(content = {
+    CoffeeVibeTheme(context2 = LocalContext.current,content = {
         Scaffold()
         { innerPadding ->
             if (!networkAvailable) {
@@ -385,15 +385,7 @@ fun MenuScreen(
                                             textAlign = TextAlign.Left,
                                         )
                                     }
-//                                    stickyHeader {
-//                                        Text(
-//                                            text = category,
-//                                            color = colorScheme.onBackground,
-//                                            fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
-//                                            fontSize = 28.sp,
-//                                            textAlign = TextAlign.Left,
-//                                        )
-//                                    }
+
                                     currentIndex++
 
                                     items(filteredGoods, key = { it.id }) { item ->
@@ -452,7 +444,7 @@ fun ListItem2(
     available: String
 ) {
 
-    CoffeeVibeTheme(content = {
+    CoffeeVibeTheme(context2 = LocalContext.current,content = {
         OutlinedCard(
             modifier = Modifier
                 .width(175.dp)
