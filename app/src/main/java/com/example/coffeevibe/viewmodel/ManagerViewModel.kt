@@ -93,7 +93,7 @@ class ManagerViewModel : ViewModel() {
                      id = idOrder ?: 0,
                      clientName = orderDoc.getString("IdClient") ?: "",
                      pickupTime = (orderDoc.get("PickupTime") ?: "") as Timestamp,
-                     state = orderDoc.getString("Status") ?: "",
+                     state = orderDoc.getLong("Status")?.toInt() ?: 0,
                      totalPrice = orderDoc.getLong("TotalPrice")?.toInt() ?: 0,
                      orderItems = items.toMutableList()
                  )
@@ -106,7 +106,7 @@ class ManagerViewModel : ViewModel() {
          }
      }
 
-    fun updateOrderState(orderId: Int, state: String) {
+    fun updateOrderState(orderId: Int, state: Int) {
         viewModelScope.launch {
             firestore.collection("Order").document(orderId.toString()).update("Status", state)
                 .await()

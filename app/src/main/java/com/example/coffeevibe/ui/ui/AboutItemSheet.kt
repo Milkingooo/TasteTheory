@@ -38,6 +38,8 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.coffeevibe.R
 import com.example.coffeevibe.ui.theme.CoffeeVibeTheme
+import com.example.coffeevibe.ui.theme.Shapes
+import com.example.coffeevibe.ui.ui.other.KbjuField
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -45,6 +47,8 @@ fun AboutItemSheet(state: Boolean = false,
                    image: String,
                    name: String,
                    description: String,
+                   composition: String,
+                   kbju: String,
                    onClose: (Boolean) -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState(true)
@@ -58,11 +62,10 @@ fun AboutItemSheet(state: Boolean = false,
                 onClose(showBottomSheet)
             },
             sheetState = sheetState,
-            containerColor = colorScheme.surface,
+            containerColor = colorScheme.background,
             contentColor = colorScheme.onSurface
         ) {
                 Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp)
@@ -79,40 +82,61 @@ fun AboutItemSheet(state: Boolean = false,
                         ),
                         contentDescription = null, // Описание для доступности
                         modifier = Modifier
+                            .fillMaxWidth()
                             .size(250.dp)
-                            .clip(shape = RoundedCornerShape(40.dp)),
+                            .clip(shape = Shapes.medium),
                         contentScale = ContentScale.Crop,
+                        alignment = Alignment.Center
                     )
 
-                    Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(20.dp))
 
                     Text(
                         text = name,
                         fontFamily = FontFamily(Font(R.font.roboto_condensed_black)),
                         color = colorScheme.onBackground,
                         textAlign = TextAlign.Center,
-                        fontSize = 20.sp
+                        fontSize = 20.sp,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Text(
+                        text = "Описание: $description",
+                        fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
+                        color = colorScheme.onBackground,
+                        textAlign = TextAlign.Left,
+                        fontSize = 18.sp,
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Text(
+                        text = "Состав: ${composition.replace(";", ",")}",
+                        fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
+                        color = colorScheme.onBackground,
+                        textAlign = TextAlign.Left,
+                        fontSize = 18.sp,
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Text(
+                        text = "Пищевая ценность на 100 г",
+                        fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
+                        color = colorScheme.onBackground,
+                        textAlign = TextAlign.Left,
+                        fontSize = 18.sp,
                     )
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    Text(
-                        text = description,
-                        fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
-                        color = colorScheme.onBackground,
-                        textAlign = TextAlign.Center,
-                        fontSize = 20.sp,
-                    )
+                    KbjuField(kbju)
 
                     Spacer(modifier = Modifier.height(36.dp))
                 }
             }
         }
     })
-}
-
-@Preview(showBackground = true)
-@Composable
-fun AboutItemSheetPreview() {
-    AboutItemSheet(true, "","Абоба", "пвапвапвпвпв", {})
 }

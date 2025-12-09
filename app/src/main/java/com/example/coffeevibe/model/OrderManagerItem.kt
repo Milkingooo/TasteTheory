@@ -6,7 +6,7 @@ data class OrderManagerItem(
     val id: Int = 0,
     val clientName: String,
     val pickupTime: Timestamp,
-    val state: String,
+    val state: Int,
     val totalPrice: Int,
     val orderItems: MutableList<OrderManagerOrderItem>
 )

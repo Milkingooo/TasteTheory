@@ -1,6 +1,5 @@
 package com.example.coffeevibe.ui.ui
 
-import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.expandHorizontally
@@ -11,6 +10,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,7 +25,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -33,40 +32,31 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Search
-import androidx.compose.material3.BottomSheetScaffold
-import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
-import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
-import androidx.compose.material3.rememberBottomSheetScaffoldState
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
@@ -79,11 +69,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -102,7 +90,9 @@ import coil.imageLoader
 import coil.request.ImageRequest
 import coil.transform.RoundedCornersTransformation
 import com.example.coffeevibe.R
+import com.example.coffeevibe.model.MenuItem
 import com.example.coffeevibe.ui.theme.CoffeeVibeTheme
+import com.example.coffeevibe.ui.theme.Shapes
 import com.example.coffeevibe.ui.ui.other.AssistChipMenu
 import com.example.coffeevibe.ui.ui.other.IndeterminateCircularIndicator
 import com.example.coffeevibe.ui.ui.other.UserOrderItem
@@ -125,11 +115,14 @@ fun MenuScreen(
     val goods by menuViewModel.dataList.collectAsState()
     var searchQuery by rememberSaveable { mutableStateOf("") }
     var isSearching by rememberSaveable { mutableStateOf(false) }
-    var showInfo by rememberSaveable { mutableStateOf(false) }
     var showSheet by remember { mutableStateOf(false) }
-    var selectedDescription by rememberSaveable { mutableStateOf("") }
-    var selectedImage by rememberSaveable { mutableStateOf("") }
-    var selectedName by rememberSaveable { mutableStateOf("") }
+
+    var selectedName by remember { mutableStateOf("") }
+    var selectedDescription by remember { mutableStateOf("") }
+    var selectedImage by remember { mutableStateOf("") }
+    var selectedComposition by remember { mutableStateOf("") }
+    var selectedKbju by remember { mutableStateOf("") }
+
     val listState2 = rememberLazyGridState()
     val isOrderHas by menuViewModel.isOrderHas.collectAsState()
     val numAndPrice by menuViewModel.orderNP.collectAsState()
@@ -167,9 +160,11 @@ fun MenuScreen(
             showSheet,
             description = selectedDescription,
             image = selectedImage,
-            name = selectedName
+            name = selectedName,
+            composition = selectedComposition,
+            kbju = selectedKbju,
         ) {
-            showSheet = it
+            showSheet = false
         }
     }
 
@@ -281,10 +276,13 @@ fun MenuScreen(
 
                     Row(
                         modifier = Modifier
-                            .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceAround
+                            .fillMaxWidth()
+                            .padding(start = 8.dp, end = 8.dp)
+                            .horizontalScroll(rememberScrollState()),
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
                     )
                     {
+
                         categories.keys.forEach { category ->
                             AssistChipMenu(
                                 name = category,
@@ -392,19 +390,21 @@ fun MenuScreen(
                                         ListItem2(
                                             name = item.name,
                                             price = item.price,
+                                            discountPrice = item.discountPrice,
                                             image = item.image,
                                             onInfo = {
-                                                //showInfo = true
-                                                showSheet = true
+                                                selectedName = item.name
                                                 selectedDescription = item.description
                                                 selectedImage = item.image
-                                                selectedName = item.name
+                                                selectedKbju = item.kbju
+                                                selectedComposition = item.composition
+                                                showSheet = true
                                             },
                                             onAdd = {
                                                 orderVm.addItem(
                                                     id = item.id,
                                                     name = item.name,
-                                                    price = item.price,
+                                                    price = if (item.discountPrice == 0) item.price else item.discountPrice,
                                                     image = item.image,
                                                     quantity = 1
                                                 )
@@ -436,6 +436,7 @@ fun MenuScreen(
 fun ListItem2(
     name: String,
     price: Int,
+    discountPrice: Int,
     image: String,
     onInfo: () -> Unit,
     onAdd: () -> Unit,
@@ -449,14 +450,14 @@ fun ListItem2(
             modifier = Modifier
                 .width(175.dp)
                 .height(270.dp)
-                .shadow(2.dp, RoundedCornerShape(12.dp))
+                .shadow(2.dp, Shapes.large)
                 .clickable {
                     onInfo()
                 },
             colors = CardDefaults.cardColors(
                 containerColor = colorScheme.background,
             ),
-            shape = RoundedCornerShape(12.dp),
+            shape = Shapes.large,
             border = BorderStroke(
                 if (isSelected) 2.dp else 1.dp,
                 if (isSelected) colorScheme.secondary else colorScheme.onSurface
@@ -488,19 +489,18 @@ fun ListItem2(
                     contentDescription = null,
                     modifier = Modifier
                         .size(130.dp)
-                        .clip(shape = RoundedCornerShape(18.dp)),
+                        .clip(shape = Shapes.medium),
                     contentScale = ContentScale.Crop,
 
                 )
-
 
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
                     text = name,
-                    fontWeight = FontWeight.Medium,
+                    style = MaterialTheme.typography.bodyMedium,
                     color = colorScheme.onBackground,
-                    textAlign = TextAlign.Center,
+                    textAlign = TextAlign.Left,
                     modifier = Modifier
                         .animateContentSize(),
                     maxLines = 1,
@@ -521,17 +521,36 @@ fun ListItem2(
                             textAlign = TextAlign.Center,
                             textDecoration = TextDecoration.LineThrough,
                         )
-//                        Icon(
-//                            Icons.Filled.ErrorOutline,
-//                            "Error",
-//                            tint = colorScheme.error,
-//                        )
                     } else {
-                        Text(
-                            text = "$price руб.",
-                            color = colorScheme.onBackground,
-                            textAlign = TextAlign.Center
-                        )
+                        if (discountPrice == 0) {
+                            Text(
+                                text = "$price₽",
+                                color = colorScheme.onBackground,
+                                textAlign = TextAlign.Center,
+                                fontSize = 18.sp
+                            )
+                        } else {
+                            Column(
+                                verticalArrangement = Arrangement.Center
+                            ){
+                                Text(
+                                    text = "$price₽",
+                                    color = colorScheme.onBackground,
+                                    textAlign = TextAlign.Right,
+                                    textDecoration = TextDecoration.LineThrough,
+                                    fontSize = 16.sp
+                                )
+                                Text(
+                                    text = "$discountPrice₽",
+                                    color = colorScheme.onBackground,
+                                    textAlign = TextAlign.Left,
+                                    fontSize = 18.sp,
+                                    modifier = Modifier
+                                        .background(Color(0xFFFDD835), Shapes.small)
+                                        .padding(4.dp)
+                                )
+                            }
+                        }
                     }
 
                     Spacer(modifier = Modifier.weight(1f))

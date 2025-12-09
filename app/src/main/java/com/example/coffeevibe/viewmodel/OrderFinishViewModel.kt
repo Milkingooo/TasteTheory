@@ -30,7 +30,7 @@ class OrderFinishViewModel : ViewModel() {
                     "Date" to timestamp,
                     "IdClient" to idUser,
                     "IdLocation" to idAddress,
-                    "Status" to "Создан",
+                    "Status" to 0,
                     "TotalPrice" to totalPrice,
                     "PickupTime" to when (idPickupTime){
                         0 -> Timestamp.from(timestamp.toInstant().plusSeconds(5 * 60))

@@ -6,5 +6,5 @@ data class UserOrder(
     val pickupTime: String,
     val date: String,
     val location: String,
-    val state: String
+    val state: Int
 )

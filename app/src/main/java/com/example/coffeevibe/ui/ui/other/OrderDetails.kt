@@ -1,50 +1,35 @@
 package com.example.coffeevibe.ui.ui.other
 
 import android.annotation.SuppressLint
-import android.graphics.Color
-import android.util.Log
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animate
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.text.input.OutputTransformation
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.CheckBox
 import androidx.compose.material.icons.filled.DeleteOutline
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Payments
-import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Receipt
 import androidx.compose.material.icons.filled.Remove
-import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.CircularWavyProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -53,7 +38,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
@@ -64,7 +48,8 @@ import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.ToggleFloatingActionButtonDefaults.animateIcon
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -77,6 +62,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -85,22 +71,19 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.coffeevibe.R
-import com.example.coffeevibe.model.Location
 import com.example.coffeevibe.model.OrderManagerItem
-import com.example.coffeevibe.model.OrderManagerOrderItem
 import com.example.coffeevibe.ui.theme.Shapes
-import com.example.coffeevibe.ui.ui.OrderNumber
+import com.example.coffeevibe.utils.ConvertOrderState
 import java.sql.Date
 import java.text.SimpleDateFormat
 
@@ -205,7 +188,7 @@ fun UserOrderItem(
     number: String,
     price: Int,
     pickupTime: String,
-    state: String
+    state: Int
 ) {
     val parts = pickupTime.split("=") // Разбиваем строку на части
     val seconds = parts[1].split(",")[0].toLong() // Извлекаем секунды
@@ -255,8 +238,8 @@ fun UserOrderItem(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = state,
-                    color = if (state == "Готов") colorScheme.secondary else colorScheme.onBackground,
+                    text = ConvertOrderState.convertOrderStateToString(state),
+                    color = if (state == 3) colorScheme.secondary else colorScheme.onBackground,
                     fontFamily = FontFamily(Font(R.font.roboto_condensed_black)),
                     fontSize = 20.sp
                 )
@@ -268,6 +251,69 @@ fun UserOrderItem(
                     fontSize = 20.sp
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun KbjuField(
+    kbju: String
+) {
+    val parts = kbju.split(";") // Разбиваем строку на части
+    val calories = parts[0] // Извлекаем калории
+    val protein = parts[1] // Извлекаем белки
+    val fat = parts[2] // Извлекаем жиры
+    val carbohydrates = parts[3] // Извлекаем углеводы
+
+    OutlinedCard(
+        onClick = { /* Do something */ },
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(52.dp),
+        colors = CardDefaults.cardColors(containerColor = colorScheme.onSurfaceVariant),
+        shape = RoundedCornerShape(16.dp),
+
+        ) {
+        Row(
+            modifier = Modifier
+                .padding(6.dp)
+                .fillMaxSize(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            Text(
+                text = calories,
+                color = colorScheme.onBackground,
+                fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
+                fontSize = 16.sp
+            )
+
+            VerticalDivider(color = colorScheme.onBackground)
+
+            Text(
+                text = protein,
+                color = colorScheme.onBackground,
+                fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
+                fontSize = 16.sp
+            )
+
+            VerticalDivider(color = colorScheme.onBackground, thickness = 1.dp)
+
+            Text(
+                text = fat,
+                color = colorScheme.onBackground,
+                fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
+                fontSize = 16.sp
+            )
+
+            VerticalDivider(color = colorScheme.onBackground, thickness = 1.dp)
+
+            Text(
+                text = carbohydrates,
+                color = colorScheme.onBackground,
+                fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
+                fontSize = 16.sp
+            )
         }
     }
 }
@@ -627,10 +673,52 @@ fun QuantityControl(
 }
 
 @Composable
+fun MyAlertDialog(
+    onDismissRequest: () -> Unit,
+    onConfirmation: () -> Unit,
+    dialogTitle: String,
+    dialogText: String,
+    icon: ImageVector,
+) {
+    AlertDialog(
+        icon = {
+            Icon(icon, contentDescription = "Example Icon", tint = colorScheme.error)
+        },
+        title = {
+            Text(text = dialogTitle)
+        },
+        text = {
+            Text(text = dialogText)
+        },
+        onDismissRequest = {
+            onDismissRequest()
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    onConfirmation()
+                }
+            ) {
+                Text("Подтвердить")
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = {
+                    onDismissRequest()
+                }
+            ) {
+                Text("Отмена")
+            }
+        }
+    )
+}
+
+@Composable
 fun ManagerOrdersListItem(
     order: OrderManagerItem,
     onUpdate: (Int) -> Unit,
-    state: String
+    state: Int
 ) {
     val parts = order.pickupTime.toString().split("=") // Разбиваем строку на части
     val seconds = parts[1].split(",")[0].toLong() // Извлекаем секунды
@@ -640,13 +728,21 @@ fun ManagerOrdersListItem(
     val format = SimpleDateFormat("HH:mm")
     val timeString = format.format(date)
 
-    var inputIndex by remember { mutableIntStateOf(0) }
+    var openDialog by remember { mutableStateOf(false) }
+    var confirmAction by remember { mutableStateOf(false) }
+    var selectedIndex by remember { mutableStateOf(0) }
 
-    inputIndex = when (state) {
-        "Создан" -> 0
-        "Готов" -> 1
-        "Выдан" -> 2
-        else -> 0
+    if (openDialog) {
+        MyAlertDialog(
+            onDismissRequest = { openDialog = false },
+            onConfirmation = {
+                confirmAction = true
+                openDialog = false
+            },
+            dialogTitle = "Подтвердите действие",
+            dialogText = "Подтвердите изменение статуса заказа №${order.id} на ${ConvertOrderState.convertOrderStateToString(selectedIndex)}",
+            icon = Icons.Filled.CheckBox
+        )
     }
     OutlinedCard(
         onClick = { /* Do something */ },
@@ -694,15 +790,16 @@ fun ManagerOrdersListItem(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            val buttons = listOf("Создан", "Готов", "Выдан")
+            val buttons = listOf("Создан", "Готовится", "Готов", "Выдан")
             SegmentedButtonSingleSelectSample(
                 title = "Выберите действие",
                 segments = buttons,
                 actions = {
-                    onUpdate(it)
+                    selectedIndex = it
+                    if (confirmAction) onUpdate(it)
                 },
                 orientationHorizontal = false,
-                inputIndex = inputIndex
+                inputIndex = state
             )
 
             Spacer(modifier = Modifier.height(12.dp))

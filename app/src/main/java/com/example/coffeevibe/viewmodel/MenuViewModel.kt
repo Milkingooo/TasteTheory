@@ -77,12 +77,12 @@ class MenuViewModel(val context: Context) : ViewModel() {
                 val items = snapshot?.documents?.mapNotNull { item ->
                     try {
                         when {
-                            item.data?.get("Status").toString() != "Выдан" -> {
+                            item.data?.get("Status") != 4 -> {
                                 CreateOrderItem(
                                     price = item.data?.get("TotalPrice").toString().toInt(),
                                     number = item.id,
                                     pickupTime = item.data?.get("PickupTime").toString(),
-                                    state = item.data?.get("Status").toString()
+                                    state = item.data?.get("Status").toString().toInt()
                                 )
                             }
                             else -> {
@@ -201,10 +201,14 @@ class MenuViewModel(val context: Context) : ViewModel() {
                             id = item.data?.get("Id").toString().toInt(),
                             name = item.data?.get("Name").toString(),
                             price = item.data?.get("Price").toString().toInt(),
+                            discountPrice = item.data?.get("DiscountPrice").toString().toInt(),
                             category = item.data?.get("Category").toString(),
                             description = item.data?.get("Description").toString(),
                             image = item.data?.get("Image").toString(),
                             status = item.data?.get("Status").toString(),
+                            composition = item.data?.get("Dairy").toString(),
+                            kbju = item.data?.get("KBJU").toString()
+
                         )
                     } catch (e: Exception) {
                         Log.e("MyViewModel", "Error loading data", e)
@@ -270,7 +274,7 @@ class MenuViewModel(val context: Context) : ViewModel() {
                              price = item.data?.get("TotalPrice").toString().toInt(),
                              number = item.id,
                              pickupTime = item.data?.get("PickupTime").toString(),
-                             state = item.data?.get("Status").toString()
+                             state = item.data?.get("Status").toString().toInt()
                          )
                         }
                         else -> {
@@ -331,7 +335,7 @@ class MenuViewModel(val context: Context) : ViewModel() {
                         price = item.data?.get("TotalPrice").toString().toInt(),
                         number = item.id,
                         pickupTime = item.data?.get("PickupTime").toString(),
-                        state = item.data?.get("Status").toString(),
+                        state = item.data?.get("Status").toString().toInt(),
                         location = getLocationNameById(item.data?.get("IdLocation")),
                         date = item.data?.get("Date").toString()
                     )

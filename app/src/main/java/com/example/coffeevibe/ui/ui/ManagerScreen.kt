@@ -3,9 +3,7 @@ package com.example.coffeevibe.ui.ui
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -15,9 +13,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
-import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
@@ -43,16 +39,11 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import com.example.coffeevibe.R
 import com.example.coffeevibe.ui.theme.CoffeeVibeTheme
 import com.example.coffeevibe.ui.ui.other.IndeterminateCircularIndicator
 import com.example.coffeevibe.ui.ui.other.ManagerOrdersListItem
-import com.example.coffeevibe.ui.ui.other.SegmentedButtonSingleSelectSample
-import com.example.coffeevibe.ui.ui.other.UserOrder
 import com.example.coffeevibe.viewmodel.ManagerViewModel
-import com.example.coffeevibe.viewmodel.MenuViewModel
-import com.example.coffeevibe.viewmodel.OrderViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -166,11 +157,7 @@ fun ManagerMainScreen(
                             ManagerOrdersListItem(
                                 order = order,
                                 onUpdate = {
-                                    when (it) {
-                                        0 -> managerViewModel.updateOrderState(order.id, "Создан")
-                                        1 -> managerViewModel.updateOrderState(order.id, "Готов")
-                                        2 -> managerViewModel.updateOrderState(order.id, "Выдан")
-                                    }
+                                    managerViewModel.updateOrderState(order.id, it)
                                 },
                                 state = order.state
                             )

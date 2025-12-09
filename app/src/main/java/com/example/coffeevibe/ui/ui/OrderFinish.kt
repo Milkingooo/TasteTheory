@@ -34,6 +34,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -61,6 +64,7 @@ import com.example.coffeevibe.database.CartDatabase
 import com.example.coffeevibe.model.Location
 import com.example.coffeevibe.repository.CartRepository
 import com.example.coffeevibe.ui.theme.CoffeeVibeTheme
+import com.example.coffeevibe.ui.ui.other.SegmentedButtonSingleSelectSample
 import com.example.coffeevibe.utils.AuthUtils
 import com.example.coffeevibe.viewmodel.MenuViewModel
 import com.example.coffeevibe.viewmodel.OrderFinishViewModel
@@ -151,25 +155,13 @@ fun OrderFinish(
                     item {
                         Spacer(modifier = Modifier.height(16.dp))
 
-                        Row() {
                             Text(
-                                text = "Заберу здесь",
+                                text = "Заберу здесь*",
                                 color = colorScheme.onBackground,
                                 fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
                                 fontSize = 20.sp,
                                 modifier = Modifier.fillMaxWidth()
                             )
-
-                            Spacer(modifier = Modifier.width(8.dp))
-
-                            Text(
-                                text = "*",
-                                color = colorScheme.error,
-                                fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
-                                fontStyle = FontStyle.Italic,
-                                fontSize = 20.sp
-                            )
-                        }
 
                         Spacer(modifier = Modifier.height(8.dp))
 
@@ -233,6 +225,10 @@ fun OrderFinish(
                             fontSize = 20.sp,
                             modifier = Modifier.fillMaxWidth()
                         )
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        val pay = listOf("Наличные", "Карта")
+
 
                         Spacer(modifier = Modifier.height(16.dp))
 

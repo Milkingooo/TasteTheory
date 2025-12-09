@@ -4,5 +4,5 @@ data class CreateOrderItem(
     val price: Int,
     val number: String,
     val pickupTime: String,
-    val state: String
+    val state: Int
 )
