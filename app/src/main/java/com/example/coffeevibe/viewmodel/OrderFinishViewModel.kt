@@ -13,8 +13,6 @@ import kotlin.random.Random
 @SuppressLint("SimpleDateFormat")
 class OrderFinishViewModel : ViewModel() {
     private val firestore = Firebase.firestore
-
-
     fun createOrder(idUser: String,
                     idAddress: Int,
                     totalPrice: Int,

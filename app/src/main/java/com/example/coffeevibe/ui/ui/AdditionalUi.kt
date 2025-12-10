@@ -127,8 +127,7 @@ fun MinimalDialogFinish(
                         items(items, key = { it.id }) {
                             Text(
                                 text = """${it.name}
-                                    |${it.price}₽ x ${it.quantity} 
-                                    |${it.price * it.quantity}₽
+                                    |${it.price}₽ x ${it.quantity} --> ${it.price * it.quantity}₽
                                 """.trimMargin(),
                                 color = colorScheme.onBackground,
                                 fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),

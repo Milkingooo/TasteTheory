@@ -34,11 +34,15 @@ class OrderViewModel(private val repository: CartRepository, context: Context) :
     private val _itemList = MutableStateFlow<List<CartEntity>>(emptyList())
     val itemList: StateFlow<List<CartEntity>> = _itemList
 
+    private val _itemsCount = MutableStateFlow(0)
+    val itemsCount: StateFlow<Int> = _itemsCount
+
     private val _total = MutableStateFlow(0)
     val total: StateFlow<Int> = _total
 
     init {
         loadCartItems()
+        getItemsCount()
     }
 
     private fun loadCartItems() {
@@ -58,6 +62,12 @@ class OrderViewModel(private val repository: CartRepository, context: Context) :
         return itemList.value.count()
     }
 
+    fun getItemsCount() {
+        viewModelScope.launch {
+            _itemsCount.value = cartDao.getCartItemsCount()
+        }
+    }
+
     fun addItem(id: Int, name: String, price: Int, quantity: Int, image: String) {
         if (_itemList.value.none { it.idItem == id }) {
             viewModelScope.launch {
@@ -71,7 +81,7 @@ class OrderViewModel(private val repository: CartRepository, context: Context) :
                     )
                     repository.addItem(newItem)
                     menuVm.loadMenu()
-                    getCartItemsCount()
+                    getItemsCount()
                 } catch (e: Exception) {
                     Log.e("OrderListViewModel", "Error adding password: ${e.message}", e)
                 }
@@ -84,15 +94,11 @@ class OrderViewModel(private val repository: CartRepository, context: Context) :
             try {
                 cartDao.deleteItem(item)
                 menuVm.loadMenu()
-                getCartItemsCount()
+                getItemsCount()
             } catch (e: Exception) {
                 Log.e("OrderListViewModel", "Error deleting item: ${e.message}", e)
             }
         }
-    }
-
-    fun isCartIsEmpty(): Boolean {
-        return itemList.value.isEmpty()
     }
 
     fun deleteItemById(id: Int) {
@@ -100,6 +106,7 @@ class OrderViewModel(private val repository: CartRepository, context: Context) :
             try {
                 delay(300)
                 cartDao.deleteItemById(id)
+                getItemsCount()
                 Log.d("OrderListViewModel", "Item deleted: $id")
             } catch (e: Exception) {
                 Log.e("OrderListViewModel", "Error deleting item: ${e.message}", e)
@@ -107,14 +114,11 @@ class OrderViewModel(private val repository: CartRepository, context: Context) :
         }
     }
 
-    fun isItemInCart(id: Int): Boolean {
-        return itemList.value.any { it.idItem == id }
-    }
-
     fun deleteAllItems() {
         viewModelScope.launch {
             try {
                 cartDao.deleteAllItems()
+                getItemsCount()
             } catch (e: Exception) {
                 Log.e("OrderListViewModel", "Error deleting all items: ${e.message}", e)
             }
@@ -127,9 +131,11 @@ class OrderViewModel(private val repository: CartRepository, context: Context) :
                 if (newQuantity in 1..10) {
                     cartDao.updateItem(item.copy(quantity = newQuantity))
                     loadCartItems()
+                    getItemsCount()
                 }
                 else {
                     cartDao.deleteItem(item)
+                    getItemsCount()
                 }
             } catch (e: Exception) {
                 Log.e("OrderListViewModel", "Error updating item: ${e.message}", e)

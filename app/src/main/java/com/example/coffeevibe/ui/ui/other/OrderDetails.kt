@@ -204,7 +204,7 @@ fun UserOrderItem(
             .fillMaxWidth()
             .height(82.dp),
         colors = CardDefaults.cardColors(containerColor = colorScheme.surface),
-        shape = RoundedCornerShape(16.dp),
+        shape = Shapes.medium,
 
     ) {
         Row(

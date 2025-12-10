@@ -1,8 +1,10 @@
 package com.example.coffeevibe.ui.ui
 
+import android.graphics.Insets
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkHorizontally
@@ -17,6 +19,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -25,6 +28,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -33,17 +37,29 @@ import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.FilterAlt
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.Email
+import androidx.compose.material.icons.outlined.FilterAlt
 import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -51,11 +67,18 @@ import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TooltipAnchorPosition
+import androidx.compose.material3.TooltipBox
+import androidx.compose.material3.TooltipDefaults
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
+import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -73,6 +96,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -114,8 +138,10 @@ fun MenuScreen(
     val networkAvailable by NetworkUtils.isNetworkAvailable(context).collectAsState(initial = true)
     val goods by menuViewModel.dataList.collectAsState()
     var searchQuery by rememberSaveable { mutableStateOf("") }
+    var onlyDiscount by rememberSaveable { mutableStateOf(false) }
     var isSearching by rememberSaveable { mutableStateOf(false) }
     var showSheet by remember { mutableStateOf(false) }
+    var filtersMenuOpen by remember { mutableStateOf(false) }
 
     var selectedName by remember { mutableStateOf("") }
     var selectedDescription by remember { mutableStateOf("") }
@@ -144,8 +170,10 @@ fun MenuScreen(
         }
     }
 
-    val filteredGoods = if (searchQuery.isBlank()) {
+    val filteredGoods = if (searchQuery.isBlank() && !onlyDiscount) {
         goods
+    } else if (onlyDiscount) {
+        goods.filter { it.discountPrice != 0 }
     } else {
         goods.filter {
             it.name.contains(searchQuery, true)
@@ -177,39 +205,11 @@ fun MenuScreen(
 
 
     CoffeeVibeTheme(context2 = LocalContext.current,content = {
-        Scaffold()
-        { innerPadding ->
-            if (!networkAvailable) {
-                NotInternet {
-                    menuViewModel.loadMenu()
-                    menuViewModel.loadOrders()
-                }
-            }
-            else if (isLoading) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding)
-                        .padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ){
-                    IndeterminateCircularIndicator()
-                }
-            }
-            else {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .consumeWindowInsets(innerPadding)
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(start = 16.dp, end = 16.dp, top = 16.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
+        Scaffold(
+            contentWindowInsets = WindowInsets(0, 0, 0, 0),
+            topBar = {
+                TopAppBar(
+                    title = {
                         if (!isSearching) {
                             Text(
                                 text = "Меню",
@@ -257,12 +257,61 @@ fun MenuScreen(
                                 singleLine = true,
                             )
                         }
+                    },
+                    colors=TopAppBarDefaults.topAppBarColors(containerColor = colorScheme.background),
+                    actions = {
+                        Box(modifier = Modifier.wrapContentSize(Alignment.TopStart)) {
+                            // Icon button should have a tooltip associated with it for a11y.
+                            TooltipBox(
+                                positionProvider =
+                                    TooltipDefaults.rememberTooltipPositionProvider(
+                                        TooltipAnchorPosition.Above),
+                                tooltip = { PlainTooltip { Text("Localized description") } },
+                                state = rememberTooltipState(),
+                            ) {
+                                IconButton(onClick = { filtersMenuOpen = true }) {
+                                    Icon(Icons.Outlined.FilterAlt,
+                                        contentDescription = "Localized description",
+                                        tint = colorScheme.onBackground,
+                                        modifier = Modifier
+                                            .width(32.dp)
+                                            .height(32.dp)
+                                        )
+                                }
+                            }
+                            DropdownMenu(expanded = filtersMenuOpen,
+                                onDismissRequest = { filtersMenuOpen = false },
+                                containerColor = colorScheme.surface,
+                                shape = Shapes.medium
+                                ) {
+                                DropdownMenuItem(
+                                    text = { Text("Только со скидкой",
+                                        color = colorScheme.onBackground,
+                                        fontFamily = FontFamily(Font(R.font.roboto_condensed_medium))) },
+                                    onClick = {
+                                        onlyDiscount = !onlyDiscount
+                                    },
+                                    leadingIcon = {
+                                        Checkbox(
+                                            checked = onlyDiscount,
+                                            onCheckedChange = { onlyDiscount = it },
+                                            colors = CheckboxDefaults.colors(
+                                                checkedColor = colorScheme.secondary,
+                                                uncheckedColor = colorScheme.onBackground,
+                                                checkmarkColor = colorScheme.background
+                                            )
+                                        )
+                                    },
+                                )
+                            }
+                        }
+
                         IconButton(onClick = {
                             isSearching = !isSearching
                             searchQuery = ""
                         }) {
                             Icon(
-                                Icons.Filled.Search,
+                                Icons.Outlined.Search,
                                 contentDescription = "Search",
                                 tint = colorScheme.onBackground,
                                 modifier = Modifier
@@ -270,36 +319,39 @@ fun MenuScreen(
                                     .height(32.dp)
                             )
                         }
-                    }
-
-                    Spacer(modifier = Modifier.height(4.dp))
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(start = 8.dp, end = 8.dp)
-                            .horizontalScroll(rememberScrollState()),
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
-                    )
-                    {
-
-                        categories.keys.forEach { category ->
-                            AssistChipMenu(
-                                name = category,
-                                click = {
-                                    scope.launch {
-                                        val index = categoryIndexMap[category] ?: 0
-                                        listState2.animateScrollToItem(index)
-                                    }
-                                }
-                            )
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(4.dp))
-
+                    },
+                    windowInsets = TopAppBarDefaults.windowInsets,
+                )
+            }
+        )
+        { innerPadding ->
+            if (!networkAvailable) {
+                NotInternet {
+                    menuViewModel.loadMenu()
+                    menuViewModel.loadOrders()
+                }
+            }
+            else if (isLoading) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ){
+                    IndeterminateCircularIndicator()
+                }
+            }
+            else {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding)
+                ) {
                     PullToRefreshBox(
-                        modifier = Modifier.padding(4.dp).weight(1f),
+                        modifier = Modifier
+                            .padding(4.dp)
+                            .weight(1f),
                         state = state,
                         isRefreshing = isRefreshing,
                         onRefresh = onRefresh,
@@ -323,6 +375,29 @@ fun MenuScreen(
                             horizontalArrangement = Arrangement.spacedBy(16.dp),
                             state = listState2,
                         ) {
+                            stickyHeader() {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .background(colorScheme.background),
+                                    horizontalArrangement = Arrangement.SpaceAround
+                                )
+                                {
+                                    categories.keys.forEach { category ->
+                                        AssistChipMenu(
+                                            name = category,
+                                            click = {
+                                                scope.launch {
+                                                    val index =
+                                                        categoryIndexMap[category] ?: 0
+                                                    listState2.animateScrollToItem(index)
+                                                }
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+
                             if (filteredGoods.isNotEmpty()) {
                                 if (isOrderHas) {
                                     item(span = { GridItemSpan(2) }) {

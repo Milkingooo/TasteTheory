@@ -373,7 +373,7 @@ fun OrderFinish(
                                 Text(
                                     "Подтвердить",
                                     fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
-                                    color = colorScheme.surface,
+                                    color = colorScheme.background,
                                     fontSize = 18.sp
                                 )
                             }
@@ -421,6 +421,7 @@ fun OrderFinish(
                             menuVm.loadMenu()
                             menuVm.loadOrders()
                             orderVm.deleteAllItems()
+                            orderVm.getItemsCount()
 
                             success = true
                         }

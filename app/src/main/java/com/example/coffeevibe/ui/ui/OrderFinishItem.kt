@@ -41,10 +41,8 @@ fun OrderFinishItem(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(116.dp)
-            .background(colorScheme.background, RoundedCornerShape(10.dp)),
-        colors = CardDefaults.cardColors(containerColor = colorScheme.background),
-        shape = RoundedCornerShape(10.dp)
+            .background(colorScheme.background),
+        colors = CardDefaults.cardColors(containerColor = colorScheme.background)
     ) {
         Row(
             modifier = Modifier
@@ -53,22 +51,6 @@ fun OrderFinishItem(
             horizontalArrangement = Arrangement.Start,
             verticalAlignment = Alignment.Top
         ) {
-            AsyncImage(
-                model =
-                ImageRequest.Builder(LocalContext.current).data(data = image)
-                    .apply(block = fun ImageRequest.Builder.() {
-                        crossfade(true) // Плавный переход при загрузке нового изображения
-                    }).build(),
-                contentDescription = null, // Описание для доступности
-                modifier = Modifier
-                    .width(75.dp)
-                    .height(75.dp)
-                    .clip(shape = RoundedCornerShape(16.dp)),
-                contentScale = ContentScale.Crop,
-            )
-
-            Spacer(modifier = Modifier.width(16.dp))
-
             Column(
                 verticalArrangement = Arrangement.spacedBy(2.dp)
             ) {
@@ -82,28 +64,19 @@ fun OrderFinishItem(
                 )
 
                 Text(
-                    text = "$price ₽ x $quantity шт",
+                    text = "$price ₽ x $quantity шт --> ${price * quantity} ₽",
                     color = colorScheme.onBackground,
                     fontSize = 16.sp)
 
-                Text(
-                    text = "${price * quantity} ₽",
-                    color = colorScheme.onBackground,
-                    //modifier = Modifier.width(150.dp),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    fontFamily = FontFamily(Font(R.font.roboto_condensed_bold))
-                    )
+//                Text(
+//                    text = "${price * quantity} ₽",
+//                    color = colorScheme.onBackground,
+//                    //modifier = Modifier.width(150.dp),
+//                    maxLines = 1,
+//                    overflow = TextOverflow.Ellipsis,
+//                    fontFamily = FontFamily(Font(R.font.roboto_condensed_bold))
+//                    )
                 }
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun OrderFinishItemPreview() {
-    OrderFinishItem("Кофе",
-        150,
-        "https://coffee.hb.ru-msk.vkcloud-storage.ru/CoffeeGoods/matcha_tea.jpg",
-        1)
 }

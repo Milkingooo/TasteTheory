@@ -8,12 +8,16 @@ import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemColors
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -127,6 +131,8 @@ fun BottomNavigationBar(navController: NavController, orderVm: OrderViewModel) {
             val backStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = backStackEntry?.destination?.route
 
+            val cartItemsCount = orderVm.itemsCount.collectAsState()
+
             NavBarItems.BarItems.forEach { navItem ->
                 NavigationBarItem(
                     selected = currentRoute == navItem.route,
@@ -140,31 +146,31 @@ fun BottomNavigationBar(navController: NavController, orderVm: OrderViewModel) {
                         }
                     },
                     icon = {
-//                        if (navItem.route == "cart") {
-//                            BadgedBox(
-//                                badge = {
-//                                    if (orderVm.getCartItemsCount() > 0) {
-//                                        Badge(
-//                                            containerColor = Color.Red,
-//                                            contentColor = Color.White
-//                                        ) {
-//                                            Text("${orderVm.getCartItemsCount()}")
-//                                        }
-//                                    }
-//                                }
-//                            ) {
+                        if (navItem.route == "cart") {
+                            BadgedBox(
+                                badge = {
+                                    if (cartItemsCount.value > 0) {
+                                        Badge(
+                                            containerColor = Color.Red,
+                                            contentColor = Color.White
+                                        ) {
+                                            Text("${cartItemsCount.value}")
+                                        }
+                                    }
+                                }
+                            ) {
                                 Icon(
                                     imageVector = navItem.image,
                                     contentDescription = "Local description",
                                 )
-//                            }
-//                        }
-//                        else {
-//                            Icon(
-//                                imageVector = navItem.image,
-//                                contentDescription = "Local description",
-//                            )
-//                        }
+                            }
+                        }
+                        else {
+                            Icon(
+                                imageVector = navItem.image,
+                                contentDescription = "Local description",
+                            )
+                        }
                     },
                     label = {
 
