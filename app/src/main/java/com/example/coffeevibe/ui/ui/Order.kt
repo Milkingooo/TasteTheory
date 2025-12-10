@@ -54,6 +54,8 @@ import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
@@ -97,7 +99,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun CartScreen(
     onCreateOrder: () -> Unit,
@@ -133,31 +135,29 @@ fun CartScreen(
         Scaffold(
             contentWindowInsets = WindowInsets(0, 0, 0, 0),
             topBar = {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text(
-                        text = "Корзина",
-                        color = colorScheme.onBackground,
-                        fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
-                        fontSize = 28.sp,
-                        textAlign = TextAlign.Left
-                    )
-
-                    IconButton(onClick = { orderVm.deleteAllItems() }) {
-                        Icon(
-                            Icons.Outlined.Delete,
-                            contentDescription = "Localized description",
-                            tint = colorScheme.onBackground,
-                            modifier = Modifier.size(26.dp)
+                TopAppBar(
+                    title = {
+                        Text(
+                            text = "Корзина",
+                            color = colorScheme.onBackground,
+                            fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
+                            fontSize = 28.sp,
+                            textAlign = TextAlign.Left
                         )
-                    }
-                }
-
+                    },
+                    actions = {
+                        IconButton(onClick = { orderVm.deleteAllItems() }) {
+                            Icon(
+                                Icons.Outlined.Delete,
+                                contentDescription = "Localized description",
+                                tint = colorScheme.onBackground,
+                                modifier = Modifier.size(26.dp)
+                            )
+                        }
+                    },
+                    windowInsets = TopAppBarDefaults.windowInsets,
+                    colors=TopAppBarDefaults.topAppBarColors(containerColor = colorScheme.background)
+                )
             },
             bottomBar = {
                 Button(
@@ -227,7 +227,7 @@ fun CartScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(innerPadding)
-                        .padding(top = 16.dp, start = 16.dp, end = 16.dp),
+                        .padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     items(orderItems, key = { it.id }) {
