@@ -4,6 +4,7 @@ import android.widget.Toast
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,6 +18,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
@@ -28,10 +30,12 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ElevatedSuggestionChip
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.InputChip
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SegmentedButton
@@ -64,11 +68,14 @@ import com.example.coffeevibe.database.CartDatabase
 import com.example.coffeevibe.model.Location
 import com.example.coffeevibe.repository.CartRepository
 import com.example.coffeevibe.ui.theme.CoffeeVibeTheme
+import com.example.coffeevibe.ui.theme.Typography
+import com.example.coffeevibe.ui.ui.other.AssistChipMenu
 import com.example.coffeevibe.ui.ui.other.SegmentedButtonSingleSelectSample
 import com.example.coffeevibe.utils.AuthUtils
 import com.example.coffeevibe.viewmodel.MenuViewModel
 import com.example.coffeevibe.viewmodel.OrderFinishViewModel
 import com.example.coffeevibe.viewmodel.OrderViewModel
+import kotlinx.coroutines.launch
 import java.sql.Timestamp
 import java.time.Instant
 
@@ -83,6 +90,7 @@ fun OrderFinish(
     var locations: List<Location> = emptyList()
     var placeSelected by remember { mutableIntStateOf(0) }
     var pickupTime by remember { mutableIntStateOf(0) }
+    var paymentType by remember { mutableIntStateOf(0) }
     var showInfo by rememberSaveable { mutableStateOf(false) }
     var success by rememberSaveable { mutableStateOf(false) }
     var progressState by remember { mutableStateOf(false) }
@@ -227,8 +235,51 @@ fun OrderFinish(
                         )
                         Spacer(modifier = Modifier.height(8.dp))
 
-                        val pay = listOf("Наличные", "Карта")
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        )
+                        {
 
+                            FilterChip(
+                                selected = paymentType == 0,
+                                onClick = { paymentType = 0 },
+                                label = { Text("Сразу",fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
+                                    color = colorScheme.onBackground) },
+                                leadingIcon =
+                                    if (paymentType == 0) {
+                                        {
+                                            Icon(
+                                                imageVector = Icons.Filled.Done,
+                                                contentDescription = "Localized Description",
+                                                modifier = Modifier.size(FilterChipDefaults.IconSize),
+                                            )
+                                        }
+                                    } else {
+                                        null
+                                    },
+                            )
+
+                            FilterChip(
+                                selected = paymentType == 1,
+                                onClick = { paymentType = 1 },
+                                label = { Text("При получении",fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
+                                    color = colorScheme.onBackground) },
+                                leadingIcon =
+                                    if (paymentType == 1) {
+                                        {
+                                            Icon(
+                                                imageVector = Icons.Filled.Done,
+                                                contentDescription = "Localized Description",
+                                                modifier = Modifier.size(FilterChipDefaults.IconSize),
+                                            )
+                                        }
+                                    } else {
+                                        null
+                                    },
+                            )
+                        }
 
                         Spacer(modifier = Modifier.height(16.dp))
 

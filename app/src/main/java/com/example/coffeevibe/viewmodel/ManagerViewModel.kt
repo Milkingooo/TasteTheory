@@ -69,7 +69,7 @@ class ManagerViewModel : ViewModel() {
 
              // фильтруем только активные заказы
              val orders = currentOrders.filter {
-                 it.getString("Status") != "Выдан"
+                 it.getLong("Status")?.toInt() != 4
              }
 
              // группируем items по IdOrder

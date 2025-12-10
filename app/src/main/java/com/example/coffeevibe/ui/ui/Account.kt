@@ -131,17 +131,6 @@ fun AccountScreen(
                     keyboardType = KeyboardType.Email
                 )
 
-                TextFieldWithName(
-                    title = "Пароль",
-                    value = password,
-                    exitValue = {
-                        password = it
-                    },
-                    isInCorrect = isInCorrectPassword,
-                    placeholder = "*********",
-                    keyboardType = KeyboardType.Password
-                )
-
                 BaseButton(
                     title = "Сбросить пароль",
                     click = { },

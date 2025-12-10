@@ -77,7 +77,7 @@ class MenuViewModel(val context: Context) : ViewModel() {
                 val items = snapshot?.documents?.mapNotNull { item ->
                     try {
                         when {
-                            item.data?.get("Status") != 4 -> {
+                            item.data?.get("Status").toString().toInt() != 4 -> {
                                 CreateOrderItem(
                                     price = item.data?.get("TotalPrice").toString().toInt(),
                                     number = item.id,
@@ -239,9 +239,9 @@ class MenuViewModel(val context: Context) : ViewModel() {
                     .await()
 
                 val ordersCount = snapshot.documents.count { document ->
-                    document["Status"]?.toString()?.trim() == "Создан" || document["Status"]?.toString()?.trim() == "Готов"
+                    document["Status"].toString().toInt() != 4
                 }
-
+                Log.e("MyViewModel", "Orders count:  $ordersCount")
                 _isOrderHas.value = ordersCount > 0
             } catch (e: Exception) {
                 Log.e("MyViewModel", "Error loading data", e)
@@ -269,7 +269,7 @@ class MenuViewModel(val context: Context) : ViewModel() {
             val items = snapshot.documents.mapNotNull { item ->
                 try {
                     when {
-                        item.data?.get("Status").toString() != "Выдан" -> {
+                        item.data?.get("Status").toString().toInt() != 4 -> {
                          CreateOrderItem(
                              price = item.data?.get("TotalPrice").toString().toInt(),
                              number = item.id,
@@ -326,7 +326,7 @@ class MenuViewModel(val context: Context) : ViewModel() {
             val snapshot = firestore
                 .collection("Order")
                 .whereEqualTo("IdClient", AuthUtils.getUserId())
-                .whereEqualTo("Status", "Выдан")
+                .whereEqualTo("Status", 4)
                 .get()
                 .await()
             val items = snapshot.documents.mapNotNull { item ->

@@ -796,7 +796,20 @@ fun ManagerOrdersListItem(
                 segments = buttons,
                 actions = {
                     selectedIndex = it
-                    if (confirmAction) onUpdate(it)
+                    openDialog = true
+
+                    if (confirmAction){
+
+                        onUpdate(
+                            when (it) {
+                                0 -> 1
+                                1 -> 2
+                                2 -> 3
+                                3 -> 4
+                                else -> 1
+                            }
+                        )
+                    }
                 },
                 orientationHorizontal = false,
                 inputIndex = state

@@ -25,10 +25,12 @@ class ManagerActivity : ComponentActivity() {
         setContent {
             FirebaseApp.initializeApp(this)
             val managerVm = ManagerViewModel()
+            val loginVm = LoginViewModel(applicationContext)
 
             ManagerMainScreen(
                 managerViewModel = managerVm,
                 onBackPressed = {
+                    loginVm.logout()
                     startActivity(Intent(this, LoginActivity::class.java))
                     finish()
                 }
