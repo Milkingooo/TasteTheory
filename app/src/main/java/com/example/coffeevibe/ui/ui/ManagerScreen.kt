@@ -21,6 +21,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
@@ -73,36 +75,34 @@ fun ManagerMainScreen(
         Scaffold(
             contentWindowInsets = WindowInsets(0, 0, 0, 0),
             topBar = {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text(
-                        text = "Активные заказы",
-                        color = colorScheme.onBackground,
-                        fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
-                        fontSize = 28.sp,
-                        textAlign = TextAlign.Left
-                    )
-
-                    IconButton(
-                        onClick = {
-                            onBackPressed()
+                TopAppBar(
+                    title = {
+                        Text(
+                            text = "Активные заказы",
+                            color = colorScheme.onBackground,
+                            fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
+                            fontSize = 28.sp,
+                            textAlign = TextAlign.Left
+                        )},
+                    actions = {
+                        IconButton(
+                            onClick = {
+                                onBackPressed()
+                            }
+                        ) {
+                            Icon(
+                                Icons.AutoMirrored.Filled.ExitToApp,
+                                contentDescription = "Localized description",
+                                tint = colorScheme.onBackground,
+                                modifier = Modifier
+                                    .width(35.dp)
+                                    .height(35.dp)
+                            )
                         }
-                    ) {
-                        Icon(
-                            Icons.AutoMirrored.Filled.ExitToApp,
-                            contentDescription = "Localized description",
-                            tint = colorScheme.onBackground,
-                            modifier = Modifier
-                                .width(35.dp)
-                                .height(35.dp)
-                        )
-                    }
-                }
+                    },
+                    windowInsets = TopAppBarDefaults.windowInsets,
+                    colors=TopAppBarDefaults.topAppBarColors(containerColor = colorScheme.background)
+                )
 
             }) { innerPadding ->
             if (isLoading) {

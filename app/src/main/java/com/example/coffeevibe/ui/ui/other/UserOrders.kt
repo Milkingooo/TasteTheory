@@ -156,7 +156,8 @@ fun UserOrdersScreen(
                             UserOrder(
                                 price = order.price,
                                 number = order.number,
-                                dateOrder = order.date
+                                dateOrder = order.date,
+                                state = order.state
                             )
                         }
                     }

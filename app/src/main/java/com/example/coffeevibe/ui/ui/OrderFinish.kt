@@ -1,10 +1,10 @@
 package com.example.coffeevibe.ui.ui
 
-import android.widget.Toast
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
@@ -30,17 +29,12 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ElevatedSuggestionChip
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.InputChip
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -48,6 +42,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -57,20 +52,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
 import com.example.coffeevibe.R
-import com.example.coffeevibe.database.CartDatabase
 import com.example.coffeevibe.model.Location
-import com.example.coffeevibe.repository.CartRepository
 import com.example.coffeevibe.ui.theme.CoffeeVibeTheme
-import com.example.coffeevibe.ui.theme.Typography
-import com.example.coffeevibe.ui.ui.other.AssistChipMenu
-import com.example.coffeevibe.ui.ui.other.SegmentedButtonSingleSelectSample
 import com.example.coffeevibe.utils.AuthUtils
 import com.example.coffeevibe.viewmodel.MenuViewModel
 import com.example.coffeevibe.viewmodel.OrderFinishViewModel
@@ -396,38 +384,45 @@ fun OrderFinish(
 
             if (showInfo) {
                 //val locName = locations[placeSelected].address
+                val coroutineScope = rememberCoroutineScope()
+                var placeName by remember { mutableStateOf("Cucumber") }
 
-                MinimalDialogFinish(
-                    state = showInfo,
-                    onClose = { showInfo = false },
-                    totalPrice = totalPrice,
-                    items = items,
-                    continueOrder = {
-                        showInfo = false
-                        if (placeSelected != 0) {
-                            progressState = true
+                coroutineScope.launch {
+                    placeName = menuVm.getLocationNameById(placeSelected)
+                }
+                    MinimalDialogFinish(
+                        state = showInfo,
+                        onClose = { showInfo = false },
+                        totalPrice = totalPrice,
+                        items = items,
+                        payment = paymentType,
+                        location = placeName,
+                        continueOrder = {
+                            showInfo = false
+                            if (placeSelected != 0) {
+                                progressState = true
 
-                            orderFinishVm.createOrder(
-                                idUser = AuthUtils.getUserId()!!,
-                                idAddress = placeSelected,
-                                totalPrice = totalPrice,
-                                items = items,
-                                idPickupTime = pickupTime
-                            ){
-                                progressState = false
+                                orderFinishVm.createOrder(
+                                    idUser = AuthUtils.getUserId()!!,
+                                    idAddress = placeSelected,
+                                    totalPrice = totalPrice,
+                                    items = items,
+                                    idPickupTime = pickupTime
+                                ) {
+                                    progressState = false
+                                }
+                                //Toast.makeText(context, "Заказ оформлен", Toast.LENGTH_SHORT).show()
+                                menuVm.updateOrderWas(true)
+                                menuVm.loadMenu()
+                                menuVm.loadOrders()
+                                orderVm.deleteAllItems()
+                                orderVm.getItemsCount()
+
+                                success = true
                             }
-                            //Toast.makeText(context, "Заказ оформлен", Toast.LENGTH_SHORT).show()
-                            menuVm.updateOrderWas(true)
-                            menuVm.loadMenu()
-                            menuVm.loadOrders()
-                            orderVm.deleteAllItems()
-                            orderVm.getItemsCount()
-
-                            success = true
                         }
-                    }
-                )
-            }
+                    )
+                }
         }
     })
 }
@@ -488,7 +483,12 @@ fun OrderPlaced(
 
     Card(
         modifier = Modifier
-            .animateContentSize()
+            .animateContentSize(
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioLowBouncy,
+                    stiffness = Spring.StiffnessLow
+                )
+            )
             .fillMaxWidth()
             .clickable {
                 expanded = !expanded

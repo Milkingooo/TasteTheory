@@ -46,6 +46,18 @@ private val lightColorScheme = lightColorScheme(
     onSurfaceVariant = LightTooltipBackground
 )
 
+private val lightColorScheme2 = lightColorScheme(
+    background = LightBackground2,
+    onBackground = LightTextAndIcons2,
+    primary = LightAccentColor2,
+    error = LightErrorColor2,
+    tertiary = LightWarningColor2,
+    secondary = LightSuccessColor2,
+    surface = LightInactiveElementBackground2,
+    onSurface = LightShadowAndBorder2,
+    onSurfaceVariant = LightTooltipBackground2
+)
+
 @Composable
 fun CoffeeVibeTheme(
     content: @Composable () -> Unit,

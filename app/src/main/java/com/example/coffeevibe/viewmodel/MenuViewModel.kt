@@ -77,12 +77,14 @@ class MenuViewModel(val context: Context) : ViewModel() {
                 val items = snapshot?.documents?.mapNotNull { item ->
                     try {
                         when {
-                            item.data?.get("Status").toString().toInt() != 4 -> {
+                            item.data?.get("Status").toString().toInt() != 4 && item.data?.get("Status").toString().toInt() != 5 -> {
                                 CreateOrderItem(
                                     price = item.data?.get("TotalPrice").toString().toInt(),
                                     number = item.id,
                                     pickupTime = item.data?.get("PickupTime").toString(),
-                                    state = item.data?.get("Status").toString().toInt()
+                                    state = item.data?.get("Status").toString().toInt(),
+                                    id = item.id.toInt(),
+                                    date = item.data?.get("Date").toString(),
                                 )
                             }
                             else -> {
@@ -239,7 +241,7 @@ class MenuViewModel(val context: Context) : ViewModel() {
                     .await()
 
                 val ordersCount = snapshot.documents.count { document ->
-                    document["Status"].toString().toInt() != 4
+                    document["Status"].toString().toInt() != 4 && document["Status"].toString().toInt() != 5
                 }
                 Log.e("MyViewModel", "Orders count:  $ordersCount")
                 _isOrderHas.value = ordersCount > 0
@@ -269,12 +271,14 @@ class MenuViewModel(val context: Context) : ViewModel() {
             val items = snapshot.documents.mapNotNull { item ->
                 try {
                     when {
-                        item.data?.get("Status").toString().toInt() != 4 -> {
+                        item.data?.get("Status").toString().toInt() != 4 && item.data?.get("Status").toString().toInt() != 5 -> {
                          CreateOrderItem(
                              price = item.data?.get("TotalPrice").toString().toInt(),
                              number = item.id,
                              pickupTime = item.data?.get("PickupTime").toString(),
-                             state = item.data?.get("Status").toString().toInt()
+                             state = item.data?.get("Status").toString().toInt(),
+                             id = item.id.toInt(),
+                             date = item.data?.get("Date").toString()
                          )
                         }
                         else -> {
@@ -326,7 +330,7 @@ class MenuViewModel(val context: Context) : ViewModel() {
             val snapshot = firestore
                 .collection("Order")
                 .whereEqualTo("IdClient", AuthUtils.getUserId())
-                .whereEqualTo("Status", 4)
+                .whereIn("Status", listOf(4, 5))
                 .get()
                 .await()
             val items = snapshot.documents.mapNotNull { item ->
@@ -351,9 +355,18 @@ class MenuViewModel(val context: Context) : ViewModel() {
         }
     }
 
-    private suspend fun getLocationNameById(id: Any?): String{
+    suspend fun getLocationNameById(id: Any?): String {
         val snapshot = firestore.collection("Location").whereEqualTo("Id", id).get().await()
             val locationName = snapshot.documents.firstOrNull()?.data?.get("Address").toString()
             return locationName
+    }
+
+    fun cancelOrder(orderId: Int) {
+        viewModelScope.launch {
+            try {
+                firestore.collection("Order").document(orderId.toString()).update("Status", 5).await()
+                Log.d("MyViewModel", "Order cancelled successfully")
+            } catch (e: Exception) { }
+        }
     }
 }

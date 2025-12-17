@@ -1,8 +1,13 @@
 package com.example.coffeevibe.ui.ui
 
+import android.R.attr.rotationX
 import android.graphics.Insets
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -40,28 +45,43 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.outlined.TrendingDown
+import androidx.compose.material.icons.automirrored.outlined.TrendingUp
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.FilterAlt
+import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.Deck
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.FilterAlt
+import androidx.compose.material.icons.outlined.PriceCheck
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.outlined.TrendingDown
+import androidx.compose.material.icons.outlined.TrendingUp
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExpandedFullScreenSearchBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.OutlinedCard
@@ -69,6 +89,10 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SearchBar
+import androidx.compose.material3.SearchBarDefaults
+import androidx.compose.material3.SearchBarState
+import androidx.compose.material3.SearchBarValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.TooltipAnchorPosition
 import androidx.compose.material3.TooltipBox
@@ -78,6 +102,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
+import androidx.compose.material3.rememberSearchBarState
 import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -90,13 +115,18 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -104,8 +134,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.PopupProperties
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.compose.AsyncImagePainter
@@ -124,8 +156,10 @@ import com.example.coffeevibe.utils.CashApplication
 import com.example.coffeevibe.utils.NetworkUtils
 import com.example.coffeevibe.viewmodel.MenuViewModel
 import com.example.coffeevibe.viewmodel.OrderViewModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.math.min
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -138,10 +172,12 @@ fun MenuScreen(
     val networkAvailable by NetworkUtils.isNetworkAvailable(context).collectAsState(initial = true)
     val goods by menuViewModel.dataList.collectAsState()
     var searchQuery by rememberSaveable { mutableStateOf("") }
-    var onlyDiscount by rememberSaveable { mutableStateOf(false) }
     var isSearching by rememberSaveable { mutableStateOf(false) }
     var showSheet by remember { mutableStateOf(false) }
     var filtersMenuOpen by remember { mutableStateOf(false) }
+    var onlyDiscount by rememberSaveable { mutableStateOf(false) }
+    var priceDecreasing  by rememberSaveable { mutableStateOf(false) }
+    var priceIncreasing by rememberSaveable { mutableStateOf(false) }
 
     var selectedName by remember { mutableStateOf("") }
     var selectedDescription by remember { mutableStateOf("") }
@@ -170,15 +206,27 @@ fun MenuScreen(
         }
     }
 
-    val filteredGoods = if (searchQuery.isBlank() && !onlyDiscount) {
-        goods
-    } else if (onlyDiscount) {
-        goods.filter { it.discountPrice != 0 }
-    } else {
-        goods.filter {
+
+    val filteredGoods = when {
+        searchQuery.isBlank() && !onlyDiscount -> goods
+        onlyDiscount -> goods.filter { it.discountPrice != 0 }
+        priceDecreasing -> goods.sortedByDescending { it.price }
+        priceIncreasing -> goods.sortedBy { it.price }
+        else -> goods.filter {
             it.name.contains(searchQuery, true)
+                    || it.price.toString().contains(searchQuery, true)
+                    || it.discountPrice.toString().contains(searchQuery, true)
         }
     }
+//        if (searchQuery.isBlank() && !onlyDiscount) {
+//        goods
+//    } else if (onlyDiscount) {
+//        goods.filter { it.discountPrice != 0 }
+//    } else {
+//        goods.filter {
+//            it.name.contains(searchQuery, true)
+//        }
+//    }
 
     val categories = filteredGoods.groupBy { it.category }.toSortedMap()
     val categoryIndexMap = remember { mutableStateMapOf<String, Int>() }
@@ -202,7 +250,6 @@ fun MenuScreen(
         menuViewModel.loadUserOrders()
         menuViewModel.updateOrderWas(false)
     }
-
 
     CoffeeVibeTheme(context2 = LocalContext.current,content = {
         Scaffold(
@@ -266,7 +313,7 @@ fun MenuScreen(
                                 positionProvider =
                                     TooltipDefaults.rememberTooltipPositionProvider(
                                         TooltipAnchorPosition.Above),
-                                tooltip = { PlainTooltip { Text("Localized description") } },
+                                tooltip = { PlainTooltip { Text("Фильтрация") } },
                                 state = rememberTooltipState(),
                             ) {
                                 IconButton(onClick = { filtersMenuOpen = true }) {
@@ -295,6 +342,44 @@ fun MenuScreen(
                                         Checkbox(
                                             checked = onlyDiscount,
                                             onCheckedChange = { onlyDiscount = it },
+                                            colors = CheckboxDefaults.colors(
+                                                checkedColor = colorScheme.secondary,
+                                                uncheckedColor = colorScheme.onBackground,
+                                                checkmarkColor = colorScheme.background
+                                            )
+                                        )
+                                    },
+                                )
+                                DropdownMenuItem(
+                                    text = { Text("По убыванию цены",
+                                        color = colorScheme.onBackground,
+                                        fontFamily = FontFamily(Font(R.font.roboto_condensed_medium))) },
+                                    onClick = {
+                                        //onlyDiscount = !onlyDiscount
+                                    },
+                                    leadingIcon = {
+                                        Checkbox(
+                                            checked = priceDecreasing,
+                                            onCheckedChange = { priceDecreasing = it },
+                                            colors = CheckboxDefaults.colors(
+                                                checkedColor = colorScheme.secondary,
+                                                uncheckedColor = colorScheme.onBackground,
+                                                checkmarkColor = colorScheme.background
+                                            )
+                                        )
+                                    },
+                                )
+                                DropdownMenuItem(
+                                    text = { Text("По возрастанию цены",
+                                        color = colorScheme.onBackground,
+                                        fontFamily = FontFamily(Font(R.font.roboto_condensed_medium))) },
+                                    onClick = {
+                                        //onlyDiscount = !onlyDiscount
+                                    },
+                                    leadingIcon = {
+                                        Checkbox(
+                                            checked = priceIncreasing,
+                                            onCheckedChange = { priceIncreasing = it },
                                             colors = CheckboxDefaults.colors(
                                                 checkedColor = colorScheme.secondary,
                                                 uncheckedColor = colorScheme.onBackground,
@@ -347,6 +432,7 @@ fun MenuScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(innerPadding)
+
                 ) {
                     PullToRefreshBox(
                         modifier = Modifier
@@ -410,36 +496,52 @@ fun MenuScreen(
                                             HorizontalPager(
                                                 state = pagerState,
                                                 contentPadding = PaddingValues(end = 16.dp),
-                                                pageSpacing = 6.dp
+                                                pageSpacing = 6.dp,
+                                                modifier = Modifier.animateItem()
                                             ) {
                                                 UserOrderItem(
                                                     number = numAndPrice[it].number,
                                                     price = numAndPrice[it].price,
                                                     pickupTime = numAndPrice[it].pickupTime,
-                                                    state = numAndPrice[it].state
+                                                    state = numAndPrice[it].state,
+                                                    cancelOrder = {
+                                                        menuViewModel.cancelOrder(numAndPrice[it].id)
+                                                    },
+                                                    orderDate = numAndPrice[it].date
                                                 )
                                             }
                                             Spacer(modifier = Modifier.height(6.dp))
-                                            Row(
-                                                Modifier
+//                                            Row(
+//                                                Modifier
+//                                                    .wrapContentHeight()
+//                                                    .fillMaxWidth()
+//                                                    .align(Alignment.CenterHorizontally)
+//                                                    .padding(bottom = 8.dp),
+//                                                horizontalArrangement = Arrangement.Center
+//                                            ) {
+//                                                repeat(pagerState.pageCount) { iteration ->
+//                                                    val color =
+//                                                        if (pagerState.currentPage == iteration) Color.DarkGray else Color.LightGray
+//                                                    Box(
+//                                                        modifier = Modifier
+//                                                            .padding(2.dp)
+//                                                            .clip(CircleShape)
+//                                                            .background(color)
+//                                                            .size(8.dp)
+//                                                    )
+//                                                }
+//                                            }
+                                            PageIndicator(
+                                                numberOfPages = pagerState.pageCount,
+                                                selectedPage = pagerState.currentPage,
+                                                modifier = Modifier
                                                     .wrapContentHeight()
                                                     .fillMaxWidth()
                                                     .align(Alignment.CenterHorizontally)
                                                     .padding(bottom = 8.dp),
-                                                horizontalArrangement = Arrangement.Center
-                                            ) {
-                                                repeat(pagerState.pageCount) { iteration ->
-                                                    val color =
-                                                        if (pagerState.currentPage == iteration) Color.DarkGray else Color.LightGray
-                                                    Box(
-                                                        modifier = Modifier
-                                                            .padding(2.dp)
-                                                            .clip(CircleShape)
-                                                            .background(color)
-                                                            .size(8.dp)
-                                                    )
-                                                }
-                                            }
+                                                defaultColor = Color.LightGray,
+                                                selectedColor = Color.DarkGray
+                                            )
                                         }
                                     }
                                 }
@@ -506,7 +608,6 @@ fun MenuScreen(
     })
 }
 
-
 @Composable
 fun ListItem2(
     name: String,
@@ -547,26 +648,31 @@ fun ListItem2(
 
                 val imageLoader = (LocalContext.current.applicationContext as CashApplication).imageLoader
 
+                val painter = rememberAsyncImagePainter(
+                    ImageRequest.Builder(LocalContext.current)
+                        .data(data = image)
+                        .crossfade(true)
+                        .memoryCacheKey(image)
+                        .diskCacheKey(image)
+                        .transformations(RoundedCornersTransformation(10f))
+                        .error(R.drawable.error_load)
+                        .build(),
+                    imageLoader = imageLoader
+                )
+                val state = painter.state
+                val transition by animateFloatAsState(
+                    targetValue = if (state is AsyncImagePainter.State.Success) 1f else 0f
+                )
+
                 Image(
-                    painter = rememberAsyncImagePainter(
-                        ImageRequest.Builder(LocalContext.current)
-                            .data(data = image)
-                            .memoryCacheKey(image)
-                            .diskCacheKey(image)
-                            .error(R.drawable.error_load)
-                            .apply(block = fun ImageRequest.Builder.() {
-                                crossfade(true)
-                                transformations(RoundedCornersTransformation(10f))
-                            }).build(),
-                        placeholder = painterResource(id = R.drawable.placeholder),
-                        imageLoader = imageLoader,
-                    ),
+                    painter = painter,
                     contentDescription = null,
                     modifier = Modifier
                         .size(130.dp)
-                        .clip(shape = Shapes.medium),
+                        .clip(shape = Shapes.medium)
+                        .alpha(transition)
+                    ,
                     contentScale = ContentScale.Crop,
-
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -666,25 +772,53 @@ fun ListItem2(
 }
 
 @Composable
-fun CachedImage(url: String) {
-    Box {
-        AsyncImage(
-            model =
-            ImageRequest.Builder(LocalContext.current).data(data = url)
-                .apply(block = fun ImageRequest.Builder.() {
-                    crossfade(true) // Плавный переход при загрузке нового изображения
-                }).build(),
-            contentDescription = null, // Описание для доступности
-            modifier = Modifier
-                .width(130.dp)
-                .height(130.dp)
-                .clip(shape = RoundedCornerShape(20.dp)),
-            contentScale = ContentScale.Crop,
-        )
-
-        val painter = rememberAsyncImagePainter(url)
-        if (painter.state is AsyncImagePainter.State.Loading) {
-            CircularProgressIndicator(color = colorScheme.onBackground)
+fun PageIndicator(
+    numberOfPages: Int,
+    selectedPage: Int = 0,
+    selectedColor: Color = Color.White,
+    defaultColor: Color = Color.Gray,
+    defaultRadius: Dp = 8.dp,
+    selectedLength: Dp = 25.dp,
+    space: Dp = 4.dp,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center,
+        modifier = modifier
+    ) {
+        repeat(numberOfPages) {
+            Indicator(
+                isSelected = it == selectedPage,
+                selectedColor = selectedColor,
+                defaultColor = defaultColor,
+                defaultRadius = defaultRadius,
+                selectedLength = selectedLength,
+            )
         }
     }
+}
+
+/**
+ * pager indicator item
+ */
+@Composable
+fun Indicator(
+    isSelected: Boolean,
+    selectedColor: Color,
+    defaultColor: Color,
+    defaultRadius: Dp,
+    selectedLength: Dp,
+    modifier: Modifier = Modifier.height(defaultRadius)
+) {
+    val width by animateDpAsState(
+        targetValue = if (isSelected) selectedLength else defaultRadius,
+        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy)
+    )
+    Box(
+        modifier = modifier
+            .width(width)
+            .clip(CircleShape)
+            .background(color = if (isSelected) selectedColor else defaultColor)
+    )
 }

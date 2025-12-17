@@ -31,7 +31,7 @@ class OrderFinishViewModel : ViewModel() {
                     "Status" to 1,
                     "TotalPrice" to totalPrice,
                     "PickupTime" to when (idPickupTime){
-                        0 -> Timestamp.from(timestamp.toInstant().plusSeconds(5 * 60))
+                        0 -> Timestamp.from(timestamp.toInstant())
                         1 -> Timestamp.from(timestamp.toInstant().plusSeconds(15 * 60))
                         2 -> Timestamp.from(timestamp.toInstant().plusSeconds(30 * 60))
                         3 -> Timestamp.from(timestamp.toInstant().plusSeconds(60 * 60))

@@ -25,6 +25,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -63,7 +64,7 @@ fun AboutItemSheet(state: Boolean = false,
             },
             sheetState = sheetState,
             containerColor = colorScheme.background,
-            contentColor = colorScheme.onSurface
+            contentColor = colorScheme.onBackground
         ) {
                 Column(
                     modifier = Modifier
@@ -103,6 +104,16 @@ fun AboutItemSheet(state: Boolean = false,
                     Spacer(modifier = Modifier.height(12.dp))
 
                     Text(
+                        text = "250 г",
+                        fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
+                        color = Color.Gray,
+                        textAlign = TextAlign.Left,
+                        fontSize = 16.sp,
+                    )
+
+                    Spacer(modifier = Modifier.height(6.dp))
+
+                    Text(
                         text = "Описание: $description",
                         fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
                         color = colorScheme.onBackground,
@@ -110,7 +121,7 @@ fun AboutItemSheet(state: Boolean = false,
                         fontSize = 18.sp,
                     )
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(6.dp))
 
                     Text(
                         text = "Состав: ${composition.replace(";", ",")}",
@@ -120,7 +131,7 @@ fun AboutItemSheet(state: Boolean = false,
                         fontSize = 18.sp,
                     )
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(6.dp))
 
                     Text(
                         text = "Пищевая ценность на 100 г",

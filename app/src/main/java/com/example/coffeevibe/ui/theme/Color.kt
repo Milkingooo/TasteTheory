@@ -11,6 +11,16 @@ val LightSuccessColor = Color(0xFF_8D_B6_00)
 val LightInactiveElementBackground = Color(0xFF_EA_E0_D5)
 val LightShadowAndBorder = Color(0xFF_88_78_64)
 val LightTooltipBackground = Color(0xFF_FF_F1_E8)
+
+val LightBackground2 = Color.LightGray
+val LightTextAndIcons2 = Color.Black
+val LightAccentColor2 = Color.White
+val LightErrorColor2 = Color(0xFF_B2_22_22)
+val LightWarningColor2 = Color(0xFF_FF_8C_00)
+val LightSuccessColor2 = Color(0xFF_8D_B6_00)
+val LightInactiveElementBackground2 = Color(0xFF_EA_E0_D5)
+val LightShadowAndBorder2 = Color(0xFF_88_78_64)
+val LightTooltipBackground2 = Color(0xFF_FF_F1_E8)
 //
 //// Основной фон
 //val DarkBackground = Color(0xFF_30_27_22)
