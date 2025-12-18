@@ -61,6 +61,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.coffeevibe.R
 import com.example.coffeevibe.ui.theme.CoffeeVibeTheme
+import com.example.coffeevibe.ui.theme.Shapes
 import com.example.coffeevibe.ui.ui.AdminPanelScreen
 import com.example.coffeevibe.viewmodel.LoginViewModel
 
@@ -107,7 +108,7 @@ fun ProfileScreen(
                     .fillMaxSize()
                     .background(colorScheme.background)
                     .padding(paddingValues)
-                    .padding(16.dp)
+                    //.padding(16.dp)
                     .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -117,7 +118,8 @@ fun ProfileScreen(
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
                     color = colorScheme.onBackground,
-                    textAlign = TextAlign.Left
+                    textAlign = TextAlign.Left,
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -134,16 +136,12 @@ fun ProfileScreen(
                         inSettings()
                     })
 
-                SettingsSubCategory("Помощь",
+                SettingsSubCategory("Поддержка",
                     icon = Icons.Filled.SupportAgent,
                     //BitmapPainter(ImageBitmap.imageResource(R.drawable.settings_48)),
                     action = {
                         inSupport()
                     })
-
-//                SettingsSubCategory("О приложении",
-//                    icon = Icons.Filled.Info,
-//                    action = { inAboutScreen() })
 
                 SettingsSubCategory("Администрирование",
                     icon = Icons.Filled.AdminPanelSettings,
@@ -157,7 +155,7 @@ fun ProfileScreen(
                         loginVm.logout()
                     },
                     colors = ButtonDefaults.buttonColors(colorScheme.error),
-                    shape = RoundedCornerShape(10.dp),
+                    shape = Shapes.medium,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp)

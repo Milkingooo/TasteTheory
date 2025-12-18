@@ -91,6 +91,7 @@ import com.example.coffeevibe.R
 import com.example.coffeevibe.database.CartDatabase
 import com.example.coffeevibe.repository.CartRepository
 import com.example.coffeevibe.ui.theme.CoffeeVibeTheme
+import com.example.coffeevibe.ui.theme.Shapes
 import com.example.coffeevibe.ui.ui.other.CartItemNew
 import com.example.coffeevibe.utils.AuthUtils
 import com.example.coffeevibe.viewmodel.OrderViewModel
@@ -183,7 +184,7 @@ fun CartScreen(
                         else ButtonDefaults.buttonColors(
                         containerColor = Color.Gray
                     ),
-                    shape = RoundedCornerShape(10.dp),
+                    shape = Shapes.medium,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(start = 16.dp, end = 16.dp, bottom = 8.dp, top = 8.dp)

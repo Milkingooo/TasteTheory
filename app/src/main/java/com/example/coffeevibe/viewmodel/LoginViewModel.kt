@@ -75,7 +75,7 @@ class LoginViewModel(val context: Context) : ViewModel() {
                         "Password" to password,
                         "Id" to id,
                         "IsAdmin" to false,
-                        "IsManager" to false
+                        "IsManager" to false,
                     )
                 )
                 .addOnSuccessListener {

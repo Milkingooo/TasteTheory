@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,14 +16,21 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonColors
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,24 +49,28 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.coffeevibe.R
 import com.example.coffeevibe.ui.theme.CoffeeVibeTheme
+import com.example.coffeevibe.ui.theme.Shapes
 import com.example.coffeevibe.ui.ui.other.BaseButton
+import com.example.coffeevibe.ui.ui.other.BaseButtonWithIcon
 import com.example.coffeevibe.ui.ui.other.SwitchWithThumbIconSample
 import com.example.coffeevibe.ui.ui.other.TextFieldWithName
 import com.example.coffeevibe.viewmodel.LoginViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AccountScreen(
-    onBackPressed: () -> Unit
+    onBackPressed: () -> Unit,
+    loginVm: LoginViewModel
 ) {
-    val context = LocalContext.current
-    val loginVm = LoginViewModel(context)
-
     var name by remember { mutableStateOf("") }
+    var newName by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
+    var newEmail by remember { mutableStateOf("") }
+
     val isInCorrectName by remember { mutableStateOf(false) }
+    var isNameEdit by remember { mutableStateOf(false) }
+    var isEmailEdit by remember { mutableStateOf(false) }
     val isInCorrectEmail by remember { mutableStateOf(false) }
-    val isInCorrectPassword by remember { mutableStateOf(false) }
 
     var isUserLoggedIn by remember { mutableStateOf(false) }
     isUserLoggedIn = loginVm.isLogin()
@@ -69,21 +81,11 @@ fun AccountScreen(
     }
 
     CoffeeVibeTheme(context2 = LocalContext.current,content = {
-        Scaffold() { innerPadding ->
-
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(colorScheme.background)
-                    .consumeWindowInsets(innerPadding)
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
+        Scaffold(
+            contentWindowInsets = WindowInsets(0, 0, 0, 0),
+            topBar = {
+            TopAppBar(
+                title = {
                     Text(
                         text = "Аккаунт",
                         color = colorScheme.onBackground,
@@ -91,7 +93,8 @@ fun AccountScreen(
                         fontSize = 28.sp,
                         textAlign = TextAlign.Left
                     )
-
+                },
+                actions = {
                     IconButton(
                         onClick = {
                             onBackPressed()
@@ -106,10 +109,22 @@ fun AccountScreen(
                                 .height(20.dp)
                         )
                     }
-                }
+                },
+                windowInsets = TopAppBarDefaults.windowInsets,
+                colors=TopAppBarDefaults.topAppBarColors(containerColor = colorScheme.background)
+            ) }
+        ) { innerPadding ->
 
-                Spacer(modifier = Modifier.size(16.dp))
-
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(colorScheme.background)
+                    .padding(innerPadding)
+            ) {
+//                Row(
+//                    modifier = Modifier.fillMaxWidth(),
+//                    verticalAlignment = Alignment.CenterVertically,
+//                ) {
                 TextFieldWithName(
                     title = "Имя",
                     value = name,
@@ -117,61 +132,56 @@ fun AccountScreen(
                         name = it
                     },
                     isInCorrect = isInCorrectName,
-                    placeholder = "Ваше имя"
+                    placeholder = "Ваше имя",
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = true
                 )
+//                    BaseButtonWithIcon(
+//                        click = {
+//                            isNameEdit = !isNameEdit
+//                        },
+//                        icon = if (isNameEdit) Icons.Default.Save else Icons.Default.Edit,
+//                        iconTint = colorScheme.background,
+//                        color = IconButtonColors(
+//                            containerColor = colorScheme.primary,
+//                            contentColor = colorScheme.background,
+//                            disabledContainerColor = colorScheme.primary,
+//                            disabledContentColor = colorScheme.background
+//                        ),
+//                        modifier = Modifier.size(48.dp),
+//                        shape = Shapes.small,
+//                    )
+//                }
 
-                TextFieldWithName(
-                    title = "Почта",
-                    value = email,
-                    exitValue = {
-                        email = it
-                    },
-                    isInCorrect = isInCorrectEmail,
-                    placeholder = "Ваша почта",
-                    keyboardType = KeyboardType.Email
-                )
+                    TextFieldWithName(
+                        title = "Почта",
+                        value = email,
+                        exitValue = {
+                            email = it
+                        },
+                        isInCorrect = isInCorrectEmail,
+                        placeholder = "Ваша почта",
+                        keyboardType = KeyboardType.Email,
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = true
+                    )
 
                 BaseButton(
                     title = "Сбросить пароль",
-                    click = { },
+                    click = {
+                        loginVm.sendPasswordResetEmail(email)
+                    },
                     color = ButtonDefaults.buttonColors(colorScheme.primary),
                 )
 
-//                TextFieldWithName(
-//                    title = "Телефон",
-//                    value = phone,
-//                    exitValue = {
-//                        phone = it
-//                    },
-//                    isInCorrect = isInCorrectPhone,
-//                    placeholder = "+7 (800) 555-35-35",
-//                    keyboardType = KeyboardType.Phone
-//                )
+//                BaseButton(
+//                    title = "Удалить аккаунт",
+//                    click = {
 //
-//                SwitchWithThumbIconSample(
-//                    "Вход по СМС"
+//                    },
+//                    color = ButtonDefaults.buttonColors(colorScheme.error)
 //                )
-
-                BaseButton(
-                    title = "Сохранить",
-                    click = { },
-                    color = ButtonDefaults.buttonColors(colorScheme.primary),
-                )
-
-                BaseButton(
-                    title = "Удалить аккаунт",
-                    click = { },
-                    color = ButtonDefaults.buttonColors(colorScheme.error)
-                )
             }
         }
     })
-}
-
-@Preview(showBackground = true)
-@Composable
-fun AccountPreview() {
-    AccountScreen(
-        {}
-    )
 }

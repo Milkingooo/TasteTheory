@@ -208,15 +208,15 @@ fun MenuScreen(
 
 
     val filteredGoods = when {
-        searchQuery.isBlank() && !onlyDiscount -> goods
-        onlyDiscount -> goods.filter { it.discountPrice != 0 }
-        priceDecreasing -> goods.sortedByDescending { it.price }
-        priceIncreasing -> goods.sortedBy { it.price }
-        else -> goods.filter {
+        searchQuery.isNotBlank() -> goods.filter {
             it.name.contains(searchQuery, true)
                     || it.price.toString().contains(searchQuery, true)
                     || it.discountPrice.toString().contains(searchQuery, true)
         }
+        onlyDiscount -> goods.filter { it.discountPrice != 0 }
+        priceDecreasing -> goods.sortedByDescending { it.price }
+        priceIncreasing -> goods.sortedBy { it.price }
+        else -> goods
     }
 //        if (searchQuery.isBlank() && !onlyDiscount) {
 //        goods
@@ -355,7 +355,7 @@ fun MenuScreen(
                                         color = colorScheme.onBackground,
                                         fontFamily = FontFamily(Font(R.font.roboto_condensed_medium))) },
                                     onClick = {
-                                        //onlyDiscount = !onlyDiscount
+                                        priceDecreasing = !priceDecreasing
                                     },
                                     leadingIcon = {
                                         Checkbox(
@@ -374,7 +374,7 @@ fun MenuScreen(
                                         color = colorScheme.onBackground,
                                         fontFamily = FontFamily(Font(R.font.roboto_condensed_medium))) },
                                     onClick = {
-                                        //onlyDiscount = !onlyDiscount
+                                        priceIncreasing = !priceIncreasing
                                     },
                                     leadingIcon = {
                                         Checkbox(

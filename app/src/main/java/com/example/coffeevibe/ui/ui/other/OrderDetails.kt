@@ -1,6 +1,7 @@
 package com.example.coffeevibe.ui.ui.other
 
 import android.annotation.SuppressLint
+import android.graphics.drawable.shapes.Shape
 import android.util.Log
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animate
@@ -47,6 +48,7 @@ import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonColors
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme.colorScheme
@@ -91,6 +93,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -118,19 +121,19 @@ fun SegmentedButtonSingleSelectSample(
     var openDialog by remember { mutableStateOf(false) }
     var confirmAction by remember { mutableStateOf(false) }
 
-    if (openDialog) {
-        MyAlertDialog(
-            onDismissRequest = { openDialog = false },
-            onConfirmation = {
-                confirmAction = true
-                openDialog = false
-            },
-            dialogTitle = "Подтвердите действие",
-            icon = Icons.Filled.CheckBox,
-            dialogText = "Вы уверены, что хотите изменить статус заказа на ${ConvertOrderState.convertOrderStateToString(selectedIndex + 1)}?",
-
-        )
-    }
+//    if (openDialog) {
+//        MyAlertDialog(
+//            onDismissRequest = { openDialog = false },
+//            onConfirmation = {
+//                confirmAction = true
+//                openDialog = false
+//            },
+//            dialogTitle = "Подтвердите действие",
+//            icon = Icons.Filled.CheckBox,
+//            dialogText = "Подтвердить действие?",
+//
+//        )
+//    }
 
     if (orientationHorizontal) {
         Row(
@@ -156,13 +159,10 @@ fun SegmentedButtonSingleSelectSample(
                             count = segments.size
                         ),
                         onClick = {
-                            openDialog = true
-
-                            if (confirmAction) {
-                                selectedIndex = index
-                                actions(selectedIndex)
-                                confirmAction = false
-                            }
+                            //openDialog = true
+                            selectedIndex = index
+                            actions(selectedIndex)
+                            //confirmAction = false
                         },
                         selected = index == selectedIndex,
                         colors = SegmentedButtonDefaults.colors(colorScheme.primary)
@@ -200,11 +200,11 @@ fun SegmentedButtonSingleSelectSample(
                         onClick = {
                             openDialog = true
 
-                            if (confirmAction) {
+                            //if (confirmAction) {
                                 selectedIndex = index
                                 actions(selectedIndex)
-                                confirmAction = false
-                            }
+                                //confirmAction = false
+                            //}
                         },
                         selected = index == selectedIndex,
                         colors = SegmentedButtonDefaults.colors(colorScheme.primary)
@@ -506,6 +506,40 @@ fun KbjuField(
 }
 
 @Composable
+fun BaseButtonWithIcon(
+    click: () -> Unit,
+    icon: ImageVector,
+    iconTint: Color,
+    color: IconButtonColors,
+    modifier: Modifier,
+    shape: androidx.compose.ui.graphics.Shape,
+){
+//    Button(
+//        onClick = { click() },
+//        colors = color,
+//        shape = shape,
+//        modifier = modifier
+//    ) {
+//        Icon(
+//            icon,
+//            tint = iconTint,
+//            contentDescription = null
+//        )
+//    }
+    IconButton(
+        onClick = { click() },
+        colors = color,
+        shape = shape,
+        modifier = modifier
+    ) {
+        Icon(
+            icon,
+            tint = iconTint,
+            contentDescription = null
+        )
+    }
+}
+@Composable
 fun BaseButton(
     click: () -> Unit,
     title: String,
@@ -514,7 +548,7 @@ fun BaseButton(
     Button(
         onClick = { click() },
         colors = color,
-        shape = RoundedCornerShape(10.dp),
+        shape = Shapes.medium,
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
@@ -538,7 +572,9 @@ fun TextFieldWithName(
     exitValue: (String) -> Unit,
     isInCorrect: Boolean,
     placeholder: String,
-    keyboardType: KeyboardType = KeyboardType.Text
+    keyboardType: KeyboardType = KeyboardType.Text,
+    modifier: Modifier,
+    enabled: Boolean = false
 ){
     Column(
         modifier = Modifier.padding(8.dp),
@@ -567,7 +603,8 @@ fun TextFieldWithName(
             placeholder = { Text(placeholder, color = colorScheme.onSurface) },
             isError = isInCorrect,
             singleLine = true,
-            modifier = Modifier.fillMaxWidth()
+            modifier = modifier,
+            enabled = enabled
         )
     }
 }
@@ -872,7 +909,7 @@ fun MyAlertDialog(
 ) {
     AlertDialog(
         icon = {
-            Icon(icon, contentDescription = "Example Icon", tint = colorScheme.error)
+            Icon(icon, contentDescription = "Example Icon", tint = colorScheme.onBackground)
         },
         title = {
             Text(text = dialogTitle)
@@ -900,7 +937,10 @@ fun MyAlertDialog(
             ) {
                 Text("Отмена")
             }
-        }
+        },
+        containerColor = colorScheme.background,
+        textContentColor = colorScheme.onBackground,
+        titleContentColor = colorScheme.onBackground
     )
 }
 

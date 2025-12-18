@@ -103,7 +103,7 @@ fun MainScreen(
                 composable(Screen.Admin.route){ AdminPanelScreen( onBackPressed = { navController.navigate("account") }) }
 
                 composable(Screen.AccountSettings.route){
-                    AccountScreen( onBackPressed = { navController.navigate("account") })
+                    AccountScreen( onBackPressed = { navController.navigate("account") }, loginVm = loginVm)
                 }
 
                 composable(Screen.Settings.route) {
