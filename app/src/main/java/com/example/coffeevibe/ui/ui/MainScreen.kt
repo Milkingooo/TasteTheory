@@ -229,4 +229,5 @@ sealed class Screen(val route: String) {
     object Admin : Screen("admin")
     object Settings : Screen("settings")
     object Support : Screen("support")
+    object Splash : Screen("splashScreen")
 }

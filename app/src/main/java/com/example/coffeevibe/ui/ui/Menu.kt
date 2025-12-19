@@ -1,7 +1,5 @@
 package com.example.coffeevibe.ui.ui
 
-import android.R.attr.rotationX
-import android.graphics.Insets
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
@@ -9,7 +7,6 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.expandHorizontally
-import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkHorizontally
@@ -17,7 +14,6 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,7 +21,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -41,47 +36,26 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.input.rememberTextFieldState
-import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.outlined.TrendingDown
-import androidx.compose.material.icons.automirrored.outlined.TrendingUp
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.FilterAlt
-import androidx.compose.material.icons.filled.Mic
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.outlined.Deck
-import androidx.compose.material.icons.outlined.Edit
-import androidx.compose.material.icons.outlined.Email
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.KeyboardDoubleArrowUp
 import androidx.compose.material.icons.outlined.FilterAlt
-import androidx.compose.material.icons.outlined.PriceCheck
 import androidx.compose.material.icons.outlined.Search
-import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material.icons.outlined.TrendingDown
-import androidx.compose.material.icons.outlined.TrendingUp
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExpandedFullScreenSearchBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
-import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.OutlinedCard
@@ -89,10 +63,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SearchBar
-import androidx.compose.material3.SearchBarDefaults
-import androidx.compose.material3.SearchBarState
-import androidx.compose.material3.SearchBarValue
+import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TooltipAnchorPosition
 import androidx.compose.material3.TooltipBox
@@ -102,10 +73,10 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
-import androidx.compose.material3.rememberSearchBarState
 import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -117,36 +88,27 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.PopupProperties
 import androidx.navigation.NavController
-import coil.compose.AsyncImage
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import coil.imageLoader
 import coil.request.ImageRequest
 import coil.transform.RoundedCornersTransformation
 import com.example.coffeevibe.R
-import com.example.coffeevibe.model.MenuItem
 import com.example.coffeevibe.ui.theme.CoffeeVibeTheme
 import com.example.coffeevibe.ui.theme.Shapes
 import com.example.coffeevibe.ui.ui.other.AssistChipMenu
@@ -156,10 +118,8 @@ import com.example.coffeevibe.utils.CashApplication
 import com.example.coffeevibe.utils.NetworkUtils
 import com.example.coffeevibe.viewmodel.MenuViewModel
 import com.example.coffeevibe.viewmodel.OrderViewModel
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlin.math.min
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -171,6 +131,7 @@ fun MenuScreen(
     val context = LocalContext.current
     val networkAvailable by NetworkUtils.isNetworkAvailable(context).collectAsState(initial = true)
     val goods by menuViewModel.dataList.collectAsState()
+
     var searchQuery by rememberSaveable { mutableStateOf("") }
     var isSearching by rememberSaveable { mutableStateOf(false) }
     var showSheet by remember { mutableStateOf(false) }
@@ -218,15 +179,6 @@ fun MenuScreen(
         priceIncreasing -> goods.sortedBy { it.price }
         else -> goods
     }
-//        if (searchQuery.isBlank() && !onlyDiscount) {
-//        goods
-//    } else if (onlyDiscount) {
-//        goods.filter { it.discountPrice != 0 }
-//    } else {
-//        goods.filter {
-//            it.name.contains(searchQuery, true)
-//        }
-//    }
 
     val categories = filteredGoods.groupBy { it.category }.toSortedMap()
     val categoryIndexMap = remember { mutableStateMapOf<String, Int>() }
@@ -254,12 +206,33 @@ fun MenuScreen(
     CoffeeVibeTheme(context2 = LocalContext.current,content = {
         Scaffold(
             contentWindowInsets = WindowInsets(0, 0, 0, 0),
+            floatingActionButton = {
+                val displayButton = remember { derivedStateOf { listState2.firstVisibleItemIndex > 4 } }
+
+                AnimatedVisibility(visible = displayButton.value) {
+                    FloatingActionButton(
+                        onClick = {
+                            coroutineScope.launch {
+                                listState2.animateScrollToItem(0)
+                            }
+                        },
+                        containerColor = colorScheme.primary,
+                        contentColor = colorScheme.onBackground,
+                    ) {
+                        Icon(
+                            Icons.Filled.KeyboardDoubleArrowUp,
+                            "Вверх",
+                            tint = colorScheme.background
+                        )
+                    }
+                }
+            },
             topBar = {
                 TopAppBar(
                     title = {
                         if (!isSearching) {
                             Text(
-                                text = "Меню",
+                                text = stringResource(R.string.Menu),
                                 color = colorScheme.onBackground,
                                 fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
                                 fontSize = 28.sp,
@@ -297,7 +270,7 @@ fun MenuScreen(
                                 placeholder = {
                                     Text(
                                         text = "Поиск",
-                                        color = colorScheme.onSurface
+                                        color = colorScheme.onBackground
                                     )
                                 },
                                 shape = MaterialTheme.shapes.large,
@@ -495,7 +468,7 @@ fun MenuScreen(
                                         Column {
                                             HorizontalPager(
                                                 state = pagerState,
-                                                contentPadding = PaddingValues(end = 16.dp),
+                                                contentPadding = if (numAndPrice.size > 1) PaddingValues(end = 16.dp) else PaddingValues(0.dp),
                                                 pageSpacing = 6.dp,
                                                 modifier = Modifier.animateItem()
                                             ) {
@@ -511,26 +484,7 @@ fun MenuScreen(
                                                 )
                                             }
                                             Spacer(modifier = Modifier.height(6.dp))
-//                                            Row(
-//                                                Modifier
-//                                                    .wrapContentHeight()
-//                                                    .fillMaxWidth()
-//                                                    .align(Alignment.CenterHorizontally)
-//                                                    .padding(bottom = 8.dp),
-//                                                horizontalArrangement = Arrangement.Center
-//                                            ) {
-//                                                repeat(pagerState.pageCount) { iteration ->
-//                                                    val color =
-//                                                        if (pagerState.currentPage == iteration) Color.DarkGray else Color.LightGray
-//                                                    Box(
-//                                                        modifier = Modifier
-//                                                            .padding(2.dp)
-//                                                            .clip(CircleShape)
-//                                                            .background(color)
-//                                                            .size(8.dp)
-//                                                    )
-//                                                }
-//                                            }
+
                                             PageIndicator(
                                                 numberOfPages = pagerState.pageCount,
                                                 selectedPage = pagerState.currentPage,
@@ -622,11 +576,16 @@ fun ListItem2(
 ) {
 
     CoffeeVibeTheme(context2 = LocalContext.current,content = {
-        OutlinedCard(
+        Card(
             modifier = Modifier
                 .width(175.dp)
                 .height(270.dp)
-                .shadow(2.dp, Shapes.large)
+                //.shadow(4.dp, Shapes.large)
+                .shadow(
+                    4.dp,
+                    Shapes.large,
+                    spotColor = if (isSelected) colorScheme.secondary else colorScheme.onSurface
+                )
                 .clickable {
                     onInfo()
                 },
@@ -635,7 +594,7 @@ fun ListItem2(
             ),
             shape = Shapes.large,
             border = BorderStroke(
-                if (isSelected) 2.dp else 1.dp,
+                if (isSelected) 2.dp else 0.dp,
                 if (isSelected) colorScheme.secondary else colorScheme.onSurface
             )
         ) {

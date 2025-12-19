@@ -6,11 +6,15 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.example.coffeevibe.database.CartDatabase
 import com.example.coffeevibe.repository.CartRepository
 import com.example.coffeevibe.ui.ui.MainScreen
+import com.example.coffeevibe.ui.ui.SplashScreen
 import com.example.coffeevibe.viewmodel.LoginViewModel
 import com.example.coffeevibe.viewmodel.MenuViewModel
 import com.example.coffeevibe.viewmodel.OrderViewModel
@@ -29,6 +33,7 @@ class MainActivity : ComponentActivity() {
             val orderViewModel = OrderViewModel(repository, applicationContext)
             val loginVm = LoginViewModel(applicationContext)
             val menuVm = MenuViewModel(context = applicationContext)
+            val load by menuVm.isMenuLoad.collectAsState()
 
             loginVm.checkRoles {
                 if (it == 1) {
@@ -37,17 +42,21 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
-            MainScreen(
-                onLogin = {
-                    startActivity(Intent(this, LoginActivity::class.java))
-                },
-                inFinishOrder = {
-                    startActivity(Intent(this, OrderActivity::class.java))
-                },
-                menuViewModel = menuVm,
-                orderViewModel = orderViewModel,
-                loginVm = loginVm
-            )
+            if (!load) {
+                MainScreen(
+                    onLogin = {
+                        startActivity(Intent(this, LoginActivity::class.java))
+                    },
+                    inFinishOrder = {
+                        startActivity(Intent(this, OrderActivity::class.java))
+                    },
+                    menuViewModel = menuVm,
+                    orderViewModel = orderViewModel,
+                    loginVm = loginVm
+                )
+            } else {
+                SplashScreen(menuVm = menuVm)
+            }
         }
     }
 }

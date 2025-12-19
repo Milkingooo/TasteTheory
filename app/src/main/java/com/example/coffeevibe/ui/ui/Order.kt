@@ -112,27 +112,6 @@ fun CartScreen(
     val context = LocalContext.current
 
     CoffeeVibeTheme(context2 = LocalContext.current,content = {
-//        Scaffold(
-//            contentWindowInsets = WindowInsets(0,0,0,0),
-//            bottomBar = {
-//                OrderBottomBar(
-//                    totalPrice = totalPrice,
-//                    orderAvailable = orderItems.isNotEmpty() && AuthUtils.isUserAuth(),
-//                    onCreateOrder = {
-//                        if (orderItems.isNotEmpty() && AuthUtils.isUserAuth()) {
-//                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-//                            onCreateOrder()
-//                        }
-//                    }
-//                )
-//            }
-//        ) { innerPadding ->
-//            Column(
-//                modifier = Modifier
-//                    .fillMaxSize()
-//                    .padding(innerPadding)
-//                    .consumeWindowInsets(innerPadding)
-//            ) {
         Scaffold(
             contentWindowInsets = WindowInsets(0, 0, 0, 0),
             topBar = {

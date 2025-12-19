@@ -5,4 +5,5 @@
     <string name="title_activity_reg">RegActivity</string>
     <string name="title_activity_account">AccountActivity</string>
     <string name="title_activity_order">OrderActivity</string>
+    <string name="Menu">Меню</string>
 </resources>
