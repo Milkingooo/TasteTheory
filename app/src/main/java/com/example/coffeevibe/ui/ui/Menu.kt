@@ -581,7 +581,7 @@ fun ListItem2(
                 .shadow(
                     4.dp,
                     Shapes.large,
-                    spotColor = if (isSelected) colorScheme.secondary else colorScheme.onSurface
+                    spotColor = if (isSelected) colorScheme.primary else colorScheme.onSurface
                 )
                 .clickable {
                     onInfo()
@@ -592,7 +592,7 @@ fun ListItem2(
             shape = Shapes.large,
             border = BorderStroke(
                 if (isSelected) 2.dp else 0.dp,
-                if (isSelected) colorScheme.secondary else colorScheme.onSurface
+                if (isSelected) colorScheme.primary else colorScheme.onSurface
             )
         ) {
             Column(
@@ -704,7 +704,7 @@ fun ListItem2(
                             .width(45.dp)
                             .height(45.dp)
                             .clip(shape = RoundedCornerShape(16.dp))
-                            .background(color = if (available == "Недоступен") Color.LightGray else colorScheme.secondary),
+                            .background(color = if (available == "Недоступен") Color.LightGray else colorScheme.primary),
                         enabled = available != "Недоступен"
                     ) {
                         if (!isSelected) {

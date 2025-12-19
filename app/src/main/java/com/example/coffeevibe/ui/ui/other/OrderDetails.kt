@@ -842,7 +842,7 @@ fun QuantityControl(
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
-            .background(colorScheme.surface, RoundedCornerShape(8.dp))
+            .background(colorScheme.primary, RoundedCornerShape(8.dp))
             .height(35.dp)
     ) {
         IconButton(onClick = {
@@ -852,7 +852,7 @@ fun QuantityControl(
                 Icon(
                     Icons.Filled.Remove,
                     contentDescription = "Localized description",
-                    tint = colorScheme.onBackground,
+                    tint = colorScheme.background,
                     modifier = Modifier
                         .width(20.dp)
                         .height(20.dp)
@@ -863,7 +863,7 @@ fun QuantityControl(
                 Icon(
                     Icons.Filled.DeleteOutline,
                     contentDescription = "Localized description",
-                    tint = colorScheme.onBackground,
+                    tint = colorScheme.background,
                     modifier = Modifier
                         .width(20.dp)
                         .height(20.dp)
@@ -874,7 +874,7 @@ fun QuantityControl(
 
         Text(
             text = "$quantity шт",
-            color = colorScheme.onBackground,
+            color = colorScheme.background,
             fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
             modifier = Modifier.scale(scale),
             fontSize = 14.sp
@@ -886,7 +886,7 @@ fun QuantityControl(
             Icon(
                 Icons.Filled.Add,
                 contentDescription = "Localized description",
-                tint = colorScheme.onBackground,
+                tint = colorScheme.background,
                 modifier = Modifier
                     .width(20.dp)
                     .height(20.dp)

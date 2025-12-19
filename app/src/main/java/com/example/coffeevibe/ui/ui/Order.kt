@@ -113,7 +113,7 @@ fun CartScreen(
                     },
                     colors = if (orderItems.isNotEmpty() && AuthUtils.isUserAuth())
                         ButtonDefaults.buttonColors(
-                            containerColor = colorScheme.secondary
+                            containerColor = colorScheme.primary
                         )
                         else ButtonDefaults.buttonColors(
                         containerColor = Color.Gray

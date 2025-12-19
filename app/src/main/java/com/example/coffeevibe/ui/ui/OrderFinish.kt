@@ -451,13 +451,6 @@ fun FilterChipItem(
                 color = colorScheme.onBackground,
             )
         },
-        colors = if (selectedItem) {
-            FilterChipDefaults.filterChipColors(
-                selectedContainerColor = colorScheme.surface
-            )
-        } else FilterChipDefaults.filterChipColors(
-
-        ),
         selected = selectedItem,
         leadingIcon = if (selectedItem) {
             {
