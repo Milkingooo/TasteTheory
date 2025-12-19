@@ -35,11 +35,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.graphics.shapes.Morph
 import com.example.coffeevibe.R
 import com.example.coffeevibe.ui.theme.CoffeeVibeTheme
-import com.example.coffeevibe.ui.theme.Shapes
-import com.google.android.material.shape.MaterialShapes
 
 @Composable
 fun AboutAppScreen(

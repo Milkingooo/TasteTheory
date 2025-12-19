@@ -1,7 +1,6 @@
 package com.example.coffeevibe.ui.ui.other
 
 import android.annotation.SuppressLint
-import android.graphics.drawable.shapes.Shape
 import android.util.Log
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animate
@@ -22,7 +21,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -39,7 +37,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.CircularWavyProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -94,10 +91,8 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.coffeevibe.R
@@ -105,7 +100,6 @@ import com.example.coffeevibe.model.OrderManagerItem
 import com.example.coffeevibe.ui.theme.Shapes
 import com.example.coffeevibe.utils.ConvertOrderState
 import java.sql.Date
-import java.sql.Timestamp
 import java.text.SimpleDateFormat
 
 @OptIn(ExperimentalMaterial3Api::class)
