@@ -59,6 +59,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.coffeevibe.R
 import com.example.coffeevibe.model.Location
 import com.example.coffeevibe.ui.theme.CoffeeVibeTheme
+import com.example.coffeevibe.ui.theme.Shapes
 import com.example.coffeevibe.utils.AuthUtils
 import com.example.coffeevibe.viewmodel.MenuViewModel
 import com.example.coffeevibe.viewmodel.OrderFinishViewModel
@@ -487,7 +488,7 @@ fun OrderPlaced(
                 expanded = !expanded
             }
             .height(if (expanded) 180.dp else 55.dp)
-            .clip(RoundedCornerShape(10.dp)),
+            .clip(Shapes.medium),
         colors = if (selectedPlace == "Выбрать место получения") CardDefaults.cardColors(containerColor = Color.LightGray)
         else CardDefaults.cardColors(containerColor = colorScheme.primary)
     ) {
@@ -504,7 +505,7 @@ fun OrderPlaced(
             ) {
                 Text(
                     text = selectedPlace,
-                    color = if (selectedPlace == "Выбрать место получения") colorScheme.onBackground else colorScheme.background,
+                    color = if (selectedPlace == "Выбрать место получения") colorScheme.error else colorScheme.background,
                     fontFamily = FontFamily(Font(R.font.roboto_condensed_black)),
                     fontSize = 16.sp
                 )

@@ -113,26 +113,6 @@ fun UserOrdersScreen(
                             .padding(top = 16.dp, start = 16.dp, end = 16.dp),
                         verticalArrangement = Arrangement.spacedBy(16.dp),
                     ) {
-//                    sortedOrders.forEach { (date, orders) ->
-//
-//                        item {
-////                            val parts = date.split("=") // Разбиваем строку на части
-////                            val seconds = parts[1].split(",")[0].toLong() // Извлекаем секунды
-////                            val nanoseconds = parts[2].split(")")[0].toLong() // Извлекаем наносекунды
-////                            val milliseconds = seconds * 1000 + nanoseconds / 1_000_000
-////                            val date = Date(milliseconds)
-////                            val format2 = SimpleDateFormat("EEE, dd MMM yyyy")
-////                            val timeString = format2.format(date)
-//
-//                            Text(
-//                                text = date.toString(),
-//                                color = colorScheme.onBackground,
-//                                fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
-//                                fontSize = 28.sp,
-//                                textAlign = TextAlign.Left,
-//                            )
-//                        }
-
                         items(sortedOrders, key = { it.number }) { order ->
                             UserOrder(
                                 price = order.price,

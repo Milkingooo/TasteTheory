@@ -127,34 +127,31 @@ fun CartScreen(
                 ) {
                     Row(
                         horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth()
                     ) {
-                        Icon(
-                            Icons.Filled.ShoppingBasket,
-                            "Localized description",
-                            tint = colorScheme.background
-                        )
-                        Spacer(modifier = Modifier.weight(1f))
+//                        Icon(
+//                            Icons.Filled.ShoppingBasket,
+//                            contentDescription = "Localized description",
+//                            tint = colorScheme.onPrimary
+//                        )
                         Text(
                             text = "К оформлению",
-                            color = colorScheme.background,
+                            modifier = Modifier.width(100.dp),
+                            color = colorScheme.onPrimary,
                             fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
-                            fontSize = 16.sp,
-                            modifier = Modifier
-                                .width(130.dp)
+                            fontSize = 16.sp
                         )
-                        Spacer(modifier = Modifier.weight(1f))
                         Text(
                             text = "$totalPrice₽",
-                            modifier = Modifier
-                                .width(100.dp)
-                                .weight(1f),
-                            color = colorScheme.background,
+                            modifier = Modifier.width(100.dp),
+                            color = colorScheme.onPrimary,
                             fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
                             fontSize = 16.sp,
                             textAlign = TextAlign.Right
                         )
                     }
+
                 }
             }
         ) { innerPadding ->

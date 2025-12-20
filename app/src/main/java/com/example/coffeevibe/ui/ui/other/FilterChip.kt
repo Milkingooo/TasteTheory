@@ -26,8 +26,8 @@ fun AssistChipMenu(
             )
         },
         colors = AssistChipDefaults.assistChipColors(
-            containerColor = colorScheme.surface,
-            labelColor = colorScheme.onBackground,
+            containerColor = colorScheme.secondaryContainer,
+            labelColor = colorScheme.onSecondaryContainer,
         )
     )
 }

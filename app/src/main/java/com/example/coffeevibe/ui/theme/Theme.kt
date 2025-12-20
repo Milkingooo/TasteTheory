@@ -14,34 +14,43 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val lightScheme = lightColorScheme(
-    primary = primaryLight,
-    onPrimary = onPrimaryLight,
-    primaryContainer = primaryContainerLight,
-    onPrimaryContainer = onPrimaryContainerLight,
-    secondary = secondaryLight,
-    onSecondary = onSecondaryLight,
-    secondaryContainer = secondaryContainerLight,
-    onSecondaryContainer = onSecondaryContainerLight,
-    tertiary = tertiaryLight,
-    onTertiary = onTertiaryLight,
-    tertiaryContainer = tertiaryContainerLight,
-    onTertiaryContainer = onTertiaryContainerLight,
-    error = errorLight,
-    onError = onErrorLight,
-    errorContainer = errorContainerLight,
-    onErrorContainer = onErrorContainerLight,
-    background = backgroundLight,
-    onBackground = onBackgroundLight,
-    surface = surfaceLight,
-    onSurface = onSurfaceLight,
-    surfaceVariant = surfaceVariantLight,
-    onSurfaceVariant = onSurfaceVariantLight,
-    outline = outlineLight,
-    outlineVariant = outlineVariantLight,
-    scrim = scrimLight,
-    inverseSurface = inverseSurfaceLight,
-    inverseOnSurface = inverseOnSurfaceLight,
-    inversePrimary = inversePrimaryLight,
+    primary = primaryLight, //Основной цвет приложения, который определяет общий визуальный стиль.
+    onPrimary = onPrimaryLight, //Цвет текста и иконок на элементах основного цвета.
+    primaryContainer = primaryContainerLight, //Светлый оттенок основного цвета, используемый для фона контейнеров и карточек.
+    onPrimaryContainer = onPrimaryContainerLight, //Цвет текста и иконок на контейнерах основного цвета.
+
+    secondary = secondaryLight, //Дополнительный цвет, который дополняет основной цвет и добавляет разнообразие дизайну.
+    onSecondary = onSecondaryLight, //Цвет текста и иконок на элементах вторичного цвета.
+    secondaryContainer = secondaryContainerLight, //Светлый оттенок вторичного цвета, используемый для фона контейнеров и карточек.
+    onSecondaryContainer = onSecondaryContainerLight, //Цвет текста и иконок на контейнерах вторичного цвета.
+
+    tertiary = tertiaryLight, //Третичный цвет, который используется реже и добавляет акценты в дизайн.
+    onTertiary = onTertiaryLight, //Цвет текста и иконок на элементах третичного цвета.
+    tertiaryContainer = tertiaryContainerLight, //Светлый оттенок третичного цвета, используемый для фона контейнеров и карточек.
+    onTertiaryContainer = onTertiaryContainerLight, //Цвет текста и иконок на контейнерах третичного цвета.
+
+    error = errorLight, //Цвет, используемый для отображения ошибок и предупреждений.
+    onError = onErrorLight, //Цвет текста и иконок на элементах ошибочного цвета.
+    errorContainer = errorContainerLight, //Фоновое оформление сообщений об ошибках.
+    onErrorContainer = onErrorContainerLight, //Цвет текста внутри контейнера ошибки.
+
+    background = backgroundLight, //Общий фон страницы или экрана.
+    onBackground = onBackgroundLight, //Цвет текста и иконок на фоновом элементе.
+
+    surface = surfaceLight, //Цвет поверхности основных компонентов, таких как карточки и панели инструментов.
+    onSurface = onSurfaceLight, //Цвет текста и иконок на поверхностных компонентах.
+    surfaceVariant = surfaceVariantLight, //Вариант цвета поверхности, используемый для границ и разделения поверхностей.
+    onSurfaceVariant = onSurfaceVariantLight, //Цвет текста и иконок на поверхностях варианта.
+
+    outline = outlineLight, //Цвет контуров и рамок вокруг элементов.
+    outlineVariant = outlineVariantLight, //Альтернативный цвет контуров и рамок.
+
+    scrim = scrimLight, //Полупрозрачный слой, накладываемый поверх содержимого для эффекта затемнения.
+
+    inverseSurface = inverseSurfaceLight, //Обратный цвет поверхности, используемый для контрастных элементов.
+    inverseOnSurface = inverseOnSurfaceLight, //Цвет текста и иконок на обратной стороне поверхности.
+    inversePrimary = inversePrimaryLight, //Обратная версия основного цвета.
+
     surfaceDim = surfaceDimLight,
     surfaceBright = surfaceBrightLight,
     surfaceContainerLowest = surfaceContainerLowestLight,

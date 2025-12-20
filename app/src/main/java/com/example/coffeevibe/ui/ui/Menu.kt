@@ -490,8 +490,8 @@ fun MenuScreen(
                                                     .fillMaxWidth()
                                                     .align(Alignment.CenterHorizontally)
                                                     .padding(bottom = 8.dp),
-                                                defaultColor = Color.LightGray,
-                                                selectedColor = Color.DarkGray
+                                                defaultColor = colorScheme.onSecondaryContainer,
+                                                selectedColor = colorScheme.secondaryContainer
                                             )
                                         }
                                     }
@@ -581,7 +581,7 @@ fun ListItem2(
                 .shadow(
                     4.dp,
                     Shapes.large,
-                    spotColor = if (isSelected) colorScheme.primary else colorScheme.onSurface
+                    spotColor = if (isSelected) colorScheme.secondaryContainer else colorScheme.secondary
                 )
                 .clickable {
                     onInfo()
@@ -592,7 +592,7 @@ fun ListItem2(
             shape = Shapes.large,
             border = BorderStroke(
                 if (isSelected) 2.dp else 0.dp,
-                if (isSelected) colorScheme.primary else colorScheme.onSurface
+                if (isSelected) colorScheme.secondaryContainer else colorScheme.outline
             )
         ) {
             Column(
@@ -704,20 +704,20 @@ fun ListItem2(
                             .width(45.dp)
                             .height(45.dp)
                             .clip(shape = RoundedCornerShape(16.dp))
-                            .background(color = if (available == "Недоступен") Color.LightGray else colorScheme.primary),
+                            .background(color = if (available == "Недоступен") Color.LightGray else colorScheme.secondaryContainer),
                         enabled = available != "Недоступен"
                     ) {
                         if (!isSelected) {
                             Icon(
                                 Icons.Filled.Add,
                                 "Add",
-                                tint = colorScheme.background,
+                                tint = colorScheme.onSecondaryContainer,
                             )
                         } else {
                             Icon(
                                 Icons.Filled.Delete,
                                 "Remove",
-                                tint = colorScheme.background,
+                                tint = colorScheme.onSecondaryContainer,
                             )
                         }
                     }

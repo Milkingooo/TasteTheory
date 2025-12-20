@@ -5,8 +5,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Fastfood
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.SetMeal
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
@@ -126,7 +128,7 @@ fun BottomNavigationBar(navController: NavController, orderVm: OrderViewModel) {
         NavigationBar(
             containerColor = colorScheme.background,
             modifier = Modifier
-                .shadow(10.dp, shape = RoundedCornerShape(30.dp), ambientColor = colorScheme.onSurface)
+                .shadow(10.dp, spotColor = colorScheme.primaryContainer)
         ) {
             val backStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = backStackEntry?.destination?.route
@@ -151,8 +153,8 @@ fun BottomNavigationBar(navController: NavController, orderVm: OrderViewModel) {
                                 badge = {
                                     if (cartItemsCount.value > 0) {
                                         Badge(
-                                            containerColor = Color.Red,
-                                            contentColor = Color.White
+                                            containerColor = colorScheme.primaryContainer,
+                                            contentColor = colorScheme.onPrimaryContainer
                                         ) {
                                             Text("${cartItemsCount.value}")
                                         }
@@ -178,9 +180,9 @@ fun BottomNavigationBar(navController: NavController, orderVm: OrderViewModel) {
                     modifier = Modifier
                         .background(colorScheme.background),
                     colors = NavigationBarItemColors(
-                        selectedIconColor = colorScheme.background,
+                        selectedIconColor = colorScheme.onPrimary,
                         unselectedIconColor = colorScheme.onBackground,
-                        selectedIndicatorColor = colorScheme.onBackground,
+                        selectedIndicatorColor = colorScheme.primary,
                         unselectedTextColor = Color.White,
                         selectedTextColor = Color.White,
                         disabledIconColor = colorScheme.onBackground,
@@ -195,7 +197,7 @@ fun BottomNavigationBar(navController: NavController, orderVm: OrderViewModel) {
 object NavBarItems {
     val BarItems = listOf(
         BarItem(
-            image = Icons.Filled.Menu,
+            image = Icons.Filled.Fastfood,
             route = "menu"
         ),
         BarItem(

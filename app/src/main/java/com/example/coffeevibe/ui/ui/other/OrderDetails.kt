@@ -160,9 +160,9 @@ fun SegmentedButtonSingleSelectSample(
                             //confirmAction = false
                         },
                         selected = index == selectedIndex,
-                        colors = SegmentedButtonDefaults.colors(colorScheme.primary)
+                        colors = SegmentedButtonDefaults.colors(colorScheme.primaryContainer)
                     ) {
-                        Text(label, overflow = TextOverflow.Ellipsis)
+                        Text(label, overflow = TextOverflow.Ellipsis, color = colorScheme.onPrimaryContainer)
                     }
                 }
             }
@@ -202,9 +202,9 @@ fun SegmentedButtonSingleSelectSample(
                             //}
                         },
                         selected = index == selectedIndex,
-                        colors = SegmentedButtonDefaults.colors(colorScheme.primary)
+                        colors = SegmentedButtonDefaults.colors(colorScheme.primaryContainer)
                     ) {
-                        Text(label, overflow = TextOverflow.Ellipsis)
+                        Text(label, overflow = TextOverflow.Ellipsis, color = colorScheme.onPrimaryContainer)
                     }
                 }
             }
@@ -217,8 +217,8 @@ fun SegmentedButtonSingleSelectSample(
 fun IndeterminateCircularIndicator() {
     CircularWavyProgressIndicator(
         modifier = Modifier.width(64.dp),
-        color = colorScheme.secondary,
-        trackColor = colorScheme.surfaceVariant
+        color = colorScheme.primaryContainer,
+        trackColor = colorScheme.onPrimaryContainer
     )
 }
 
@@ -284,9 +284,9 @@ fun UserOrderItem(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(102.dp)
-                    .shadow(4.dp, Shapes.medium, spotColor = colorScheme.onSurface)
+                    .shadow(4.dp, Shapes.medium, spotColor = colorScheme.background)
                     .animateContentSize(),
-                colors = CardDefaults.cardColors(containerColor = colorScheme.surface),
+                colors = CardDefaults.cardColors(containerColor = colorScheme.secondaryContainer),
                 shape = Shapes.medium,
 
                 ) {
@@ -300,19 +300,19 @@ fun UserOrderItem(
                     Column {
                         Text(
                             text = "Ваш заказ",
-                            color = colorScheme.onBackground,
+                            color = colorScheme.onSecondaryContainer,
                             fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
                             fontSize = 18.sp
                         )
                         Text(
                             text = "К оплате: $price₽",
-                            color = colorScheme.onBackground,
+                            color = colorScheme.onSecondaryContainer,
                             fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
                             fontSize = 18.sp
                         )
                         Text(
                             text = "Заберите к $timeString",
-                            color = colorScheme.onBackground,
+                            color = colorScheme.onSecondaryContainer,
                             fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
                             fontSize = 16.sp
                         )
@@ -330,14 +330,14 @@ fun UserOrderItem(
                     ) {
                         Text(
                             text = ConvertOrderState.convertOrderStateToString(state),
-                            color = if (state == 3) colorScheme.secondary else colorScheme.onBackground,
+                            color = if (state == 3) colorScheme.secondary else colorScheme.onSecondaryContainer,
                             fontFamily = FontFamily(Font(R.font.roboto_condensed_black)),
                             fontSize = 20.sp
                         )
 
                         Text(
                             text = number,
-                            color = colorScheme.onBackground,
+                            color = colorScheme.onSecondaryContainer,
                             fontFamily = FontFamily(Font(R.font.roboto_condensed_black)),
                             fontSize = 20.sp
                         )
@@ -351,7 +351,7 @@ fun UserOrderItem(
             DropdownMenu(
                 expanded = orderActionsOpen,
                 onDismissRequest = { orderActionsOpen = false },
-                containerColor = colorScheme.surface,
+                containerColor = colorScheme.secondaryContainer,
                 shape = Shapes.medium
             ) {
                 DropdownMenuItem(
@@ -702,7 +702,7 @@ fun UserOrder(
         colors = CardDefaults.cardColors(containerColor = colorScheme.background),
         shape = RoundedCornerShape(16.dp),
         border = BorderStroke(1.dp,
-            if (state == 5) colorScheme.error else colorScheme.secondary
+            if (state == 5) colorScheme.error else colorScheme.primary
         ))
     {
         Row(
@@ -842,7 +842,7 @@ fun QuantityControl(
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
-            .background(colorScheme.primary, RoundedCornerShape(8.dp))
+            .background(colorScheme.secondaryContainer, RoundedCornerShape(8.dp))
             .height(35.dp)
     ) {
         IconButton(onClick = {
@@ -852,7 +852,7 @@ fun QuantityControl(
                 Icon(
                     Icons.Filled.Remove,
                     contentDescription = "Localized description",
-                    tint = colorScheme.background,
+                    tint = colorScheme.onSecondaryContainer,
                     modifier = Modifier
                         .width(20.dp)
                         .height(20.dp)
@@ -863,7 +863,7 @@ fun QuantityControl(
                 Icon(
                     Icons.Filled.DeleteOutline,
                     contentDescription = "Localized description",
-                    tint = colorScheme.background,
+                    tint = colorScheme.onSecondaryContainer,
                     modifier = Modifier
                         .width(20.dp)
                         .height(20.dp)
@@ -874,7 +874,7 @@ fun QuantityControl(
 
         Text(
             text = "$quantity шт",
-            color = colorScheme.background,
+            color = colorScheme.onSecondaryContainer,
             fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
             modifier = Modifier.scale(scale),
             fontSize = 14.sp
@@ -886,7 +886,7 @@ fun QuantityControl(
             Icon(
                 Icons.Filled.Add,
                 contentDescription = "Localized description",
-                tint = colorScheme.background,
+                tint = colorScheme.onSecondaryContainer,
                 modifier = Modifier
                     .width(20.dp)
                     .height(20.dp)
