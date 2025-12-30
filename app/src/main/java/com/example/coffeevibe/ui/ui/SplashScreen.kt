@@ -12,6 +12,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -52,7 +53,7 @@ fun SplashScreen(menuVm: MenuViewModel) {
         // AnimationEffect
         LaunchedEffect(key1 = true) {
             scale.animateTo(
-                targetValue = 0.5f,
+                targetValue = 1f,
                 animationSpec = tween(
                     durationMillis = 800,
                     easing = {
@@ -78,9 +79,9 @@ fun SplashScreen(menuVm: MenuViewModel) {
 //            )
 //        )
 //    }
-        Box(Modifier.fillMaxSize().systemBarsPadding().padding(16.dp)) {
+        Box(Modifier.fillMaxSize().systemBarsPadding().padding(20.dp)) {
             Image(
-                painter = painterResource(id = R.drawable.volodya),
+                painter = painterResource(id = R.drawable.ic_launcher),
                 contentDescription = "",
                 modifier = Modifier
                     .align(Alignment.Center)
@@ -93,7 +94,7 @@ fun SplashScreen(menuVm: MenuViewModel) {
                 fontSize = 40.sp,
                 letterSpacing = 5.sp,
                 modifier = Modifier.align(Alignment.BottomCenter),
-                color = colorScheme.primary
+                color = colorScheme.onBackground
             )
         }
     })
