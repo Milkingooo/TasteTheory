@@ -9,12 +9,16 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.example.coffeevibe.database.CartDatabase
 import com.example.coffeevibe.repository.CartRepository
+import com.example.coffeevibe.ui.theme.CoffeeVibeTheme
 import com.example.coffeevibe.ui.ui.MainScreen
 import com.example.coffeevibe.ui.ui.SplashScreen
+import com.example.coffeevibe.ui.ui.other.SettingsScreen
+import com.example.coffeevibe.ui.ui.other.TestScreen
 import com.example.coffeevibe.viewmodel.LoginViewModel
 import com.example.coffeevibe.viewmodel.MenuViewModel
 import com.example.coffeevibe.viewmodel.OrderViewModel
@@ -26,7 +30,10 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            FirebaseApp.initializeApp(this)
+            CoffeeVibeTheme(
+                context2 = LocalContext.current
+            ) {
+                FirebaseApp.initializeApp(this)
             val passwordDb = CartDatabase.getDatabase(applicationContext)
             val passwordDao = passwordDb.cartDao()
             val repository = CartRepository(passwordDao)
@@ -41,7 +48,6 @@ class MainActivity : ComponentActivity() {
                     finish()
                 }
             }
-
             if (!load) {
                 MainScreen(
                     onLogin = {
@@ -56,6 +62,7 @@ class MainActivity : ComponentActivity() {
                 )
             } else {
                 SplashScreen(menuVm = menuVm)
+            }
             }
         }
     }

@@ -537,7 +537,7 @@ fun OrderPlaced(
                         ) {
                             Text(
                                 text = it.address,
-                                color = colorScheme.onBackground,
+                                color = colorScheme.background,
                                 fontSize = 20.sp,
                                 fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
                             )

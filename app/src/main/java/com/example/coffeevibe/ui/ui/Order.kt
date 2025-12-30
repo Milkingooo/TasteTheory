@@ -130,21 +130,16 @@ fun CartScreen(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.fillMaxWidth()
                     ) {
-//                        Icon(
-//                            Icons.Filled.ShoppingBasket,
-//                            contentDescription = "Localized description",
-//                            tint = colorScheme.onPrimary
-//                        )
                         Text(
                             text = "К оформлению",
-                            modifier = Modifier.width(100.dp),
+                            modifier = Modifier.width(120.dp),
                             color = colorScheme.onPrimary,
                             fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
                             fontSize = 16.sp
                         )
                         Text(
                             text = "$totalPrice₽",
-                            modifier = Modifier.width(100.dp),
+                            modifier = Modifier.width(120.dp),
                             color = colorScheme.onPrimary,
                             fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
                             fontSize = 16.sp,

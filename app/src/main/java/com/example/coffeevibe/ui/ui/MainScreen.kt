@@ -61,8 +61,7 @@ fun MainScreen(
             ) {
                 composable(Screen.Menu.route) {
                     MenuScreen( orderVm = orderViewModel,
-                        menuViewModel = menuViewModel,
-                        navController = navController)
+                        menuViewModel = menuViewModel)
                 }
 
                 composable(Screen.Cart.route) {

@@ -72,6 +72,7 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -123,7 +124,6 @@ import kotlinx.coroutines.launch
 fun MenuScreen(
     orderVm: OrderViewModel,
     menuViewModel: MenuViewModel,
-    navController: NavController
 ) {
     val context = LocalContext.current
     val networkAvailable by NetworkUtils.isNetworkAvailable(context).collectAsState(initial = true)
@@ -153,10 +153,9 @@ fun MenuScreen(
 
     var isRefreshing by remember { mutableStateOf(false) }
     val state = rememberPullToRefreshState()
-    val coroutineScope = rememberCoroutineScope()
     val onRefresh: () -> Unit = {
         isRefreshing = true
-        coroutineScope.launch {
+        scope.launch {
             delay(1000)
             isRefreshing = false
             menuViewModel.loadMenu()
@@ -165,20 +164,60 @@ fun MenuScreen(
     }
 
 
-    val filteredGoods = when {
-        searchQuery.isNotBlank() -> goods.filter {
-            it.name.contains(searchQuery, true)
-                    || it.price.toString().contains(searchQuery, true)
-                    || it.discountPrice.toString().contains(searchQuery, true)
+//    val filteredGoods = when {
+//        searchQuery.isNotBlank() -> goods.filter {
+//            it.name.contains(searchQuery, true)
+//                    || it.price.toString().contains(searchQuery, true)
+//                    || it.discountPrice.toString().contains(searchQuery, true)
+//        }
+//        onlyDiscount -> goods.filter { it.discountPrice != 0 }
+//        priceDecreasing -> goods.sortedByDescending { it.price }
+//        priceIncreasing -> goods.sortedBy { it.price }
+//        else -> goods
+//    }
+
+    val filteredGoods by remember (
+        goods,
+        searchQuery,
+        onlyDiscount,
+        priceIncreasing,
+        priceDecreasing
+    ) {
+        derivedStateOf {
+            var result = goods
+
+            if (searchQuery.isNotBlank()) {
+                result = result.filter {
+                    it.name.contains(searchQuery, true) ||
+                            it.price.toString().contains(searchQuery, ) ||
+                            it.discountPrice.toString().contains(searchQuery, true)
+                }
+            }
+
+            if (onlyDiscount) {
+                result = result.filter {
+                    it.discountPrice > 0
+                }
+            }
+
+            result = when {
+                priceIncreasing -> result.sortedBy { it.price }
+                priceDecreasing -> result.sortedByDescending { it.price }
+                else -> result
+            }
+
+            result
         }
-        onlyDiscount -> goods.filter { it.discountPrice != 0 }
-        priceDecreasing -> goods.sortedByDescending { it.price }
-        priceIncreasing -> goods.sortedBy { it.price }
-        else -> goods
     }
 
     val categories = filteredGoods.groupBy { it.category }.toSortedMap()
     val categoryIndexMap = remember { mutableStateMapOf<String, Int>() }
+    var itemIndex = 0
+
+    categories.forEach { (category, items) ->
+        categoryIndexMap[category] = itemIndex
+        itemIndex += items.size + 1
+    }
 
     if (showSheet) {
         AboutItemSheet(
@@ -193,23 +232,24 @@ fun MenuScreen(
         }
     }
 
-    if (orderWas) {
-        menuViewModel.loadMenu()
-        menuViewModel.loadOrders()
-        menuViewModel.loadUserOrders()
-        menuViewModel.updateOrderWas(false)
+    LaunchedEffect(orderWas) {
+        if (orderWas) {
+            menuViewModel.loadMenu()
+            menuViewModel.loadOrders()
+            menuViewModel.loadUserOrders()
+            menuViewModel.updateOrderWas(false)
+        }
     }
-
     CoffeeVibeTheme(context2 = LocalContext.current,content = {
         Scaffold(
             contentWindowInsets = WindowInsets(0, 0, 0, 0),
             floatingActionButton = {
-                val displayButton = remember { derivedStateOf { listState2.firstVisibleItemIndex > 4 } }
+                val displayButton by remember { derivedStateOf { listState2.firstVisibleItemIndex > 4 } }
 
-                AnimatedVisibility(visible = displayButton.value) {
+                AnimatedVisibility(visible = displayButton) {
                     FloatingActionButton(
                         onClick = {
-                            coroutineScope.launch {
+                            scope.launch {
                                 listState2.animateScrollToItem(0)
                             }
                         },
@@ -326,11 +366,12 @@ fun MenuScreen(
                                         fontFamily = FontFamily(Font(R.font.roboto_condensed_medium))) },
                                     onClick = {
                                         priceDecreasing = !priceDecreasing
+                                        if (priceDecreasing) priceIncreasing = false
                                     },
                                     leadingIcon = {
                                         Checkbox(
                                             checked = priceDecreasing,
-                                            onCheckedChange = { priceDecreasing = it },
+                                            onCheckedChange = {},
                                             colors = CheckboxDefaults.colors(
                                                 checkedColor = colorScheme.secondary,
                                                 uncheckedColor = colorScheme.onBackground,
@@ -345,11 +386,12 @@ fun MenuScreen(
                                         fontFamily = FontFamily(Font(R.font.roboto_condensed_medium))) },
                                     onClick = {
                                         priceIncreasing = !priceIncreasing
+                                        if (priceIncreasing) priceDecreasing = false
                                     },
                                     leadingIcon = {
                                         Checkbox(
                                             checked = priceIncreasing,
-                                            onCheckedChange = { priceIncreasing = it },
+                                            onCheckedChange = {},
                                             colors = CheckboxDefaults.colors(
                                                 checkedColor = colorScheme.secondary,
                                                 uncheckedColor = colorScheme.onBackground,
@@ -496,11 +538,8 @@ fun MenuScreen(
                                         }
                                     }
                                 }
-                                var currentIndex = 0
 
                                 categories.forEach { (category, filteredGoods) ->
-
-                                    categoryIndexMap[category] = currentIndex
 
                                     item(span = { GridItemSpan(2) }, key = category) {
                                         Text(
@@ -511,8 +550,6 @@ fun MenuScreen(
                                             textAlign = TextAlign.Left,
                                         )
                                     }
-
-                                    currentIndex++
 
                                     items(filteredGoods, key = { it.id }) { item ->
                                         ListItem2(
@@ -546,7 +583,6 @@ fun MenuScreen(
                                             available = item.status
                                         )
                                     }
-                                    currentIndex += filteredGoods.size + 1
                                 }
 
                             }
@@ -581,7 +617,7 @@ fun ListItem2(
                 .shadow(
                     4.dp,
                     Shapes.large,
-                    spotColor = if (isSelected) colorScheme.secondaryContainer else colorScheme.secondary
+                    spotColor = if (isSelected) colorScheme.primary else colorScheme.secondary
                 )
                 .clickable {
                     onInfo()
@@ -592,7 +628,7 @@ fun ListItem2(
             shape = Shapes.large,
             border = BorderStroke(
                 if (isSelected) 2.dp else 0.dp,
-                if (isSelected) colorScheme.secondaryContainer else colorScheme.outline
+                if (isSelected) colorScheme.primary else colorScheme.outline
             )
         ) {
             Column(
@@ -679,7 +715,7 @@ fun ListItem2(
                                 )
                                 Text(
                                     text = "$discountPrice₽",
-                                    color = colorScheme.onBackground,
+                                    color = colorScheme.background,
                                     textAlign = TextAlign.Left,
                                     fontSize = 18.sp,
                                     modifier = Modifier
