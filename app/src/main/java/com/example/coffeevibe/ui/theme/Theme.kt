@@ -1,5 +1,8 @@
+@file:Suppress("DEPRECATION")
+
 package com.example.coffeevibe.ui.theme
 
+import android.app.Activity
 import android.content.Context
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -10,8 +13,17 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
+import androidx.core.view.WindowCompat
+import com.example.coffeevibe.utils.ThemeManager
 
 private val lightScheme = lightColorScheme(
     primary = primaryLight, //Основной цвет приложения, который определяет общий визуальный стиль.
@@ -106,15 +118,33 @@ fun CoffeeVibeTheme(
     dynamicColor: Boolean = false, //для палитры системы true
     content: @Composable() () -> Unit
 ) {
+    val themeManager = ThemeManager(context2)
+    var dynamicColor by remember { mutableStateOf(dynamicColor) }
+
+    dynamicColor = themeManager.isDynamicTheme()
+    val isSystemTheme = themeManager.isSystemTheme()
+    val isDarkTheme = themeManager.isDarkTheme()
+
   val colorScheme = when {
       dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
           val context = LocalContext.current
           if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
       }
-      
-      darkTheme -> darkScheme
+      isSystemTheme -> {
+          if (darkTheme) darkScheme else lightScheme
+      }
+      isDarkTheme -> darkScheme
       else -> lightScheme
   }
+
+    val view = LocalView.current
+    if (!view.isInEditMode) {
+        SideEffect {
+            val window = (view.context as Activity).window
+            window.statusBarColor = colorScheme.primary.toArgb()
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
+        }
+    }
 
   MaterialTheme(
     colorScheme = colorScheme,

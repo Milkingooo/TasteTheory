@@ -1,14 +1,16 @@
 package com.example.coffeevibe.ui.ui
 
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Fastfood
 import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.SetMeal
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
@@ -21,6 +23,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
@@ -35,9 +40,12 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.coffeevibe.ui.theme.CoffeeVibeTheme
 import com.example.coffeevibe.ui.ui.other.ProfileScreen
-import com.example.coffeevibe.ui.ui.other.SettingsScreen
-import com.example.coffeevibe.ui.ui.other.SupportScreen
+import com.example.coffeevibe.ui.ui.other.TestScreen
+import com.example.coffeevibe.ui.ui.settings.SettingsScreen
+import com.example.coffeevibe.ui.ui.settings.SupportScreen
 import com.example.coffeevibe.ui.ui.other.UserOrdersScreen
+import com.example.coffeevibe.ui.ui.settings.AccountScreen
+import com.example.coffeevibe.ui.ui.settings.Faqs
 import com.example.coffeevibe.viewmodel.LoginViewModel
 import com.example.coffeevibe.viewmodel.MenuViewModel
 import com.example.coffeevibe.viewmodel.OrderViewModel
@@ -76,7 +84,6 @@ fun MainScreen(
 
                 composable(Screen.Account.route)
                 {
-                    //AccountScreen({ onLogin() })
                     ProfileScreen(
                         logOut = { onLogin() },
                         inAboutScreen = {
@@ -94,27 +101,74 @@ fun MainScreen(
                         },
                         inSupport = {
                             navController.navigate("support")
+                        },
+                        inTestScreen = {
+                            navController.navigate("testing")
                         }
                     )
                 }
                 composable(Screen.Orders.route){ UserOrdersScreen(menuViewModel = menuViewModel) }
 
-                composable(Screen.About.route){ AboutAppScreen( onBackPressed = { navController.navigate("account") }) }
+                composable(Screen.About.route,
+                    enterTransition = { slideInHorizontally(tween(durationMillis = 500)) + fadeIn(tween(durationMillis = 500)) },
+                    exitTransition = { slideOutHorizontally(tween(durationMillis = 500)) + fadeOut(tween(durationMillis = 500))}
+                ){ AboutAppScreen( onBackPressed = { navController.popBackStack() }) }
 
-                composable(Screen.Admin.route){ AdminPanelScreen( onBackPressed = { navController.navigate("account") }) }
-
-                composable(Screen.AccountSettings.route){
-                    AccountScreen( onBackPressed = { navController.navigate("account") }, loginVm = loginVm)
+                composable(Screen.Admin.route,
+                    enterTransition = { slideInHorizontally(tween(durationMillis = 500)) + fadeIn(tween(durationMillis = 500)) },
+                    exitTransition = { slideOutHorizontally(tween(durationMillis = 500)) + fadeOut(tween(durationMillis = 500))}
+                ){ AdminPanelScreen(
+                    onBackPressed = { navController.popBackStack() },
+                    menuVm = menuViewModel
+                )
                 }
 
-                composable(Screen.Settings.route) {
-                    SettingsScreen( onBackPressed = { navController.navigate("account") })
+                composable(Screen.AccountSettings.route,
+                    enterTransition = { slideInHorizontally(tween(durationMillis = 500)) + fadeIn(tween(durationMillis = 500)) },
+                    exitTransition = { slideOutHorizontally(tween(durationMillis = 500)) + fadeOut(tween(durationMillis = 500))}
+                ){
+                    AccountScreen(
+                        onBackPressed = { navController.popBackStack() },
+                        loginVm = loginVm
+                    )
                 }
 
-                composable(Screen.Support.route) {
-                    SupportScreen( onBackPressed = { navController.navigate("account") })
+                composable(Screen.Settings.route,
+                    enterTransition = { slideInHorizontally(tween(durationMillis = 500)) + fadeIn(tween(durationMillis = 500)) },
+                    exitTransition = { slideOutHorizontally(tween(durationMillis = 500)) + fadeOut(tween(durationMillis = 500))}
+                ) {
+                    SettingsScreen(
+                        onBackPressed = { navController.popBackStack() },
+                    )
                 }
 
+                composable(Screen.Support.route,
+                    enterTransition = { slideInHorizontally(tween(durationMillis = 500)) + fadeIn(tween(durationMillis = 500)) },
+                    exitTransition = { slideOutHorizontally(tween(durationMillis = 500)) + fadeOut(tween(durationMillis = 500))}
+                ) {
+                    SupportScreen(
+                        onBackPressed = { navController.popBackStack() },
+                        inFaqs = { navController.navigate("faqs")}
+                    )
+                }
+
+                composable(Screen.Faqs.route,
+                    enterTransition = { slideInHorizontally(tween(durationMillis = 500)) + fadeIn(tween(durationMillis = 500)) },
+                    exitTransition = { slideOutHorizontally(tween(durationMillis = 500)) + fadeOut(tween(durationMillis = 500))}
+                ) {
+                    Faqs(
+                        onBackPressed = { navController.popBackStack() }
+                    )
+                }
+
+                composable(Screen.Testing.route,
+                    enterTransition = { slideInHorizontally(tween(durationMillis = 500)) + fadeIn(tween(durationMillis = 500)) },
+                    exitTransition = { slideOutHorizontally(tween(durationMillis = 500)) + fadeOut(tween(durationMillis = 500))}
+                ) {
+                    TestScreen(
+                        onBackPressed = { navController.popBackStack() }
+                    )
+                }
             }
             BottomNavigationBar(navController = navController, orderVm = orderViewModel)
         }
@@ -127,7 +181,7 @@ fun BottomNavigationBar(navController: NavController, orderVm: OrderViewModel) {
         NavigationBar(
             containerColor = colorScheme.background,
             modifier = Modifier
-                .shadow(10.dp, spotColor = colorScheme.primaryContainer)
+                .shadow(10.dp, spotColor = colorScheme.onBackground)
         ) {
             val backStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = backStackEntry?.destination?.route
@@ -231,4 +285,6 @@ sealed class Screen(val route: String) {
     object Settings : Screen("settings")
     object Support : Screen("support")
     object Splash : Screen("splashScreen")
+    object Faqs: Screen("faqs")
+    object Testing: Screen("testing")
 }

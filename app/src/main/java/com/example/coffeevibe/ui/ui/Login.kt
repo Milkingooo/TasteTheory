@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
@@ -23,8 +24,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -50,220 +53,226 @@ fun LoginScreen(
     inReg: () -> Unit,
     onLogin: () -> Unit,
     inManager: () -> Unit,
+    loginVm: LoginViewModel
 ) {
     var password by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var isInCorrect by remember { mutableStateOf(false) }
     val context = LocalContext.current
-    val loginVm = LoginViewModel(context)
     var progressState by remember { mutableStateOf(false) }
+    val userRole by loginVm.userRole.collectAsState()
 
     CoffeeVibeTheme(context2 = LocalContext.current,content = {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
-                .background(colorScheme.background),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Text(
-                text = "Добро пожаловать",
-                color = colorScheme.onBackground,
+        Scaffold {
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                fontFamily = FontFamily(Font(R.font.roboto_condensed_bold)),
-                fontSize = 32.sp,
-                textAlign = TextAlign.Center
-            )
+                    .fillMaxSize()
+                    .padding(16.dp)
+                    .background(colorScheme.background),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Text(
+                    text = "Добро пожаловать",
+                    color = colorScheme.onBackground,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    fontFamily = FontFamily(Font(R.font.roboto_condensed_bold)),
+                    fontSize = 32.sp,
+                    textAlign = TextAlign.Center
+                )
 
-            Spacer(modifier = Modifier.size(16.dp))
+                Spacer(modifier = Modifier.size(16.dp))
 
-            Text(
-                text = "Почта",
-                textAlign = TextAlign.Left,
-                fontSize = 18.sp, // Используем стиль текста из темы
-                modifier = Modifier.fillMaxWidth(),
-                color = colorScheme.onBackground, // Цвет текста из темы
-                fontFamily = FontFamily(Font(R.font.roboto_condensed_bold))
-            )
+                Text(
+                    text = "Почта",
+                    textAlign = TextAlign.Left,
+                    fontSize = 18.sp, // Используем стиль текста из темы
+                    modifier = Modifier.fillMaxWidth(),
+                    color = colorScheme.onBackground, // Цвет текста из темы
+                    fontFamily = FontFamily(Font(R.font.roboto_condensed_bold))
+                )
 
-            Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(10.dp))
 
-            OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
-                textStyle = TextStyle(
-                    fontSize = 20.sp,
-                    fontFamily = FontFamily(Font(R.font.roboto_condensed_black))
-                ),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = colorScheme.onBackground,   // Основной цвет для акцентов
-                    unfocusedBorderColor = colorScheme.onSurface, // Цвет границ для неактивного состояния
-                    unfocusedPlaceholderColor = colorScheme.onBackground,
-                    focusedTextColor = colorScheme.onBackground,
-                    unfocusedTextColor = colorScheme.onBackground,
-                ),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                placeholder = { Text("xyz@gmail.com", color = colorScheme.onSurface) },
-                isError = isInCorrect,
-                singleLine = true,
-                leadingIcon = {
-                    Icon(
-                        Icons.Filled.AccountCircle,
-                        contentDescription = "Login",
-                        tint = colorScheme.onBackground
-                    )
-                },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Text(
-                text = "Пароль",
-                textAlign = TextAlign.Left,
-                fontSize = 18.sp,
-                modifier = Modifier.fillMaxWidth(),
-                color = colorScheme.onBackground,
-                fontFamily = FontFamily(Font(R.font.roboto_condensed_bold))
-            )
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            OutlinedTextField(
-                value = password,
-                onValueChange = { password = it },
-                textStyle = TextStyle(
-                    fontSize = 20.sp,
-                    fontFamily = FontFamily(Font(R.font.roboto_condensed_black))
-                ),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = colorScheme.onBackground,
-                    unfocusedBorderColor = colorScheme.onSurface,
-                    unfocusedPlaceholderColor = colorScheme.onBackground,
-                    focusedTextColor = colorScheme.onBackground,
-                    unfocusedTextColor = colorScheme.onBackground,
-                ),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                placeholder = { Text("********", color = colorScheme.onSurface) },
-                isError = isInCorrect,
-                singleLine = true,
-                leadingIcon = {
-                    Icon(
-                        Icons.Filled.Password,
-                        contentDescription = "Password",
-                        tint = colorScheme.onBackground
-                    )
-                },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            Text(
-                text = "Забыли пароль?",
-                textAlign = TextAlign.Left,
-                fontSize = 16.sp,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable {
-                        MainScope().launch {
-                            if (email.isBlank()) {
-                                Toast
-                                    .makeText(context, "Введите почту", Toast.LENGTH_SHORT)
-                                    .show()
-                            } else if (email.isNotBlank() && loginVm.checkEmailInDb(email = email)) {
-                                loginVm.sendPasswordResetEmail(email = email)
-                            } else {
-                                Toast
-                                    .makeText(
-                                        context,
-                                        "Пользоателя с таким email не существует",
-                                        Toast.LENGTH_SHORT
-                                    )
-                                    .show()
-                            }
-                        }
+                OutlinedTextField(
+                    value = email,
+                    onValueChange = { email = it },
+                    textStyle = TextStyle(
+                        fontSize = 20.sp,
+                        fontFamily = FontFamily(Font(R.font.roboto_condensed_black))
+                    ),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = colorScheme.onBackground,   // Основной цвет для акцентов
+                        unfocusedBorderColor = colorScheme.onSurface, // Цвет границ для неактивного состояния
+                        unfocusedPlaceholderColor = colorScheme.onBackground,
+                        focusedTextColor = colorScheme.onBackground,
+                        unfocusedTextColor = colorScheme.onBackground,
+                    ),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                    placeholder = { Text("xyz@gmail.com", color = colorScheme.onSurface) },
+                    isError = isInCorrect,
+                    singleLine = true,
+                    leadingIcon = {
+                        Icon(
+                            Icons.Filled.AccountCircle,
+                            contentDescription = "Login",
+                            tint = colorScheme.onBackground
+                        )
                     },
-                color = colorScheme.onBackground,
-                fontFamily = FontFamily(Font(R.font.roboto_condensed_medium))
-            )
+                    modifier = Modifier.fillMaxWidth()
+                )
 
-            Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
-            Button(
-                onClick = {
-                    if (password.trim().length < 6) {
-                        isInCorrect = true
-                        Toast.makeText(
-                            context,
-                            "Пароль должен быть больше 6 символов",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    } else {
-                        loginVm.login(
-                            login = email,
-                            password = password,
-                            isLogin = {
-                                progressState = true
+                Text(
+                    text = "Пароль",
+                    textAlign = TextAlign.Left,
+                    fontSize = 18.sp,
+                    modifier = Modifier.fillMaxWidth(),
+                    color = colorScheme.onBackground,
+                    fontFamily = FontFamily(Font(R.font.roboto_condensed_bold))
+                )
 
-                                loginVm.checkRoles { role ->
-                                    if (role == 1) {
-                                        inManager()
-                                        progressState = false
-                                    } else if (it && (role == 0 || role == 2)) {
-                                        isInCorrect = false
-                                        onLogin()
-                                        progressState = false
-                                    } else {
-                                        isInCorrect = true
-                                        progressState = false
-                                    }
+                Spacer(modifier = Modifier.height(10.dp))
+
+                OutlinedTextField(
+                    value = password,
+                    onValueChange = { password = it },
+                    textStyle = TextStyle(
+                        fontSize = 20.sp,
+                        fontFamily = FontFamily(Font(R.font.roboto_condensed_black))
+                    ),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = colorScheme.onBackground,
+                        unfocusedBorderColor = colorScheme.onSurface,
+                        unfocusedPlaceholderColor = colorScheme.onBackground,
+                        focusedTextColor = colorScheme.onBackground,
+                        unfocusedTextColor = colorScheme.onBackground,
+                    ),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    placeholder = { Text("********", color = colorScheme.onSurface) },
+                    isError = isInCorrect,
+                    singleLine = true,
+                    leadingIcon = {
+                        Icon(
+                            Icons.Filled.Password,
+                            contentDescription = "Password",
+                            tint = colorScheme.onBackground
+                        )
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Text(
+                    text = "Забыли пароль?",
+                    textAlign = TextAlign.Left,
+                    fontSize = 16.sp,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            MainScope().launch {
+                                if (email.isBlank()) {
+                                    Toast
+                                        .makeText(context, "Введите почту", Toast.LENGTH_SHORT)
+                                        .show()
+                                } else if (email.isNotBlank() && loginVm.checkEmailInDb(email = email)) {
+                                    loginVm.sendPasswordResetEmail(email = email)
+                                } else {
+                                    Toast
+                                        .makeText(
+                                            context,
+                                            "Пользоателя с таким email не существует",
+                                            Toast.LENGTH_SHORT
+                                        )
+                                        .show()
                                 }
                             }
+                        },
+                    color = colorScheme.onBackground,
+                    fontFamily = FontFamily(Font(R.font.roboto_condensed_medium))
+                )
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                Button(
+                    onClick = {
+                        if (password.trim().length < 6) {
+                            isInCorrect = true
+                            Toast.makeText(
+                                context,
+                                "Пароль должен быть больше 6 символов",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        } else {
+                            loginVm.login(
+                                login = email,
+                                password = password,
+                                isLogin = {
+                                    progressState = true
+
+                                    when {
+                                        userRole == 1 -> {
+                                            isInCorrect = false
+                                            inManager()
+                                            progressState = false
+                                        }
+                                        it && (userRole == 0 || userRole == 2) -> {
+                                            isInCorrect = false
+                                            onLogin()
+                                            progressState = false
+                                        }
+                                        else -> {
+                                            isInCorrect = true
+                                            progressState = false
+                                        }
+                                    }
+                                }
+                            )
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = colorScheme.primary,
+                        contentColor = colorScheme.onBackground
+                    ),
+                    shape = RoundedCornerShape(10.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(52.dp)
+                ) {
+                    if (progressState) {
+                        CircularProgressIndicator(
+                            color = colorScheme.background,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    } else {
+                        Text(
+                            "Войти",
+                            fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
+                            color = colorScheme.background,
+                            fontSize = 18.sp
                         )
                     }
-                },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = colorScheme.primary,
-                    contentColor = colorScheme.onBackground
-                ),
-                shape = RoundedCornerShape(10.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(52.dp)
-            ) {
-                if (progressState) {
-                    CircularProgressIndicator(
-                        color = colorScheme.background,
-                        modifier = Modifier.size(24.dp)
-                    )
-                } else {
-                    Text(
-                        "Войти",
-                        fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
-                        color = colorScheme.background,
-                        fontSize = 18.sp
-                    )
                 }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Text(
+                    text = "Впервые? Зарегистрироваться",
+                    textAlign = TextAlign.Center,
+                    fontSize = 16.sp,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            inReg()
+                        },
+                    color = colorScheme.onBackground,
+                    fontFamily = FontFamily(Font(R.font.roboto_condensed_medium))
+                )
             }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Text(
-                text = "Впервые? Зарегистрироваться",
-                textAlign = TextAlign.Center,
-                fontSize = 16.sp,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable {
-                        inReg()
-                    },
-                color = colorScheme.onBackground,
-                fontFamily = FontFamily(Font(R.font.roboto_condensed_medium))
-            )
         }
     })
 }

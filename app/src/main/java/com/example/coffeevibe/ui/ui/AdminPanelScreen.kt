@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -41,8 +42,11 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.PrimaryScrollableTabRow
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScaffoldDefaults.contentWindowInsets
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -69,35 +73,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.coffeevibe.R
 import com.example.coffeevibe.ui.theme.CoffeeVibeTheme
-
-
-@Composable
-fun MainAdminScreen() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Text("Главная страница администратора")
-    }
-}
-@Composable
-fun ProductsAdminScreen() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Text("Управление товарами")
-    }
-}
-@Composable
-fun OrdersAdminScreen() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Text("Управление заказами")
-    }
-}
+import com.example.coffeevibe.ui.ui.adminPanel.HomeAdmin
+import com.example.coffeevibe.ui.ui.adminPanel.OrdersAdmin
+import com.example.coffeevibe.ui.ui.adminPanel.ProductsAdmin
+import com.example.coffeevibe.viewmodel.MenuViewModel
 
 enum class Destination(
     val route: String,
@@ -110,7 +89,7 @@ enum class Destination(
     ORDERS("orders", "Заказы", Icons.Default.List, "Orders"),
     CONTENT("content", "Контент", Icons.Default.Share, "Content"),
     USERS("users", "Пользователи", Icons.Default.People, "Users"),
-    SAFETY("safety", "Безопасность", Icons.Default.Security, "Safety"),
+    //SAFETY("safety", "Безопасность", Icons.Default.Security, "Safety"),
     SUPPORT("support", "Поддержка", Icons.Default.ContactSupport, "Support")
 }
 data class TabItems(
@@ -125,7 +104,7 @@ val tabItems = listOf(
         title = "Главная",
         unSelectedIcon = Icons.Outlined.Home,
         selectedIcon = Icons.Filled.Home,
-        screen = { MainAdminScreen() }
+        screen = { HomeAdmin() }
     ),
     TabItems(
         title = "Товары",
@@ -152,12 +131,6 @@ val tabItems = listOf(
         screen = { }
     ),
     TabItems(
-        title = "Безопасность",
-        unSelectedIcon = Icons.Outlined.Security,
-        selectedIcon = Icons.Filled.Security,
-        screen = { }
-    ),
-    TabItems(
         title = "Поддержка",
         unSelectedIcon = Icons.Outlined.SupportAgent,
         selectedIcon = Icons.Filled.SupportAgent,
@@ -176,12 +149,12 @@ fun AppNavHost(
         Destination.entries.forEach { destination ->
             composable(destination.route) {
                 when (destination) {
-                    Destination.MAIN -> MainAdminScreen()
+                    Destination.MAIN -> HomeAdmin()
                     Destination.USERS -> TODO()
-                    Destination.ORDERS -> TODO()
-                    Destination.PRODUCTS -> TODO()
+                    Destination.ORDERS -> OrdersAdmin()
+                    Destination.PRODUCTS -> ProductsAdmin()
                     Destination.CONTENT -> TODO()
-                    Destination.SAFETY -> TODO()
+                    //Destination.SAFETY -> TODO()
                     Destination.SUPPORT -> TODO()
                 }
             }
@@ -192,85 +165,56 @@ fun AppNavHost(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AdminPanelScreen(
-    onBackPressed: () -> Unit
+    onBackPressed: () -> Unit,
+    menuVm: MenuViewModel,
 ) {
     CoffeeVibeTheme(context2 = LocalContext.current,content = {
-        Scaffold { paddingValues ->
+        Scaffold(
+                contentWindowInsets = WindowInsets(0, 0, 0, 0),
+                topBar = {
+                    TopAppBar(
+                        title = {
+                            Text(
+                                text = "Администрирование",
+                                color = colorScheme.onBackground,
+                                fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
+                                fontSize = 28.sp,
+                                textAlign = TextAlign.Left
+                            )
+                        },
+                        actions = {
+                            IconButton(
+                                onClick = {
+                                    onBackPressed()
+                                }
+                            ) {
+                                Icon(
+                                    Icons.Filled.ArrowBackIosNew,
+                                    contentDescription = "Localized description",
+                                    tint = colorScheme.onBackground,
+                                    modifier = Modifier
+                                        .width(20.dp)
+                                        .height(20.dp)
+                                )
+                            }
+                        },
+                        windowInsets = TopAppBarDefaults.windowInsets,
+                        colors = TopAppBarDefaults.topAppBarColors(containerColor = colorScheme.background)
+                    )
+            }
+        ) { paddingValues ->
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(colorScheme.background)
-                    .consumeWindowInsets(paddingValues)
+                    .padding(paddingValues)
                     .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text(
-                        text = "Администрирование",
-                        color = colorScheme.onBackground,
-                        fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
-                        fontSize = 28.sp,
-                        textAlign = TextAlign.Left
-                    )
+                var selectedTabIndex by remember { mutableStateOf(0) }
+                val pagerState = rememberPagerState { tabItems.size }
 
-                    IconButton(
-                        onClick = {
-                            onBackPressed()
-                        }
-                    ) {
-                        Icon(
-                            Icons.Filled.ArrowBackIosNew,
-                            contentDescription = "Localized description",
-                            tint = colorScheme.onBackground,
-                            modifier = Modifier
-                                .width(20.dp)
-                                .height(20.dp)
-                        )
-                    }
-                }
-
-//                val navController = rememberNavController()
-//                val startDestination = Destination.MAIN
-//                var selectedDestination by rememberSaveable { mutableIntStateOf(startDestination.ordinal) }
-//
-//
-//                PrimaryScrollableTabRow(
-//                    selectedTabIndex = selectedDestination,
-//                    containerColor = colorScheme.background) {
-//                        Destination.entries.forEachIndexed { index, destination ->
-//                            Tab(
-//                                selected = selectedDestination == index,
-//                                onClick = {
-//                                    navController.navigate(route = destination.route)
-//                                    selectedDestination = index
-//                                },
-//                                text = {
-//                                    Text(
-//                                        text = destination.label,
-//                                        maxLines = 1,
-//                                        overflow = TextOverflow.Ellipsis,
-//                                        fontSize = 16.sp,
-//                                    )
-//                                }
-//                            )
-//                        }
-//                    }
-//                    AppNavHost(navController, startDestination)
-                var selectedTabIndex by remember {
-                    mutableStateOf(0)
-                }
-                val pagerState = rememberPagerState {
-                    tabItems.size
-                }
-                LaunchedEffect(selectedTabIndex) {
-                    pagerState.animateScrollToPage(selectedTabIndex)
-                }
+                LaunchedEffect(selectedTabIndex) { pagerState.animateScrollToPage(selectedTabIndex) }
                 LaunchedEffect(pagerState.currentPage, pagerState.isScrollInProgress) {
                     if (!pagerState.isScrollInProgress) {
                         selectedTabIndex = pagerState.currentPage
@@ -314,9 +258,9 @@ fun AdminPanelScreen(
                         .weight(1f)
                 ) { index ->
                     when (index) {
-                        0 -> MainAdminScreen()
-                        1 -> ProductsAdminScreen()
-                        2 -> OrdersAdminScreen()
+                        0 -> HomeAdmin()
+                        1 -> ProductsAdmin(menuVm= menuVm)
+                        2 -> OrdersAdmin()
                     }
                 }
             }

@@ -6,11 +6,14 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import com.example.coffeevibe.ui.ui.LoginScreen
+import com.example.coffeevibe.viewmodel.LoginViewModel
 
 class LoginActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        val loginVm = LoginViewModel(applicationContext)
+
         setContent {
             LoginScreen(
                 inReg = {
@@ -24,7 +27,8 @@ class LoginActivity : ComponentActivity() {
                 inManager = {
                     startActivity(Intent(this, ManagerActivity::class.java))
                     finish()
-                }
+                },
+                loginVm = loginVm
             )
         }
     }

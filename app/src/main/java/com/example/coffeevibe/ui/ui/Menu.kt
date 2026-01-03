@@ -1,5 +1,6 @@
 package com.example.coffeevibe.ui.ui
 
+import android.widget.Space
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
@@ -36,6 +37,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -71,6 +73,7 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.material3.rememberTooltipState
+import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -88,6 +91,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -143,6 +147,7 @@ fun MenuScreen(
     var selectedComposition by remember { mutableStateOf("") }
     var selectedKbju by remember { mutableStateOf("") }
 
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val listState2 = rememberLazyGridState()
     val isOrderHas by menuViewModel.isOrderHas.collectAsState()
     val numAndPrice by menuViewModel.orderNP.collectAsState()
@@ -163,19 +168,6 @@ fun MenuScreen(
         }
     }
 
-
-//    val filteredGoods = when {
-//        searchQuery.isNotBlank() -> goods.filter {
-//            it.name.contains(searchQuery, true)
-//                    || it.price.toString().contains(searchQuery, true)
-//                    || it.discountPrice.toString().contains(searchQuery, true)
-//        }
-//        onlyDiscount -> goods.filter { it.discountPrice != 0 }
-//        priceDecreasing -> goods.sortedByDescending { it.price }
-//        priceIncreasing -> goods.sortedBy { it.price }
-//        else -> goods
-//    }
-
     val filteredGoods by remember (
         goods,
         searchQuery,
@@ -189,7 +181,7 @@ fun MenuScreen(
             if (searchQuery.isNotBlank()) {
                 result = result.filter {
                     it.name.contains(searchQuery, true) ||
-                            it.price.toString().contains(searchQuery, ) ||
+                            it.price.toString().contains(searchQuery, true) ||
                             it.discountPrice.toString().contains(searchQuery, true)
                 }
             }
@@ -240,8 +232,11 @@ fun MenuScreen(
             menuViewModel.updateOrderWas(false)
         }
     }
+
     CoffeeVibeTheme(context2 = LocalContext.current,content = {
         Scaffold(
+            modifier = Modifier
+                .nestedScroll(scrollBehavior.nestedScrollConnection),
             contentWindowInsets = WindowInsets(0, 0, 0, 0),
             floatingActionButton = {
                 val displayButton by remember { derivedStateOf { listState2.firstVisibleItemIndex > 4 } }
@@ -371,7 +366,10 @@ fun MenuScreen(
                                     leadingIcon = {
                                         Checkbox(
                                             checked = priceDecreasing,
-                                            onCheckedChange = {},
+                                            onCheckedChange = {
+                                                priceDecreasing = !priceDecreasing
+                                                if (priceDecreasing) priceIncreasing = false
+                                            },
                                             colors = CheckboxDefaults.colors(
                                                 checkedColor = colorScheme.secondary,
                                                 uncheckedColor = colorScheme.onBackground,
@@ -391,7 +389,10 @@ fun MenuScreen(
                                     leadingIcon = {
                                         Checkbox(
                                             checked = priceIncreasing,
-                                            onCheckedChange = {},
+                                            onCheckedChange = {
+                                                priceIncreasing = !priceIncreasing
+                                                if (priceIncreasing) priceDecreasing = false
+                                            },
                                             colors = CheckboxDefaults.colors(
                                                 checkedColor = colorScheme.secondary,
                                                 uncheckedColor = colorScheme.onBackground,
@@ -417,6 +418,7 @@ fun MenuScreen(
                             )
                         }
                     },
+                    scrollBehavior = scrollBehavior,
                     windowInsets = TopAppBarDefaults.windowInsets,
                 )
             }
@@ -476,7 +478,14 @@ fun MenuScreen(
                             stickyHeader() {
                                 Row(
                                     modifier = Modifier
+                                        .padding(top = 8.dp)
+                                        .shadow(
+                                            4.dp,
+                                            Shapes.large,
+                                            spotColor = colorScheme.secondary
+                                        )
                                         .fillMaxWidth()
+                                        .clip(Shapes.large)
                                         .background(colorScheme.background),
                                     horizontalArrangement = Arrangement.SpaceAround
                                 )
@@ -715,7 +724,7 @@ fun ListItem2(
                                 )
                                 Text(
                                     text = "$discountPrice₽",
-                                    color = colorScheme.background,
+                                    color = Color.Black,
                                     textAlign = TextAlign.Left,
                                     fontSize = 18.sp,
                                     modifier = Modifier

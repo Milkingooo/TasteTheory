@@ -1,70 +1,55 @@
-package com.example.coffeevibe.ui.ui.other
+package com.example.coffeevibe.ui.ui.settings
 
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
-import androidx.compose.material.icons.filled.Terminal
-import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.wear.compose.material.Icon
-import androidx.wear.compose.material.Scaffold
-import androidx.wear.compose.material.Text
 import com.example.coffeevibe.R
 import com.example.coffeevibe.ui.theme.CoffeeVibeTheme
-import com.example.coffeevibe.ui.ui.customUi.SimpleSearchBarSample
+import com.example.coffeevibe.ui.ui.other.BaseTextBlockWithBackground
+import com.example.coffeevibe.ui.ui.other.SettingsSubCategory
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TestScreen(
-    onBackPressed: () -> Unit
-){
+fun SupportScreen(
+    onBackPressed: () -> Unit,
+    inFaqs: () -> Unit
+) {
+
     CoffeeVibeTheme(context2 = LocalContext.current,content = {
         Scaffold(
             contentWindowInsets = WindowInsets(0, 0, 0, 0),
             topBar = {
-                CenterAlignedTopAppBar(
-                    navigationIcon = {
-                        Icon(
-                            Icons.Filled.Terminal,
-                            contentDescription = "Localized description",
-                            tint = colorScheme.onBackground,
-                            modifier = Modifier
-                                .size(40.dp)
-                                .padding(4.dp)
-                        )
-                    },
+                TopAppBar(
                     title = {
                         Text(
-                            text = "Тестирование",
+                            text = "Поддержка",
                             color = colorScheme.onBackground,
                             fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
                             fontSize = 28.sp,
-                            textAlign = TextAlign.Left,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
+                            textAlign = TextAlign.Left
                         )
                     },
                     actions = {
@@ -84,16 +69,33 @@ fun TestScreen(
                         }
                     },
                     windowInsets = TopAppBarDefaults.windowInsets,
-                    colors = TopAppBarDefaults.topAppBarColors(containerColor = colorScheme.background)
-                )
-            }
-        ) { paddingValues ->
+                    colors=TopAppBarDefaults.topAppBarColors(containerColor = colorScheme.background)
+                ) }
+        ) { innerPadding ->
+
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(paddingValues),
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .background(colorScheme.background)
+                    .padding(innerPadding)
             ) {
+                BaseTextBlockWithBackground(
+                    """Телефон горячей линии: 8-800-555-35-35 
+                        |Почта для вопросов: support-coffeevibe@gmail.com
+                    """.trimMargin()
+                )
+                SettingsSubCategory(
+                    "Часто задаваемые вопросы",
+                    icon = Icons.Filled.Info,
+                    action = {
+                        inFaqs()
+                    }
+                )
+
+//                SettingsSubCategory("Сообщить об ошибке",
+//                    icon = Icons.Filled.Info,
+//                    action = { }
+//                )
 
             }
         }

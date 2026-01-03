@@ -1,4 +1,4 @@
-package com.example.coffeevibe.ui.ui
+package com.example.coffeevibe.ui.ui.settings
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column

@@ -283,8 +283,8 @@ fun UserOrderItem(
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(102.dp)
                     .shadow(4.dp, Shapes.medium, spotColor = colorScheme.background)
+                    .height(102.dp)
                     .animateContentSize(),
                 colors = CardDefaults.cardColors(containerColor = colorScheme.secondaryContainer),
                 shape = Shapes.medium,

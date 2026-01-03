@@ -10,13 +10,58 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
+import java.util.UUID
 
 class LoginViewModel(val context: Context) : ViewModel() {
     private val auth = FirebaseAuth.getInstance()
     private val db = Firebase.firestore
 
+    private val _username = MutableStateFlow("")
+    val username: StateFlow<String> = _username
+
+    private val _userRole = MutableStateFlow(0) //TODO()
+    val userRole: StateFlow<Int> = _userRole
+
+    private val _isUserLogin = MutableStateFlow(false)
+    val isUserLogin: StateFlow<Boolean> = _isUserLogin
+
+    init {
+        getNameAndStatus()
+    }
+
+    fun getNameAndStatus(){
+        _isUserLogin.value = isLogin()
+
+        db.collection("Client")
+            .whereEqualTo("Id", auth.currentUser?.uid)
+            .get()
+            .addOnSuccessListener {
+                for (document in it) {
+                    _username.value = document.getString("Name").toString()
+
+                    val isAdmin = document.getBoolean("IsAdmin") ?: false
+                    val isManager = document.getBoolean("IsManager") ?: false
+
+                    when {
+                        isAdmin -> _userRole.value = 0
+                        isManager -> _userRole.value = 1
+                        else -> _userRole.value = 2
+                    }
+
+                    break
+                }
+            }
+            .addOnFailureListener {
+                _username.value = "Ошибка"
+                _userRole.value = 2
+            }
+    }
     fun login(login: String, password: String, isLogin: (Boolean) -> Unit) {
         try {
             if (login.isNotBlank() && password.isNotBlank()) {
@@ -122,13 +167,12 @@ class LoginViewModel(val context: Context) : ViewModel() {
             .addOnSuccessListener {
                 for (document in it) {
                     getNameEmail(document.getString("Name").toString(), document.getString("Email").toString())
-                    Log.d("NameEmail", document.getString("Name").toString() + " " + document.getString("Email").toString())
+                    _username.value = document.getString("Name").toString()
                     break
                 }
             }
             .addOnFailureListener {
                 Toast.makeText(context, "Error getting user name", Toast.LENGTH_SHORT).show()
-                Log.d("Name", "Error getting user name")
                 getNameEmail("Нет имени!", "Нет почты!")
             }
     }
@@ -137,49 +181,30 @@ class LoginViewModel(val context: Context) : ViewModel() {
         return auth.currentUser != null
     }
 
-    fun checkRoles(roleCode: (Int) -> Unit) {
-        viewModelScope.launch {
-            val (isAdmin, isManager) = checkUserRole()
-
-            if (isAdmin) {
-                roleCode(0)
-            }
-            if (isManager) {
-                roleCode(1)
-            }
-            else {
-                roleCode(2)
-            }
-        }
-    }
-    suspend fun checkUserRole(): Pair<Boolean, Boolean> {
-        val currentUser = FirebaseAuth.getInstance().currentUser
-            ?: return Pair(false, false)   // Если не авторизован
-
-        val uid: String = auth.currentUser?.uid.toString()
+    private suspend fun fetchUserRoles(): Int {
+        val uid = auth.currentUser?.uid.orEmpty()
 
         return try {
-            Log.d("RoleCheck", "Checking user role for UID: $uid")
-
             val snapshot = db.collection("Client")
                 .whereEqualTo("Id", uid)
                 .get()
                 .await()
 
             snapshot.documents.firstOrNull()?.let { doc ->
-
                 val isAdmin = doc.getBoolean("IsAdmin") ?: false
                 val isManager = doc.getBoolean("IsManager") ?: false
 
-                Log.d("RoleCheck", "User role: Admin: $isAdmin, Manager: $isManager")
-                Pair(isAdmin, isManager)
-            } ?: Pair(false, false)
+                when {
+                    isAdmin -> 0
+                    isManager -> 1
+                    else -> 2
+                }
+            } ?: 2
         } catch (e: Exception) {
             Log.e("RoleCheck", "Error checking user role", e)
-            Pair(false, false)
+            2
         }
     }
-
     private fun catchException(e: Exception) {
         if (e is FirebaseAuthUserCollisionException) {
             when (e.errorCode) {

@@ -45,7 +45,7 @@ import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun SplashScreen(menuVm: MenuViewModel) {
+fun SplashScreen() {
     val scale = remember {
         Animatable(0f)
     }
@@ -60,8 +60,8 @@ fun SplashScreen(menuVm: MenuViewModel) {
                         OvershootInterpolator(4f).getInterpolation(it)
                     })
             )
-            menuVm.loadMenu()
-            menuVm.loadOrders()
+//            menuVm.loadMenu()
+//            menuVm.loadOrders()
             delay(5000L)
         }
     CoffeeVibeTheme(context2 = LocalContext.current,content = {
