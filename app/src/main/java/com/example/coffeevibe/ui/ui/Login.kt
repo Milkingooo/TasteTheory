@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Password
@@ -25,8 +26,10 @@ import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Shapes
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -34,7 +37,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -44,6 +50,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.coffeevibe.R
 import com.example.coffeevibe.ui.theme.CoffeeVibeTheme
+import com.example.coffeevibe.ui.theme.Shapes
+import com.example.coffeevibe.ui.ui.customUi.MyPasswordTextField
+import com.example.coffeevibe.ui.ui.customUi.PasswordField
 import com.example.coffeevibe.viewmodel.LoginViewModel
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
@@ -60,7 +69,8 @@ fun LoginScreen(
     var isInCorrect by remember { mutableStateOf(false) }
     val context = LocalContext.current
     var progressState by remember { mutableStateOf(false) }
-    val userRole by loginVm.userRole.collectAsState()
+    val focusManager = LocalFocusManager.current
+    val textFieldState = rememberTextFieldState()
 
     CoffeeVibeTheme(context2 = LocalContext.current,content = {
         Scaffold {
@@ -110,6 +120,9 @@ fun LoginScreen(
                         focusedTextColor = colorScheme.onBackground,
                         unfocusedTextColor = colorScheme.onBackground,
                     ),
+                    keyboardActions = KeyboardActions {
+                        focusManager.moveFocus(FocusDirection.Next)
+                    },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                     placeholder = { Text("xyz@gmail.com", color = colorScheme.onSurface) },
                     isError = isInCorrect,
@@ -121,7 +134,9 @@ fun LoginScreen(
                             tint = colorScheme.onBackground
                         )
                     },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .clip(Shapes.small)
+                        .fillMaxWidth()
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -137,32 +152,12 @@ fun LoginScreen(
 
                 Spacer(modifier = Modifier.height(10.dp))
 
-                OutlinedTextField(
-                    value = password,
-                    onValueChange = { password = it },
-                    textStyle = TextStyle(
-                        fontSize = 20.sp,
-                        fontFamily = FontFamily(Font(R.font.roboto_condensed_black))
-                    ),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = colorScheme.onBackground,
-                        unfocusedBorderColor = colorScheme.onSurface,
-                        unfocusedPlaceholderColor = colorScheme.onBackground,
-                        focusedTextColor = colorScheme.onBackground,
-                        unfocusedTextColor = colorScheme.onBackground,
-                    ),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                    placeholder = { Text("********", color = colorScheme.onSurface) },
-                    isError = isInCorrect,
-                    singleLine = true,
-                    leadingIcon = {
-                        Icon(
-                            Icons.Filled.Password,
-                            contentDescription = "Password",
-                            tint = colorScheme.onBackground
-                        )
+                PasswordField(
+                    keyboardActions = {
+                        focusManager.clearFocus()
                     },
-                    modifier = Modifier.fillMaxWidth()
+                    isInCorrect = isInCorrect,
+                    state = textFieldState
                 )
 
                 Spacer(modifier = Modifier.height(10.dp))
@@ -200,7 +195,7 @@ fun LoginScreen(
 
                 Button(
                     onClick = {
-                        if (password.trim().length < 6) {
+                        if (textFieldState.text.toString().trim().length < 6) {
                             isInCorrect = true
                             Toast.makeText(
                                 context,
@@ -210,20 +205,25 @@ fun LoginScreen(
                         } else {
                             loginVm.login(
                                 login = email,
-                                password = password,
-                                isLogin = {
+                                password = textFieldState.text.toString().trim(),
+                                isLogin = { login, role ->
                                     progressState = true
 
                                     when {
-                                        userRole == 1 -> {
+                                        login && (role == 0) -> {
                                             isInCorrect = false
-                                            inManager()
                                             progressState = false
-                                        }
-                                        it && (userRole == 0 || userRole == 2) -> {
-                                            isInCorrect = false
                                             onLogin()
+                                        }
+                                        login && (role == 2) -> {
+                                            isInCorrect = false
                                             progressState = false
+                                            onLogin()
+                                        }
+                                        login && (role == 1) -> {
+                                            isInCorrect = false
+                                            progressState = false
+                                            inManager()
                                         }
                                         else -> {
                                             isInCorrect = true

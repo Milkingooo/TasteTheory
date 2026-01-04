@@ -14,7 +14,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.KeyboardActionHandler
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Email
@@ -37,7 +40,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -48,6 +54,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.coffeevibe.R
 import com.example.coffeevibe.ui.theme.CoffeeVibeTheme
+import com.example.coffeevibe.ui.theme.Shapes
+import com.example.coffeevibe.ui.ui.customUi.PasswordField
 import com.example.coffeevibe.viewmodel.LoginViewModel
 
 @Composable
@@ -63,6 +71,8 @@ fun Registr(
     val isAgree = remember { mutableStateOf(false) }
     val context = LocalContext.current
     var progressState by remember { mutableStateOf(false) }
+    val textFieldState = rememberTextFieldState()
+    val focusManager = LocalFocusManager.current
 
     CoffeeVibeTheme(context2 = LocalContext.current,content = {
         Scaffold() {
@@ -111,6 +121,9 @@ fun Registr(
                         focusedTextColor = colorScheme.onBackground,
                         unfocusedTextColor = colorScheme.onBackground,
                     ),
+                    keyboardActions = KeyboardActions {
+                        focusManager.moveFocus(FocusDirection.Next)
+                    },
                     placeholder = { Text("Введите имя", color = colorScheme.onSurface) },
                     isError = isInCorrect,
                     singleLine = true,
@@ -121,7 +134,9 @@ fun Registr(
                             tint = colorScheme.onBackground
                         )
                     },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .clip(Shapes.small)
+                        .fillMaxWidth()
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -137,32 +152,12 @@ fun Registr(
 
                 Spacer(modifier = Modifier.height(10.dp))
 
-                OutlinedTextField(
-                    value = password,
-                    onValueChange = { password = it },
-                    textStyle = TextStyle(
-                        fontSize = 20.sp,
-                        fontFamily = FontFamily(Font(R.font.roboto_condensed_black))
-                    ),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = colorScheme.onBackground,
-                        unfocusedBorderColor = colorScheme.onSurface,
-                        unfocusedPlaceholderColor = colorScheme.onBackground,
-                        focusedTextColor = colorScheme.onBackground,
-                        unfocusedTextColor = colorScheme.onBackground,
-                    ),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                    placeholder = { Text("********", color = colorScheme.onSurface) },
-                    isError = isInCorrect,
-                    singleLine = true,
-                    leadingIcon = {
-                        Icon(
-                            Icons.Filled.Password,
-                            contentDescription = "Password",
-                            tint = colorScheme.onBackground
-                        )
+                PasswordField(
+                    keyboardActions = {
+                        focusManager.moveFocus(FocusDirection.Next)
                     },
-                    modifier = Modifier.fillMaxWidth()
+                    isInCorrect = isInCorrect,
+                    state = textFieldState
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -192,6 +187,9 @@ fun Registr(
                         focusedTextColor = colorScheme.onBackground,
                         unfocusedTextColor = colorScheme.onBackground,
                     ),
+                    keyboardActions = KeyboardActions {
+                        focusManager.clearFocus()
+                    },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                     placeholder = { Text("xyz@gmail.com", color = colorScheme.onSurface) },
                     isError = isInCorrect,
@@ -203,7 +201,9 @@ fun Registr(
                             tint = colorScheme.onBackground
                         )
                     },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .clip(Shapes.small)
+                        .fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(6.dp))
 
@@ -236,7 +236,7 @@ fun Registr(
 
                 Button(
                     onClick = {
-                        if (password.trim().length < 6) {
+                        if (textFieldState.text.toString().trim().length < 6) {
                             isInCorrect = true
                             Toast.makeText(
                                 context,
@@ -252,7 +252,7 @@ fun Registr(
                         } else {
                             loginVm.signUp(
                                 email = email,
-                                password = password,
+                                password = textFieldState.text.toString().trim(),
                                 name = name
                             ) {
                                 progressState = true

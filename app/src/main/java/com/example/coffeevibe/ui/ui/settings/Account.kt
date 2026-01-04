@@ -2,16 +2,21 @@ package com.example.coffeevibe.ui.ui.settings
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme.colorScheme
@@ -37,36 +42,109 @@ import com.example.coffeevibe.ui.theme.CoffeeVibeTheme
 import com.example.coffeevibe.ui.ui.other.BaseButton
 import com.example.coffeevibe.ui.ui.other.TextFieldWithName
 import com.example.coffeevibe.viewmodel.LoginViewModel
+import androidx.compose.runtime.collectAsState
+import com.example.coffeevibe.ui.activities.ui.theme.ui.theme.Typography
+import com.example.coffeevibe.ui.ui.customUi.PasswordField
+import com.example.coffeevibe.ui.ui.customUi.SimpleBottomSheet
+import com.example.coffeevibe.ui.ui.other.BaseTextField
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun AccountScreen(
     onBackPressed: () -> Unit,
     loginVm: LoginViewModel
 ) {
     var name by remember { mutableStateOf("") }
-    var newName by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
-    var newEmail by remember { mutableStateOf("") }
 
     val isInCorrectName by remember { mutableStateOf(false) }
-    var isNameEdit by remember { mutableStateOf(false) }
-    var isEmailEdit by remember { mutableStateOf(false) }
     val isInCorrectEmail by remember { mutableStateOf(false) }
-
-    var isUserLoggedIn by remember { mutableStateOf(false) }
-    isUserLoggedIn = loginVm.isLogin()
+    var editProfile by remember { mutableStateOf(false) }
 
     loginVm.giveUserNameEmail { nameDb, emailDb ->
         name = nameDb
         email = emailDb
     }
 
+    if (editProfile){
+        SimpleBottomSheet(
+            state = editProfile,
+        ) {
+            var newName by remember { mutableStateOf("") }
+            var newEmail by remember { mutableStateOf("") }
+            val textFieldState = rememberTextFieldState()
+
+            Text(
+                text = "Редактирование профиля",
+                color = colorScheme.onBackground,
+                fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
+                fontSize = 26.sp,
+                textAlign = TextAlign.Center
+            )
+
+            TextFieldWithName(
+                title = "Новое имя",
+                value = newName,
+                exitValue = {
+                    newName = it
+                },
+                isInCorrect = isInCorrectName,
+                placeholder = "Введите имя",
+                modifier = Modifier.fillMaxWidth(),
+                enabled = true
+            )
+
+            TextFieldWithName(
+                title = "Новая почта",
+                value = newEmail,
+                exitValue = {
+                    newEmail = it
+                },
+                isInCorrect = isInCorrectName,
+                placeholder = "Введите новую почту",
+                modifier = Modifier.fillMaxWidth(),
+                enabled = false
+            )
+
+            PasswordField(
+                keyboardActions = {},
+                isInCorrect = textFieldState.text.trim().length > 6,
+                state = textFieldState,
+                enable = false
+            )
+
+            BaseButton(
+                title = "Сохранить",
+                click = {
+                    loginVm.updateUserProfile(
+                        newEmail = newEmail.trim(),
+                        newPassword = textFieldState.text.trim().toString(),
+                        newName = newName.trim()
+                    )
+                    editProfile = false
+                },
+                color = ButtonDefaults.buttonColors(colorScheme.secondary),
+            )
+
+            Spacer(Modifier.height(16.dp))
+
+            Text(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                text = "Удалить аккаунт",
+                style = Typography.bodySmallEmphasized,
+                textAlign = TextAlign.Center,
+                color = colorScheme.error
+            )
+
+        }
+    }
+
     CoffeeVibeTheme(context2 = LocalContext.current,content = {
         Scaffold(
             contentWindowInsets = WindowInsets(0, 0, 0, 0),
             topBar = {
-            TopAppBar(
+            CenterAlignedTopAppBar(
                 title = {
                     Text(
                         text = "Аккаунт",
@@ -76,7 +154,7 @@ fun AccountScreen(
                         textAlign = TextAlign.Left
                     )
                 },
-                actions = {
+                navigationIcon = {
                     IconButton(
                         onClick = {
                             onBackPressed()
@@ -84,7 +162,23 @@ fun AccountScreen(
                     ) {
                         Icon(
                             Icons.Filled.ArrowBackIosNew,
-                            contentDescription = "Localized description",
+                            contentDescription = "Back",
+                            tint = colorScheme.onBackground,
+                            modifier = Modifier
+                                .width(20.dp)
+                                .height(20.dp)
+                        )
+                    }
+                },
+                actions = {
+                    IconButton(
+                        onClick = {
+                            editProfile = !editProfile
+                        }
+                    ) {
+                        Icon(
+                            Icons.Filled.Edit,
+                            contentDescription = "Edit",
                             tint = colorScheme.onBackground,
                             modifier = Modifier
                                 .width(20.dp)
@@ -102,11 +196,8 @@ fun AccountScreen(
                     .fillMaxSize()
                     .background(colorScheme.background)
                     .padding(innerPadding)
+                    .padding(8.dp)
             ) {
-//                Row(
-//                    modifier = Modifier.fillMaxWidth(),
-//                    verticalAlignment = Alignment.CenterVertically,
-//                ) {
                 TextFieldWithName(
                     title = "Имя",
                     value = name,
@@ -116,37 +207,21 @@ fun AccountScreen(
                     isInCorrect = isInCorrectName,
                     placeholder = "Ваше имя",
                     modifier = Modifier.fillMaxWidth(),
-                    enabled = true
+                    enabled = false
                 )
-//                    BaseButtonWithIcon(
-//                        click = {
-//                            isNameEdit = !isNameEdit
-//                        },
-//                        icon = if (isNameEdit) Icons.Default.Save else Icons.Default.Edit,
-//                        iconTint = colorScheme.background,
-//                        color = IconButtonColors(
-//                            containerColor = colorScheme.primary,
-//                            contentColor = colorScheme.background,
-//                            disabledContainerColor = colorScheme.primary,
-//                            disabledContentColor = colorScheme.background
-//                        ),
-//                        modifier = Modifier.size(48.dp),
-//                        shape = Shapes.small,
-//                    )
-//                }
 
-                    TextFieldWithName(
-                        title = "Почта",
-                        value = email,
-                        exitValue = {
-                            email = it
-                        },
-                        isInCorrect = isInCorrectEmail,
-                        placeholder = "Ваша почта",
-                        keyboardType = KeyboardType.Email,
-                        modifier = Modifier.fillMaxWidth(),
-                        enabled = true
-                    )
+                TextFieldWithName(
+                    title = "Почта",
+                    value = email,
+                    exitValue = {
+                        email = it
+                    },
+                    isInCorrect = isInCorrectEmail,
+                    placeholder = "Ваша почта",
+                    keyboardType = KeyboardType.Email,
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = false
+                )
 
                 BaseButton(
                     title = "Сбросить пароль",
@@ -155,14 +230,6 @@ fun AccountScreen(
                     },
                     color = ButtonDefaults.buttonColors(colorScheme.primary),
                 )
-
-//                BaseButton(
-//                    title = "Удалить аккаунт",
-//                    click = {
-//
-//                    },
-//                    color = ButtonDefaults.buttonColors(colorScheme.error)
-//                )
             }
         }
     })

@@ -113,6 +113,7 @@ import coil.transform.RoundedCornersTransformation
 import com.example.coffeevibe.R
 import com.example.coffeevibe.ui.theme.CoffeeVibeTheme
 import com.example.coffeevibe.ui.theme.Shapes
+import com.example.coffeevibe.ui.ui.customUi.MenuTopBar
 import com.example.coffeevibe.ui.ui.other.AssistChipMenu
 import com.example.coffeevibe.ui.ui.other.IndeterminateCircularIndicator
 import com.example.coffeevibe.ui.ui.other.UserOrderItem
@@ -260,166 +261,22 @@ fun MenuScreen(
                 }
             },
             topBar = {
-                TopAppBar(
-                    title = {
-                        if (!isSearching) {
-                            Text(
-                                text = stringResource(R.string.Menu),
-                                color = colorScheme.onBackground,
-                                fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
-                                fontSize = 28.sp,
-                                textAlign = TextAlign.Left,
-                            )
-                        }
-                        AnimatedVisibility(
-                            visible = isSearching,
-                            enter = fadeIn() + expandHorizontally(),
-                            exit = shrinkHorizontally() + fadeOut()
-                        ) {
-                            OutlinedTextField(
-                                value = searchQuery,
-                                onValueChange = {
-                                    searchQuery = it
-                                },
-                                textStyle = TextStyle(
-                                    fontSize = 20.sp,
-                                    fontFamily = FontFamily(Font(R.font.roboto_condensed_black))
-                                ),
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor = colorScheme.onBackground,
-                                    unfocusedBorderColor = colorScheme.onSurface,
-                                    unfocusedPlaceholderColor = colorScheme.onBackground,
-                                    focusedTextColor = colorScheme.onBackground,
-                                    unfocusedTextColor = colorScheme.onBackground,
-                                ),
-                                leadingIcon = {
-                                    Icon(
-                                        Icons.Outlined.Search,
-                                        contentDescription = "Search",
-                                        tint = colorScheme.onBackground
-                                    )
-                                },
-                                placeholder = {
-                                    Text(
-                                        text = "Поиск",
-                                        color = colorScheme.onBackground
-                                    )
-                                },
-                                shape = MaterialTheme.shapes.large,
-                                singleLine = true,
-                            )
-                        }
+                MenuTopBar(
+                    title = stringResource(R.string.Menu),
+                    searchQuery = searchQuery,
+                    isSearching = isSearching,
+                    onSearchQueryChange = { searchQuery = it },
+                    onSearchToggle = {
+                        isSearching = !isSearching
+                        if (!isSearching) searchQuery = ""
                     },
-                    colors=TopAppBarDefaults.topAppBarColors(containerColor = colorScheme.background),
-                    actions = {
-                        Box(modifier = Modifier.wrapContentSize(Alignment.TopStart)) {
-                            // Icon button should have a tooltip associated with it for a11y.
-                            TooltipBox(
-                                positionProvider =
-                                    TooltipDefaults.rememberTooltipPositionProvider(
-                                        TooltipAnchorPosition.Above),
-                                tooltip = { PlainTooltip { Text("Фильтрация") } },
-                                state = rememberTooltipState(),
-                            ) {
-                                IconButton(onClick = { filtersMenuOpen = true }) {
-                                    Icon(Icons.Outlined.FilterAlt,
-                                        contentDescription = "Localized description",
-                                        tint = colorScheme.onBackground,
-                                        modifier = Modifier
-                                            .width(32.dp)
-                                            .height(32.dp)
-                                        )
-                                }
-                            }
-                            DropdownMenu(expanded = filtersMenuOpen,
-                                onDismissRequest = { filtersMenuOpen = false },
-                                containerColor = colorScheme.surface,
-                                shape = Shapes.medium
-                                ) {
-                                DropdownMenuItem(
-                                    text = { Text("Только со скидкой",
-                                        color = colorScheme.onBackground,
-                                        fontFamily = FontFamily(Font(R.font.roboto_condensed_medium))) },
-                                    onClick = {
-                                        onlyDiscount = !onlyDiscount
-                                    },
-                                    leadingIcon = {
-                                        Checkbox(
-                                            checked = onlyDiscount,
-                                            onCheckedChange = { onlyDiscount = it },
-                                            colors = CheckboxDefaults.colors(
-                                                checkedColor = colorScheme.secondary,
-                                                uncheckedColor = colorScheme.onBackground,
-                                                checkmarkColor = colorScheme.background
-                                            )
-                                        )
-                                    },
-                                )
-                                DropdownMenuItem(
-                                    text = { Text("По убыванию цены",
-                                        color = colorScheme.onBackground,
-                                        fontFamily = FontFamily(Font(R.font.roboto_condensed_medium))) },
-                                    onClick = {
-                                        priceDecreasing = !priceDecreasing
-                                        if (priceDecreasing) priceIncreasing = false
-                                    },
-                                    leadingIcon = {
-                                        Checkbox(
-                                            checked = priceDecreasing,
-                                            onCheckedChange = {
-                                                priceDecreasing = !priceDecreasing
-                                                if (priceDecreasing) priceIncreasing = false
-                                            },
-                                            colors = CheckboxDefaults.colors(
-                                                checkedColor = colorScheme.secondary,
-                                                uncheckedColor = colorScheme.onBackground,
-                                                checkmarkColor = colorScheme.background
-                                            )
-                                        )
-                                    },
-                                )
-                                DropdownMenuItem(
-                                    text = { Text("По возрастанию цены",
-                                        color = colorScheme.onBackground,
-                                        fontFamily = FontFamily(Font(R.font.roboto_condensed_medium))) },
-                                    onClick = {
-                                        priceIncreasing = !priceIncreasing
-                                        if (priceIncreasing) priceDecreasing = false
-                                    },
-                                    leadingIcon = {
-                                        Checkbox(
-                                            checked = priceIncreasing,
-                                            onCheckedChange = {
-                                                priceIncreasing = !priceIncreasing
-                                                if (priceIncreasing) priceDecreasing = false
-                                            },
-                                            colors = CheckboxDefaults.colors(
-                                                checkedColor = colorScheme.secondary,
-                                                uncheckedColor = colorScheme.onBackground,
-                                                checkmarkColor = colorScheme.background
-                                            )
-                                        )
-                                    },
-                                )
-                            }
-                        }
-
-                        IconButton(onClick = {
-                            isSearching = !isSearching
-                            searchQuery = ""
-                        }) {
-                            Icon(
-                                Icons.Outlined.Search,
-                                contentDescription = "Search",
-                                tint = colorScheme.onBackground,
-                                modifier = Modifier
-                                    .width(32.dp)
-                                    .height(32.dp)
-                            )
-                        }
-                    },
-                    scrollBehavior = scrollBehavior,
-                    windowInsets = TopAppBarDefaults.windowInsets,
+                    onlyDiscount = onlyDiscount,
+                    priceIncreasing = priceIncreasing,
+                    priceDecreasing = priceDecreasing,
+                    onOnlyDiscountChange = { onlyDiscount = it },
+                    onPriceIncreasingChange = { priceIncreasing = it },
+                    onPriceDecreasingChange = { priceDecreasing = it },
+                    scrollBehavior = scrollBehavior
                 )
             }
         )

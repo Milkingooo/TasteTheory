@@ -35,6 +35,7 @@ import androidx.compose.material.icons.outlined.DeleteOutline
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularWavyProgressIndicator
@@ -60,6 +61,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TooltipAnchorPosition
 import androidx.compose.material3.TooltipBox
 import androidx.compose.material3.TooltipDefaults
@@ -539,7 +541,10 @@ fun BaseButtonWithIcon(
 fun BaseButton(
     click: () -> Unit,
     title: String,
-    color: ButtonColors
+    color: ButtonColors = ButtonDefaults.buttonColors(
+        containerColor = colorScheme.primary,
+        contentColor = colorScheme.onBackground
+    )
 ){
     Button(
         onClick = { click() },
@@ -562,7 +567,90 @@ fun BaseButton(
 }
 
 @Composable
+fun BaseTextField(
+    value: String,
+    exitValue: (String) -> Unit,
+    isInCorrect: Boolean,
+    placeholder: String,
+    keyboardType: KeyboardType = KeyboardType.Text,
+    modifier: Modifier,
+    enabled: Boolean = false
+){
+    TextField(
+        value = value,
+        onValueChange = {
+            exitValue(it)
+        },
+        textStyle = TextStyle(
+            fontSize = 18.sp,
+            fontFamily = FontFamily(Font(R.font.roboto_condensed_medium))
+        ),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = colorScheme.onBackground,
+            unfocusedBorderColor = colorScheme.onSurface,
+            unfocusedPlaceholderColor = colorScheme.onBackground,
+            focusedTextColor = colorScheme.onBackground,
+            unfocusedTextColor = colorScheme.onBackground,
+        ),
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done, keyboardType = keyboardType),
+        placeholder = { Text(placeholder, color = colorScheme.onSurface) },
+        isError = isInCorrect,
+        singleLine = true,
+        modifier = modifier
+            .padding(8.dp),
+        enabled = enabled
+    )
+}
+
+@Composable
 fun TextFieldWithName(
+    title: String? = null,
+    value: String,
+    exitValue: (String) -> Unit,
+    isInCorrect: Boolean,
+    placeholder: String,
+    keyboardType: KeyboardType = KeyboardType.Text,
+    modifier: Modifier,
+    enabled: Boolean = false
+) {
+    OutlinedTextField(
+        value = value,
+        label = {
+            if (title != null) {
+                Text(
+                    text = title,
+                    fontSize = 16.sp,
+                    color = colorScheme.onBackground,
+                    fontFamily = FontFamily(Font(R.font.roboto_condensed_medium))
+                )
+            }
+        },
+        onValueChange = {
+            exitValue(it)
+        },
+        textStyle = TextStyle(
+            fontSize = 18.sp,
+            fontFamily = FontFamily(Font(R.font.roboto_condensed_medium))
+        ),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = colorScheme.onBackground,
+            unfocusedBorderColor = colorScheme.onSurface,
+            unfocusedPlaceholderColor = colorScheme.onBackground,
+            focusedTextColor = colorScheme.onBackground,
+            unfocusedTextColor = colorScheme.onBackground,
+        ),
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done, keyboardType = keyboardType),
+        placeholder = { Text(placeholder, color = colorScheme.onSurface) },
+        isError = isInCorrect,
+        singleLine = true,
+        modifier = modifier
+            .fillMaxWidth(),
+        enabled = enabled
+    )
+}
+
+@Composable
+fun TextAreaWithName(
     title: String,
     value: String,
     exitValue: (String) -> Unit,
@@ -598,7 +686,7 @@ fun TextFieldWithName(
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done, keyboardType = keyboardType),
             placeholder = { Text(placeholder, color = colorScheme.onSurface) },
             isError = isInCorrect,
-            singleLine = true,
+            maxLines = 5,
             modifier = modifier,
             enabled = enabled
         )
@@ -663,7 +751,7 @@ fun BaseTextBlockWithBackground(
         colors = CardDefaults.cardColors(containerColor = colorScheme.primary)
     ) {
         Column(
-            modifier = Modifier.padding(8.dp),
+            modifier = Modifier.padding(16.dp),
         ) {
             Text(
                 text = text,

@@ -50,7 +50,11 @@ fun UserOrdersScreen(
     val isLoading by menuViewModel.isOrdersLoad.collectAsState()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
 
-    val sortedOrders = orders.sortedByDescending { it.date }
+    val sortedOrders = remember(
+        orders
+    ) {
+        orders.sortedByDescending { it.date }
+    }
 
     var isRefreshing by remember { mutableStateOf(false) }
     val state = rememberPullToRefreshState()
@@ -96,7 +100,24 @@ fun UserOrdersScreen(
                     IndeterminateCircularIndicator()
                 }
             }
-            else {
+            else if(sortedOrders.isEmpty()) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding)
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ){
+                    Text(
+                        text = "Тут пока что пусто",
+                        color = colorScheme.onBackground,
+                        fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
+                        fontSize = 28.sp,
+                        textAlign = TextAlign.Left
+                    )
+                }
+            } else {
                 PullToRefreshBox(
                     modifier = Modifier
                         .fillMaxSize()

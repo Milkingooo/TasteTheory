@@ -28,31 +28,30 @@ class MainActivity : ComponentActivity() {
                 context2 = LocalContext.current
             ) {
                 FirebaseApp.initializeApp(this)
-            val passwordDb = CartDatabase.getDatabase(applicationContext)
-            val passwordDao = passwordDb.cartDao()
-            val repository = CartRepository(passwordDao)
-            val orderViewModel = OrderViewModel(repository, applicationContext)
-            val loginVm = LoginViewModel(applicationContext)
-            val menuVm = MenuViewModel(context = applicationContext)
-            val userRole = loginVm.userRole.collectAsState()
+                val passwordDb = CartDatabase.getDatabase(applicationContext)
+                val passwordDao = passwordDb.cartDao()
+                val repository = CartRepository(passwordDao)
+                val orderViewModel = OrderViewModel(repository, applicationContext)
+                val loginVm = LoginViewModel(applicationContext)
+                val menuVm = MenuViewModel(context = applicationContext)
+                val userRole = loginVm.userRole.collectAsState()
 
-                if (userRole.value == 1) {
-                    startActivity(Intent(this, ManagerActivity::class.java))
-                    finish()
-                }
-                else {
-                    MainScreen(
-                        onLogin = {
-                            startActivity(Intent(this, LoginActivity::class.java))
-                        },
-                        inFinishOrder = {
-                            startActivity(Intent(this, OrderActivity::class.java))
-                        },
-                        menuViewModel = menuVm,
-                        orderViewModel = orderViewModel,
-                        loginVm = loginVm
-                    )
-                }
+//                if (userRole.value == 1) {
+//                    startActivity(Intent(this, ManagerActivity::class.java))
+//                    finish()
+//                }
+//                else {
+                MainScreen(
+                    onLogin = {
+                        startActivity(Intent(this, LoginActivity::class.java))
+                    },
+                    inFinishOrder = {
+                        startActivity(Intent(this, OrderActivity::class.java))
+                    },
+                    menuViewModel = menuVm,
+                    orderViewModel = orderViewModel,
+                    loginVm = loginVm
+                )
             }
         }
     }

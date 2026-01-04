@@ -1,16 +1,21 @@
 package com.example.coffeevibe.viewmodel
 
+import android.R.attr.password
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -25,17 +30,19 @@ class LoginViewModel(val context: Context) : ViewModel() {
     private val _username = MutableStateFlow("")
     val username: StateFlow<String> = _username
 
-    private val _userRole = MutableStateFlow(0) //TODO()
+    private val _userRole = MutableStateFlow(5)
     val userRole: StateFlow<Int> = _userRole
 
     private val _isUserLogin = MutableStateFlow(false)
     val isUserLogin: StateFlow<Boolean> = _isUserLogin
 
     init {
-        getNameAndStatus()
+        if (auth.currentUser != null ) {
+            getNameAndStatus()
+        }
     }
 
-    fun getNameAndStatus(){
+    fun getNameAndStatus() {
         _isUserLogin.value = isLogin()
 
         db.collection("Client")
@@ -49,38 +56,48 @@ class LoginViewModel(val context: Context) : ViewModel() {
                     val isManager = document.getBoolean("IsManager") ?: false
 
                     when {
+                        !isAdmin && !isManager -> _userRole.value = 2
                         isAdmin -> _userRole.value = 0
-                        isManager -> _userRole.value = 1
-                        else -> _userRole.value = 2
+                        else -> _userRole.value = 1
                     }
 
+                    Log.e("CHECK_ROLES", "ROLE: ${_userRole.value}")
                     break
                 }
             }
             .addOnFailureListener {
                 _username.value = "Ошибка"
                 _userRole.value = 2
+                Log.e("CHECK_ROLES", "ERROR")
             }
     }
-    fun login(login: String, password: String, isLogin: (Boolean) -> Unit) {
+    fun login(login: String, password: String, isLogin: (Boolean, Int) -> Unit) {
+        if (auth.currentUser != null) {
+            isLogin(true, _userRole.value)
+        }
+
         try {
             if (login.isNotBlank() && password.isNotBlank()) {
                 auth.signInWithEmailAndPassword(login, password)
                     .addOnSuccessListener {
-                        isLogin(true)
+                        viewModelScope.launch {
+                            getNameAndStatus()
+                            delay(400)
+                            isLogin(true, _userRole.value)
                         Toast.makeText(context, "Авторизация прошла успешно", Toast.LENGTH_SHORT).show()
+                        }
                     }
                     .addOnFailureListener { e ->
-                        isLogin(false)
+                        isLogin(false, _userRole.value)
                         catchException(e)
                         Log.d("Login", e.message.toString())
                     }
             } else {
-                isLogin(false)
+                isLogin(false, _userRole.value)
                 Toast.makeText(context, "Заполните все поля", Toast.LENGTH_SHORT).show()
             }
         } catch (e: Exception) {
-            isLogin(false)
+            isLogin(false, _userRole.value)
             catchException(e)
         }
     }
@@ -113,14 +130,15 @@ class LoginViewModel(val context: Context) : ViewModel() {
     private fun addUserInDb(name: String, email: String, password: String, id: String) {
         viewModelScope.launch {
             db.collection("Client")
-                .add(
+                .document(id) // Используем UID как ID документа
+                .set(
                     hashMapOf(
                         "Name" to name,
                         "Email" to email,
-                        "Password" to password,
                         "Id" to id,
                         "IsAdmin" to false,
                         "IsManager" to false,
+                        "CreatedAt" to FieldValue.serverTimestamp(),
                     )
                 )
                 .addOnSuccessListener {
@@ -177,32 +195,51 @@ class LoginViewModel(val context: Context) : ViewModel() {
             }
     }
 
+    private fun changeNameInDb(newName: String) {
+        viewModelScope.launch {
+            db.collection("Client")
+                .document(auth.currentUser?.uid.toString()).update("Name", newName)
+                .await()
+        }
+    }
+
     fun isLogin(): Boolean {
         return auth.currentUser != null
     }
 
-    private suspend fun fetchUserRoles(): Int {
-        val uid = auth.currentUser?.uid.orEmpty()
+    fun updateUserProfile(
+        newEmail: String,
+        newPassword: String,
+        newName: String,
+    ){
+        when {
+            newName.isNotEmpty() -> {
+                changeNameInDb(newName)
+            }
+//            newEmail.isNotEmpty() -> {
+//                val user = auth.currentUser
+//                val credential = EmailAuthProvider.getCredential(user?.email!!, password.toString())
+//
+//                user.reauthenticate(credential)
+//                    .addOnSuccessListener {
+//                        user.updateEmail(newEmail)
+//                            .addOnSuccessListener {
+//                                Toast.makeText(context, "Email успешно обновлен", Toast.LENGTH_SHORT).show()
+//                            }
+//                            .addOnFailureListener { e ->
+//                                Toast.makeText(context, "Ошибка обновления email: ${e.message}", Toast.LENGTH_SHORT).show()
+//                            }
+//                    }
+//                    .addOnFailureListener { e ->
+//                        Toast.makeText(context, "Ошибка переаутентификации: ${e.message}", Toast.LENGTH_SHORT).show()
+//                    }
+//            }
+            newPassword.isNotEmpty() -> {
+                auth.currentUser?.updatePassword(newPassword)
+            }
+            else -> {
 
-        return try {
-            val snapshot = db.collection("Client")
-                .whereEqualTo("Id", uid)
-                .get()
-                .await()
-
-            snapshot.documents.firstOrNull()?.let { doc ->
-                val isAdmin = doc.getBoolean("IsAdmin") ?: false
-                val isManager = doc.getBoolean("IsManager") ?: false
-
-                when {
-                    isAdmin -> 0
-                    isManager -> 1
-                    else -> 2
-                }
-            } ?: 2
-        } catch (e: Exception) {
-            Log.e("RoleCheck", "Error checking user role", e)
-            2
+            }
         }
     }
     private fun catchException(e: Exception) {

@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.ReportProblem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -35,7 +36,8 @@ import com.example.coffeevibe.ui.ui.other.SettingsSubCategory
 @Composable
 fun SupportScreen(
     onBackPressed: () -> Unit,
-    inFaqs: () -> Unit
+    inFaqs: () -> Unit,
+    sendTicket: () -> Unit
 ) {
 
     CoffeeVibeTheme(context2 = LocalContext.current,content = {
@@ -78,12 +80,14 @@ fun SupportScreen(
                     .fillMaxSize()
                     .background(colorScheme.background)
                     .padding(innerPadding)
+                    .padding(horizontal = 8.dp)
             ) {
                 BaseTextBlockWithBackground(
                     """Телефон горячей линии: 8-800-555-35-35 
-                        |Почта для вопросов: support-coffeevibe@gmail.com
+                        |Почта для вопросов: super-max2006@mail.ru
                     """.trimMargin()
                 )
+
                 SettingsSubCategory(
                     "Часто задаваемые вопросы",
                     icon = Icons.Filled.Info,
@@ -92,10 +96,12 @@ fun SupportScreen(
                     }
                 )
 
-//                SettingsSubCategory("Сообщить об ошибке",
-//                    icon = Icons.Filled.Info,
-//                    action = { }
-//                )
+                SettingsSubCategory("Сообщить об ошибке",
+                    icon = Icons.Filled.ReportProblem,
+                    action = {
+                        sendTicket()
+                    }
+                )
 
             }
         }

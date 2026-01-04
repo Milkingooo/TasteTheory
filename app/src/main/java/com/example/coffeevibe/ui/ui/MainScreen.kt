@@ -23,9 +23,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
@@ -40,11 +37,12 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.coffeevibe.ui.theme.CoffeeVibeTheme
 import com.example.coffeevibe.ui.ui.other.ProfileScreen
-import com.example.coffeevibe.ui.ui.other.TestScreen
+import com.example.coffeevibe.ui.ui.settings.TestScreen
 import com.example.coffeevibe.ui.ui.settings.SettingsScreen
 import com.example.coffeevibe.ui.ui.settings.SupportScreen
 import com.example.coffeevibe.ui.ui.other.UserOrdersScreen
 import com.example.coffeevibe.ui.ui.settings.AccountScreen
+import com.example.coffeevibe.ui.ui.settings.ErrorTicketSendScreen
 import com.example.coffeevibe.ui.ui.settings.Faqs
 import com.example.coffeevibe.viewmodel.LoginViewModel
 import com.example.coffeevibe.viewmodel.MenuViewModel
@@ -148,7 +146,8 @@ fun MainScreen(
                 ) {
                     SupportScreen(
                         onBackPressed = { navController.popBackStack() },
-                        inFaqs = { navController.navigate("faqs")}
+                        inFaqs = { navController.navigate("faqs")},
+                        sendTicket = { navController.navigate("errorSend") }
                     )
                 }
 
@@ -169,6 +168,15 @@ fun MainScreen(
                         onBackPressed = { navController.popBackStack() }
                     )
                 }
+
+                composable(Screen.ErrorSend.route,
+                    enterTransition = { slideInHorizontally(tween(durationMillis = 500)) + fadeIn(tween(durationMillis = 500)) },
+                    exitTransition = { slideOutHorizontally(tween(durationMillis = 500)) + fadeOut(tween(durationMillis = 500))}
+                ) {
+                    ErrorTicketSendScreen(
+                        onBackPressed = { navController.popBackStack() }
+                    )
+                }
             }
             BottomNavigationBar(navController = navController, orderVm = orderViewModel)
         }
@@ -181,7 +189,7 @@ fun BottomNavigationBar(navController: NavController, orderVm: OrderViewModel) {
         NavigationBar(
             containerColor = colorScheme.background,
             modifier = Modifier
-                .shadow(10.dp, spotColor = colorScheme.onBackground)
+                .shadow(20.dp, ambientColor = colorScheme.onBackground)
         ) {
             val backStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = backStackEntry?.destination?.route
@@ -287,4 +295,5 @@ sealed class Screen(val route: String) {
     object Splash : Screen("splashScreen")
     object Faqs: Screen("faqs")
     object Testing: Screen("testing")
+    object ErrorSend: Screen("errorSend")
 }
