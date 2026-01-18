@@ -2,64 +2,192 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>FAQ по навигации в мобильном приложении</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQ – Кофейня</title>
     <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            max-width: 600px;
-            margin: auto;
-            padding: 20px;
-            background-color: #f9f9f9;
-        }
-        h1 {
-            text-align: center;
-            color: #333;
-        }
-        p.question {
-            font-size: 18px;
-            font-weight: bold;
-            margin-top: 20px;
-        }
-        p.answer {
-            font-size: 16px;
-            margin-left: 20px;
-            color: #555;
-        }
+        * {
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+body {
+    margin: 0;
+    background-color: #f6f3ef;
+    padding: 20px;
+}
+
+.faq-container {
+    max-width: 420px;
+    margin: 0 auto;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #3e2c23;
+}
+
+.faq-item {
+    background-color: #ffffff;
+    border-radius: 14px;
+    margin-bottom: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.faq-item input {
+    display: none;
+}
+
+.faq-item label {
+    display: block;
+    padding: 16px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #3e2c23;
+    cursor: pointer;
+    position: relative;
+}
+
+.faq-item label::after {
+    content: "＋";
+    position: absolute;
+    right: 16px;
+    font-size: 20px;
+    transition: transform 0.3s ease;
+}
+
+.faq-item input:checked + label::after {
+    transform: rotate(45deg);
+}
+
+.faq-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+.faq-content p {
+    padding: 0 16px 16px;
+    margin: 0;
+    font-size: 14px;
+    color: #5a4a42;
+    line-height: 1.5;
+}
+
+.faq-item input:checked ~ .faq-content {
+    max-height: 200px;
+}
     </style>
 </head>
 <body>
 
-<h1>Часто задаваемые вопросы по навигации в мобильном приложении</h1>
+<div class="faq-container">
+    <h1>Часто задаваемые вопросы</h1>
 
-<p class="question">Как зарегистрироваться в приложении?</p>
-<p class="answer">Для регистрации откройте главное меню → выберите пункт «Профиль» → нажмите кнопку «Регистрация». Следуйте инструкциям, введите необходимые данные и подтвердите регистрацию.</p>
+    <!-- Заказы -->
+    <div class="faq-item">
+        <input type="checkbox" id="faq1">
+        <label for="faq1">☕️ Как сделать заказ?</label>
+        <div class="faq-content">
+            <p>Выберите напиток или еду в меню, добавьте в корзину и нажмите «Оформить заказ». После подтверждения заказ поступит в работу.</p>
+        </div>
+    </div>
 
-<p class="question">Где находятся настройки профиля?</p>
-<p class="answer">Перейдите в главное меню → выберите пункт «Настройки» → найдите раздел «Профиль».</p>
+    <div class="faq-item">
+        <input type="checkbox" id="faq2">
+        <label for="faq2">📍 Можно ли заказать заранее?</label>
+        <div class="faq-content">
+            <p>Да, вы можете оформить предзаказ и выбрать удобное время для получения напитка в кофейне.</p>
+        </div>
+    </div>
 
-<p class="question">Как изменить пароль?</p>
-<p class="answer">Откройте главное меню → перейдите в раздел «Настройки» → выберите пункт «Безопасность» → нажмите «Изменить пароль» и следуйте подсказкам.</p>
+    <div class="faq-item">
+        <input type="checkbox" id="faq3">
+        <label for="faq3">❌ Можно ли отменить заказ?</label>
+        <div class="faq-content">
+            <p>Отмена возможна до начала приготовления напитка. Если заказ уже готовится, отмена недоступна.</p>
+        </div>
+    </div>
 
-<p class="question">Как добавить карту для оплаты?</p>
-<p class="answer">Зайдите в основное меню → выберите «Способы оплаты» → нажмите «Добавить новую карту» и заполните требуемые поля.</p>
+    <!-- Оплата -->
+    <div class="faq-item">
+        <input type="checkbox" id="faq4">
+        <label for="faq4">💳 Какие способы оплаты доступны?</label>
+        <div class="faq-content">
+            <p>Мы принимаем банковские карты, Apple Pay, Google Pay и оплату наличными при получении.</p>
+        </div>
+    </div>
 
-<p class="question">Что делать, если забыл пароль?</p>
-<p class="answer">В главном меню зайдите в профиль → кликните ссылку «Забыли пароль?» → следуйте инструкциям восстановления пароля через электронную почту или телефон.</p>
+    <div class="faq-item">
+        <input type="checkbox" id="faq5">
+        <label for="faq5">🧾 Можно ли получить чек?</label>
+        <div class="faq-content">
+            <p>Электронный чек автоматически отправляется в приложении после оплаты заказа.</p>
+        </div>
+    </div>
 
-<p class="question">Можно ли настроить уведомления?</p>
-<p class="answer">Да, настройте уведомления следующим образом: откройте главное меню → зайдите в раздел «Настройки» → активируйте или отключайте нужные типы уведомлений («Новости», «Акции», «Сообщения»).</p>
+    <!-- Бонусы -->
+    <div class="faq-item">
+        <input type="checkbox" id="faq6">
+        <label for="faq6">🎁 Как работает бонусная программа?</label>
+        <div class="faq-content">
+            <p>За каждый заказ вы получаете бонусы. Ими можно оплатить часть или полную стоимость напитков.</p>
+        </div>
+    </div>
 
-<p class="question">Как оформить заказ через мобильное приложение?</p>
-<p class="answer">Выберите интересующий товар или услугу → добавьте в корзину → перейдите в корзину и завершите оформление заказа, выбрав способ доставки и оплаты.</p>
+    <div class="faq-item">
+        <input type="checkbox" id="faq7">
+        <label for="faq7">⭐️ Когда начисляются бонусы?</label>
+        <div class="faq-content">
+            <p>Бонусы начисляются сразу после успешной оплаты заказа.</p>
+        </div>
+    </div>
 
-<p class="question">Есть ли возможность оставить отзыв о заказе?</p>
-<p class="answer">После завершения покупки в разделе вашего профиля появится ссылка «Оставить отзыв». Нажмите её и поделитесь своим мнением.</p>
+    <!-- Напитки -->
+    <div class="faq-item">
+        <input type="checkbox" id="faq8">
+        <label for="faq8">🥛 Можно ли изменить состав напитка?</label>
+        <div class="faq-content">
+            <p>Да, вы можете выбрать тип молока, сиропы и уровень сахара при оформлении заказа.</p>
+        </div>
+    </div>
 
-<p class="question">Какие возможности предоставляет личный кабинет?</p>
-<p class="answer">Через личный кабинет вы можете отслеживать заказы, просматривать историю покупок, управлять адресами доставки, способами оплаты и получать персональные рекомендации.</p>
+    <div class="faq-item">
+        <input type="checkbox" id="faq9">
+        <label for="faq9">🌱 Есть ли растительное молоко?</label>
+        <div class="faq-content">
+            <p>В нашем меню доступны альтернативные виды молока: овсяное, миндальное и соевое.</p>
+        </div>
+    </div>
 
-<p class="question">Почему не приходит код подтверждения при входе в аккаунт?</p>
-<p class="answer">Проверьте правильность ввода номера телефона или электронной почты. Если проблема сохраняется, обратитесь в службу поддержки через обратную связь в приложении.</p>
+    <!-- Аккаунт -->
+    <div class="faq-item">
+        <input type="checkbox" id="faq10">
+        <label for="faq10">👤 Нужно ли регистрироваться?</label>
+        <div class="faq-content">
+            <p>Регистрация не обязательна, но она позволяет копить бонусы и отслеживать историю заказов.</p>
+        </div>
+    </div>
+
+    <div class="faq-item">
+        <input type="checkbox" id="faq11">
+        <label for="faq11">🔒 Как защищены мои данные?</label>
+        <div class="faq-content">
+            <p>Мы используем современные технологии шифрования и не передаём данные третьим лицам.</p>
+        </div>
+    </div>
+
+    <!-- Поддержка -->
+    <div class="faq-item">
+        <input type="checkbox" id="faq12">
+        <label for="faq12">📞 Как связаться с поддержкой?</label>
+        <div class="faq-content">
+            <p>Вы можете написать нам через раздел «Поддержка» в приложении или на электронную почту.</p>
+        </div>
+    </div>
+
+</div>
 
 </body>
 </html>

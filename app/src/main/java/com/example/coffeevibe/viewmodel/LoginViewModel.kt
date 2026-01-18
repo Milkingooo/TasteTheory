@@ -210,32 +210,50 @@ class LoginViewModel(val context: Context) : ViewModel() {
     fun updateUserProfile(
         newEmail: String,
         newPassword: String,
+        oldPassword: String,
         newName: String,
     ){
         when {
             newName.isNotEmpty() -> {
                 changeNameInDb(newName)
             }
-//            newEmail.isNotEmpty() -> {
-//                val user = auth.currentUser
-//                val credential = EmailAuthProvider.getCredential(user?.email!!, password.toString())
-//
-//                user.reauthenticate(credential)
-//                    .addOnSuccessListener {
-//                        user.updateEmail(newEmail)
-//                            .addOnSuccessListener {
-//                                Toast.makeText(context, "Email успешно обновлен", Toast.LENGTH_SHORT).show()
-//                            }
-//                            .addOnFailureListener { e ->
-//                                Toast.makeText(context, "Ошибка обновления email: ${e.message}", Toast.LENGTH_SHORT).show()
-//                            }
-//                    }
-//                    .addOnFailureListener { e ->
-//                        Toast.makeText(context, "Ошибка переаутентификации: ${e.message}", Toast.LENGTH_SHORT).show()
-//                    }
-//            }
+            newEmail.isNotEmpty() -> {
+                val user = auth.currentUser
+                val credential = EmailAuthProvider.getCredential(user?.email!!, oldPassword)
+
+                user.reauthenticate(credential)
+                    .addOnSuccessListener {
+                        user.updateEmail(newEmail)
+                            .addOnSuccessListener {
+                                Toast.makeText(context, "Email успешно обновлен", Toast.LENGTH_SHORT).show()
+                            }
+                            .addOnFailureListener { e ->
+                                Toast.makeText(context, "Ошибка обновления email: ${e.message}", Toast.LENGTH_SHORT).show()
+                            }
+
+                    }
+                    .addOnFailureListener { e ->
+                        Toast.makeText(context, "Ошибка переаутентификации: ${e.message}", Toast.LENGTH_SHORT).show()
+                    }
+            }
             newPassword.isNotEmpty() -> {
-                auth.currentUser?.updatePassword(newPassword)
+                val user = auth.currentUser
+                val credential = EmailAuthProvider.getCredential(user?.email!!, oldPassword)
+
+                user.reauthenticate(credential)
+                    .addOnSuccessListener {
+                        user.updatePassword(newPassword)
+                            .addOnSuccessListener {
+                                Toast.makeText(context, "Пароль успешно обновлен", Toast.LENGTH_SHORT).show()
+                            }
+                            .addOnFailureListener { e ->
+                                Toast.makeText(context, "Ошибка обновления пароля: ${e.message}", Toast.LENGTH_SHORT).show()
+                            }
+
+                    }
+                    .addOnFailureListener { e ->
+                        Toast.makeText(context, "Ошибка переаутентификации: ${e.message}", Toast.LENGTH_SHORT).show()
+                    }
             }
             else -> {
 

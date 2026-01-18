@@ -172,7 +172,9 @@ fun SegmentedButtonSingleSelectSample(
     }
     else {
         Column(
-            modifier = Modifier.padding(8.dp).horizontalScroll(rememberScrollState()),
+            modifier = Modifier
+                .padding(8.dp)
+                .wrapContentHeight(),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
 
@@ -544,7 +546,8 @@ fun BaseButton(
     color: ButtonColors = ButtonDefaults.buttonColors(
         containerColor = colorScheme.primary,
         contentColor = colorScheme.onBackground
-    )
+    ),
+    enabled: Boolean = true
 ){
     Button(
         onClick = { click() },
@@ -553,7 +556,8 @@ fun BaseButton(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
-            .height(52.dp)
+            .height(52.dp),
+        enabled = enabled
     ) {
         Text(
             text = title,
@@ -1046,10 +1050,11 @@ fun ManagerOrdersListItem(
         onClick = { /* Do something */ },
         modifier = Modifier
             .fillMaxWidth()
+            .shadow(4.dp, Shapes.medium, spotColor = colorScheme.background)
             .wrapContentHeight()
             .animateContentSize(),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = colorScheme.secondaryContainer),
+        shape = Shapes.medium,
 
         ) {
         Column(

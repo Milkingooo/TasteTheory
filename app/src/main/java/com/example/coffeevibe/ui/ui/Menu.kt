@@ -398,8 +398,8 @@ fun MenuScreen(
                                                     .fillMaxWidth()
                                                     .align(Alignment.CenterHorizontally)
                                                     .padding(bottom = 8.dp),
-                                                defaultColor = colorScheme.onSecondaryContainer,
-                                                selectedColor = colorScheme.secondaryContainer
+                                                defaultColor = colorScheme.secondaryContainer,
+                                                selectedColor = colorScheme.onSecondaryContainer
                                             )
                                         }
                                     }

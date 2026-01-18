@@ -44,6 +44,7 @@ import com.example.coffeevibe.ui.ui.other.TextFieldWithName
 import com.example.coffeevibe.viewmodel.LoginViewModel
 import androidx.compose.runtime.collectAsState
 import com.example.coffeevibe.ui.activities.ui.theme.ui.theme.Typography
+import com.example.coffeevibe.ui.ui.customUi.PasswordAlertDialog
 import com.example.coffeevibe.ui.ui.customUi.PasswordField
 import com.example.coffeevibe.ui.ui.customUi.SimpleBottomSheet
 import com.example.coffeevibe.ui.ui.other.BaseTextField
@@ -56,15 +57,18 @@ fun AccountScreen(
 ) {
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
+    var oldPassword by remember { mutableStateOf("") }
 
     val isInCorrectName by remember { mutableStateOf(false) }
     val isInCorrectEmail by remember { mutableStateOf(false) }
     var editProfile by remember { mutableStateOf(false) }
+    var enterPassword by remember { mutableStateOf(false) }
 
     loginVm.giveUserNameEmail { nameDb, emailDb ->
         name = nameDb
         email = emailDb
     }
+
 
     if (editProfile){
         SimpleBottomSheet(
@@ -103,27 +107,23 @@ fun AccountScreen(
                 isInCorrect = isInCorrectName,
                 placeholder = "Введите новую почту",
                 modifier = Modifier.fillMaxWidth(),
-                enabled = false
+                enabled = true
             )
 
             PasswordField(
                 keyboardActions = {},
                 isInCorrect = textFieldState.text.trim().length > 6,
                 state = textFieldState,
-                enable = false
+                enable = true
             )
 
             BaseButton(
                 title = "Сохранить",
                 click = {
-                    loginVm.updateUserProfile(
-                        newEmail = newEmail.trim(),
-                        newPassword = textFieldState.text.trim().toString(),
-                        newName = newName.trim()
-                    )
-                    editProfile = false
+                    enterPassword = true
                 },
                 color = ButtonDefaults.buttonColors(colorScheme.secondary),
+                enabled = (newName.isNotEmpty() || newEmail.isNotEmpty() || textFieldState.text.trim().isNotEmpty())
             )
 
             Spacer(Modifier.height(16.dp))
@@ -136,6 +136,27 @@ fun AccountScreen(
                 textAlign = TextAlign.Center,
                 color = colorScheme.error
             )
+
+            if (enterPassword) {
+                PasswordAlertDialog(
+                    onDismissRequest = {
+                        enterPassword  = false
+                    },
+                    onConfirmation = {
+                        enterPassword  = false
+                        loginVm.updateUserProfile(
+                            newEmail = newEmail.trim(),
+                            newPassword = textFieldState.text.trim().toString(),
+                            newName = newName.trim(),
+                            oldPassword = oldPassword
+                        )
+                        editProfile = false
+                    },
+                    output = {
+                        oldPassword = it
+                    }
+                )
+            }
 
         }
     }

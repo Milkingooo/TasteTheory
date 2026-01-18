@@ -489,7 +489,7 @@ fun OrderPlaced(
             }
             .height(if (expanded) 180.dp else 55.dp)
             .clip(Shapes.medium),
-        colors = if (selectedPlace == "Выбрать место получения") CardDefaults.cardColors(containerColor = Color.LightGray)
+        colors = if (selectedPlace == "Выбрать место получения") CardDefaults.cardColors(containerColor = colorScheme.secondaryContainer)
         else CardDefaults.cardColors(containerColor = colorScheme.primary)
     ) {
         Column(
@@ -545,7 +545,7 @@ fun OrderPlaced(
                             Icon(
                                 Icons.Filled.Place,
                                 contentDescription = "Login",
-                                tint = colorScheme.onBackground,
+                                tint = colorScheme.background,
                                 modifier = Modifier
                                     .width(20.dp)
                                     .height(20.dp)
