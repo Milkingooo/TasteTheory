@@ -32,6 +32,7 @@ import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.filled.Receipt
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.outlined.DeleteOutline
+import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
@@ -74,6 +75,7 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -101,8 +103,16 @@ import com.example.coffeevibe.R
 import com.example.coffeevibe.model.OrderManagerItem
 import com.example.coffeevibe.ui.theme.Shapes
 import com.example.coffeevibe.utils.ConvertOrderState
+import com.example.coffeevibe.utils.TimeUtils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import okhttp3.Dispatcher
 import java.sql.Date
 import java.text.SimpleDateFormat
+import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
+import java.time.temporal.Temporal
+import java.util.Timer
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -341,6 +351,151 @@ fun UserOrderItem(
 
                         Text(
                             text = number,
+                            color = colorScheme.onSecondaryContainer,
+                            fontFamily = FontFamily(Font(R.font.roboto_condensed_black)),
+                            fontSize = 20.sp
+                        )
+                    }
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(4.dp))
+        if (isWithinThreeMinutes(orderDate)) {
+            DropdownMenu(
+                expanded = orderActionsOpen,
+                onDismissRequest = { orderActionsOpen = false },
+                containerColor = colorScheme.secondaryContainer,
+                shape = Shapes.medium
+            ) {
+                DropdownMenuItem(
+                    text = { Text("Отменить заказ", color = colorScheme.error) },
+                    onClick = {
+                        openDialog = true
+                        //if (confirmAction) { cancelOrder() }
+                    },
+                    leadingIcon = {
+                        Icon(
+                            Icons.Outlined.DeleteOutline,
+                            tint = colorScheme.error,
+                            contentDescription = null
+                        )
+                    },
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun OrderCard(
+    number: String,
+    price: Int,
+    pickupTime: String,
+    state: Int,
+    cancelOrder: () -> Unit,
+    orderDate: String
+){
+    val currentDateTime = LocalDateTime.now()
+    val endDateTime = TimeUtils.convertTimestampToLocalDateTime(pickupTime)
+    var minutesEnd: Long = 0
+
+    //val timeString = TimeUtils.convertToMillsWithFormat(pickupTime, "HH:mm")
+
+    val threeMinutesPlus = TimeUtils.convertToMills(orderDate) + 180000
+    val format = SimpleDateFormat("HH:mm")
+    val cancelTime = format.format(Date(threeMinutesPlus))
+
+    var orderActionsOpen by remember { mutableStateOf(false) }
+    var openDialog by remember { mutableStateOf(false) }
+
+    if (openDialog) {
+        MyAlertDialog(
+            onDismissRequest = { openDialog = !openDialog },
+            onConfirmation = {
+                openDialog = false
+                cancelOrder()
+            },
+            dialogTitle = "Подтвердите действие",
+            icon = Icons.Filled.CheckBox,
+            dialogText = "Вы уверены, что хотите отменить заказ?"
+        )
+    }
+
+    val scope = rememberCoroutineScope()
+
+    scope.launch(Dispatchers.IO) {
+        minutesEnd = ChronoUnit.MINUTES.between(currentDateTime, endDateTime) % 60
+    }
+
+    Box(modifier = Modifier.wrapContentSize(Alignment.TopEnd)) {
+        // Icon button should have a tooltip associated with it for a11y.
+        TooltipBox(
+            positionProvider =
+                TooltipDefaults.rememberTooltipPositionProvider(
+                    TooltipAnchorPosition.Above),
+            tooltip = { PlainTooltip { Text("Ваш заказ") } },
+            state = rememberTooltipState(),
+        ) {
+            OutlinedCard(
+                onClick = {
+                    orderActionsOpen = true
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .shadow(4.dp, Shapes.medium, spotColor = colorScheme.background)
+                    .height(102.dp)
+                    .animateContentSize(),
+                colors = CardDefaults.cardColors(containerColor = colorScheme.secondaryContainer),
+                shape = Shapes.medium
+                ) {
+                Row(
+                    modifier = Modifier
+                        .padding(6.dp)
+                        .fillMaxSize(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceAround
+                ) {
+                    Column {
+                        Text(
+                            text = "Ваш заказ ${ConvertOrderState.convertOrderStateToString(state)} №$number",
+                            color = colorScheme.onSecondaryContainer,
+                            fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
+                            fontSize = 18.sp
+                        )
+                        Text(
+                            text = "Осталось ~ $minutesEnd минут",
+                            color = colorScheme.onSecondaryContainer,
+                            fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
+                            fontSize = 16.sp
+                        )
+//                        Text(
+//                            text = "К оплате: $price₽",
+//                            color = colorScheme.onSecondaryContainer,
+//                            fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
+//                            fontSize = 16.sp
+//                        )
+                        if (isWithinThreeMinutes(orderDate)) {
+                            Text(
+                                text = "Можно отменить до $cancelTime",
+                                color = colorScheme.error,
+                                fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
+                                fontSize = 12.sp
+                            )
+                        }
+                    }
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+//                        Text(
+//                            text = ConvertOrderState.convertOrderStateToString(state),
+//                            color = if (state == 3) colorScheme.secondary else colorScheme.onSecondaryContainer,
+//                            fontFamily = FontFamily(Font(R.font.roboto_condensed_black)),
+//                            fontSize = 20.sp
+//                        )
+                        Text(
+                            text = "$price₽",
                             color = colorScheme.onSecondaryContainer,
                             fontFamily = FontFamily(Font(R.font.roboto_condensed_black)),
                             fontSize = 20.sp
@@ -651,6 +806,7 @@ fun TextFieldWithName(
             .fillMaxWidth(),
         enabled = enabled
     )
+    Spacer(Modifier.size(8.dp))
 }
 
 @Composable
@@ -663,38 +819,39 @@ fun TextAreaWithName(
     keyboardType: KeyboardType = KeyboardType.Text,
     modifier: Modifier,
     enabled: Boolean = false
-){
-    Column(
-        modifier = Modifier.padding(8.dp),
-    ) {
-        OutlinedTextField(
-            value = value,
-            label = { Text(text = title,
+) {
+    OutlinedTextField(
+        value = value,
+        label = {
+            Text(
+                text = title,
                 fontSize = 16.sp,
                 color = colorScheme.onBackground,
-                fontFamily = FontFamily(Font(R.font.roboto_condensed_medium))) },
-            onValueChange = {
-                exitValue(it)
-            },
-            textStyle = TextStyle(
-                fontSize = 18.sp,
                 fontFamily = FontFamily(Font(R.font.roboto_condensed_medium))
-            ),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = colorScheme.onBackground,
-                unfocusedBorderColor = colorScheme.onSurface,
-                unfocusedPlaceholderColor = colorScheme.onBackground,
-                focusedTextColor = colorScheme.onBackground,
-                unfocusedTextColor = colorScheme.onBackground,
-            ),
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done, keyboardType = keyboardType),
-            placeholder = { Text(placeholder, color = colorScheme.onSurface) },
-            isError = isInCorrect,
-            maxLines = 5,
-            modifier = modifier,
-            enabled = enabled
-        )
-    }
+            )
+        },
+        onValueChange = {
+            exitValue(it)
+        },
+        textStyle = TextStyle(
+            fontSize = 18.sp,
+            fontFamily = FontFamily(Font(R.font.roboto_condensed_medium))
+        ),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = colorScheme.onBackground,
+            unfocusedBorderColor = colorScheme.onSurface,
+            unfocusedPlaceholderColor = colorScheme.onBackground,
+            focusedTextColor = colorScheme.onBackground,
+            unfocusedTextColor = colorScheme.onBackground,
+        ),
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done, keyboardType = keyboardType),
+        placeholder = { Text(placeholder, color = colorScheme.onSurface) },
+        isError = isInCorrect,
+        maxLines = 5,
+        modifier = modifier,
+        enabled = enabled
+    )
+    Spacer(Modifier.size(8.dp))
 }
 
 @Composable
@@ -775,38 +932,40 @@ fun UserOrder(
     price: Int,
     number: String,
     dateOrder: String,
-    state: Int
+    state: Int,
+    click: () -> Unit
 ) {
     val parts = dateOrder.split("=") // Разбиваем строку на части
     val seconds = parts[1].split(",")[0].toLong() // Извлекаем секунды
     val nanoseconds = parts[2].split(")")[0].toLong() // Извлекаем наносекунды
     val milliseconds = seconds * 1000 + nanoseconds / 1_000_000
     val date = Date(milliseconds)
-    val format = SimpleDateFormat("yyyy-MM-dd HH:mm")
     val format2 = SimpleDateFormat("EEE, dd MMM yyyy HH:mm")
     val timeString = format2.format(date)
 
     OutlinedCard(
-        onClick = { /* Do something */ },
+        onClick = {
+            click()
+        },
         modifier = Modifier
             .fillMaxWidth()
             .height(68.dp),
         colors = CardDefaults.cardColors(containerColor = colorScheme.background),
         shape = RoundedCornerShape(16.dp),
-        border = BorderStroke(1.dp,
+        border = BorderStroke(2.dp,
             if (state == 5) colorScheme.error else colorScheme.primary
         ))
     {
         Row(
             modifier = Modifier
-                .padding(6.dp)
+                .padding(vertical = 6.dp, horizontal = 16.dp)
                 .fillMaxSize(),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceAround
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Column {
                 Text(
-                    text = timeString,
+                    text = "Заказ ${ConvertOrderState.convertOrderStateToString(state)}",
                     color = colorScheme.onBackground,
                     fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
                     fontSize = 18.sp
@@ -818,12 +977,26 @@ fun UserOrder(
                     fontSize = 16.sp
                 )
             }
-                Text(
-                    text = number,
-                    color = colorScheme.onBackground,
-                    fontFamily = FontFamily(Font(R.font.roboto_condensed_black)),
-                    fontSize = 20.sp
+
+            Text(
+                text = "№$number",
+                color = colorScheme.onBackground,
+                fontFamily = FontFamily(Font(R.font.roboto_condensed_black)),
+                fontSize = 20.sp
+            )
+
+            IconButton(
+                onClick = { click() },
+                modifier = Modifier
+                    .clip(Shapes.large)
+                    .background(colorScheme.secondaryContainer)
+            ) {
+                Icon(
+                    Icons.Outlined.Description,
+                    "Состав заказа",
+                    tint = colorScheme.onSecondaryContainer
                 )
+            }
         }
     }
 }

@@ -35,7 +35,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.coffeevibe.ui.activities.ui.theme.Typography
 import com.example.coffeevibe.ui.theme.CoffeeVibeTheme
+import com.example.coffeevibe.ui.ui.adminPanel.AddEditProductScreen
 import com.example.coffeevibe.ui.ui.other.ProfileScreen
 import com.example.coffeevibe.ui.ui.settings.TestScreen
 import com.example.coffeevibe.ui.ui.settings.SettingsScreen
@@ -45,6 +47,7 @@ import com.example.coffeevibe.ui.ui.settings.AccountScreen
 import com.example.coffeevibe.ui.ui.settings.ErrorTicketSendScreen
 import com.example.coffeevibe.ui.ui.settings.Faqs
 import com.example.coffeevibe.viewmodel.LoginViewModel
+import com.example.coffeevibe.viewmodel.ManagerViewModel
 import com.example.coffeevibe.viewmodel.MenuViewModel
 import com.example.coffeevibe.viewmodel.OrderViewModel
 
@@ -54,7 +57,8 @@ fun MainScreen(
     onLogin: () -> Unit,
     menuViewModel: MenuViewModel,
     orderViewModel: OrderViewModel,
-    loginVm: LoginViewModel
+    loginVm: LoginViewModel,
+    managerVm: ManagerViewModel
 ) {
     val navController = rememberNavController()
 
@@ -117,7 +121,8 @@ fun MainScreen(
                     exitTransition = { slideOutHorizontally(tween(durationMillis = 500)) + fadeOut(tween(durationMillis = 500))}
                 ){ AdminPanelScreen(
                     onBackPressed = { navController.popBackStack() },
-                    menuVm = menuViewModel
+                    menuVm = menuViewModel,
+                    managerVm = managerVm
                 )
                 }
 
@@ -164,8 +169,11 @@ fun MainScreen(
                     enterTransition = { slideInHorizontally(tween(durationMillis = 500)) + fadeIn(tween(durationMillis = 500)) },
                     exitTransition = { slideOutHorizontally(tween(durationMillis = 500)) + fadeOut(tween(durationMillis = 500))}
                 ) {
-                    TestScreen(
-                        onBackPressed = { navController.popBackStack() }
+//                    TestScreen(
+//                        onBackPressed = { navController.popBackStack() }
+//                    )
+                    AddEditProductScreen(
+                        menuViewModel = menuViewModel
                     )
                 }
 
@@ -236,7 +244,10 @@ fun BottomNavigationBar(navController: NavController, orderVm: OrderViewModel) {
                         }
                     },
                     label = {
-
+                        Text(
+                            text = navItem.name,
+                            style = Typography.titleSmall
+                        )
                     },
                     modifier = Modifier
                         .background(colorScheme.background),
@@ -244,8 +255,8 @@ fun BottomNavigationBar(navController: NavController, orderVm: OrderViewModel) {
                         selectedIconColor = colorScheme.onPrimary,
                         unselectedIconColor = colorScheme.onBackground,
                         selectedIndicatorColor = colorScheme.primary,
-                        unselectedTextColor = Color.White,
-                        selectedTextColor = Color.White,
+                        unselectedTextColor = colorScheme.onBackground,
+                        selectedTextColor = colorScheme.primary,
                         disabledIconColor = colorScheme.onBackground,
                         disabledTextColor = Color.White
                     )
@@ -259,19 +270,23 @@ object NavBarItems {
     val BarItems = listOf(
         BarItem(
             image = Icons.Filled.Fastfood,
-            route = "menu"
+            route = "menu",
+            name = "Меню"
         ),
         BarItem(
             image = Icons.Filled.ShoppingCart,
-            route = "cart"
+            route = "cart",
+            name = "Корзина"
         ),
         BarItem(
             image = Icons.Filled.History,
-            route = "orders"
+            route = "orders",
+            name = "Заказы"
         ),
         BarItem(
             image = Icons.Filled.AccountCircle,
-            route = "account"
+            route = "account",
+            name = "Профиль"
         )
 
     )
@@ -279,7 +294,8 @@ object NavBarItems {
 
 data class BarItem(
     val image: ImageVector,
-    val route: String
+    val route: String,
+    val name: String
 )
 
 sealed class Screen(val route: String) {

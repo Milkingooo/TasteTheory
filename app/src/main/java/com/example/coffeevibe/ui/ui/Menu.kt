@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -104,6 +105,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
@@ -116,6 +118,7 @@ import com.example.coffeevibe.ui.theme.Shapes
 import com.example.coffeevibe.ui.ui.customUi.MenuTopBar
 import com.example.coffeevibe.ui.ui.other.AssistChipMenu
 import com.example.coffeevibe.ui.ui.other.IndeterminateCircularIndicator
+import com.example.coffeevibe.ui.ui.other.OrderCard
 import com.example.coffeevibe.ui.ui.other.UserOrderItem
 import com.example.coffeevibe.utils.CashApplication
 import com.example.coffeevibe.utils.NetworkUtils
@@ -303,7 +306,6 @@ fun MenuScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(innerPadding)
-
                 ) {
                     PullToRefreshBox(
                         modifier = Modifier
@@ -325,7 +327,6 @@ fun MenuScreen(
                         LazyVerticalGrid(
                             columns = GridCells.Adaptive(minSize = 128.dp),
                             modifier = Modifier
-//                                .weight(1f)
                                 .fillMaxWidth()
                                 .padding(horizontal = 16.dp),
                             verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -377,7 +378,7 @@ fun MenuScreen(
                                                 pageSpacing = 6.dp,
                                                 modifier = Modifier.animateItem()
                                             ) {
-                                                UserOrderItem(
+                                                OrderCard(
                                                     number = numAndPrice[it].number,
                                                     price = numAndPrice[it].price,
                                                     pickupTime = numAndPrice[it].pickupTime,
@@ -522,18 +523,39 @@ fun ListItem2(
                     targetValue = if (state is AsyncImagePainter.State.Success) 1f else 0f
                 )
 
-                Image(
-                    painter = painter,
-                    contentDescription = null,
+                Box(
                     modifier = Modifier
-                        .size(130.dp)
-                        .clip(shape = Shapes.medium)
-                        .alpha(transition)
-                    ,
-                    contentScale = ContentScale.Crop,
+                        .size(150.dp)
                 )
+                {
+                    Image(
+                        painter = painter,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(140.dp)
+                            .clip(shape = Shapes.medium)
+                            .alpha(transition)
+                            .align(Alignment.Center),
+                        contentScale = ContentScale.Crop,
+                    )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                    if (discountPrice != 0){
+                    Text(
+                        "Хит",
+                        color = colorScheme.background,
+                        modifier = Modifier
+                            .width(60.dp)
+                            .padding(4.dp)
+                            .offset(x = (-10).dp, y = -(10).dp)
+                            .clip(Shapes.medium)
+                            .background(colorScheme.primary)
+                            .align(Alignment.TopStart),
+                        textAlign = TextAlign.Center
+                    )
+                        }
+                }
+
+                Spacer(modifier = Modifier.height(4.dp))
 
                 Text(
                     text = name,
@@ -546,10 +568,10 @@ fun ListItem2(
                     overflow = TextOverflow.Ellipsis,
                 )
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
                 Row(
-                    verticalAlignment = Alignment.CenterVertically,
+                    verticalAlignment = Alignment.Top,
                     horizontalArrangement = Arrangement.SpaceBetween
                 )
                 {
@@ -570,7 +592,8 @@ fun ListItem2(
                             )
                         } else {
                             Column(
-                                verticalArrangement = Arrangement.Center
+                                verticalArrangement = Arrangement.Center,
+                                modifier = Modifier.height(75.dp)
                             ){
                                 Text(
                                     text = "$price₽",

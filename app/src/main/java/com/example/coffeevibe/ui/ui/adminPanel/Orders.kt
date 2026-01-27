@@ -27,6 +27,7 @@ import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -51,10 +52,12 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun OrdersAdmin(){
-    val managerViewModel = ManagerViewModel()
+fun OrdersAdmin(
+    managerVm: ManagerViewModel? = null
+){
+    val managerViewModel: ManagerViewModel = managerVm ?: ManagerViewModel()
 
-    val selectedLocation by remember { mutableStateOf(1)}
+    val selectedLocation by remember { mutableIntStateOf(1) }
     val orders by managerViewModel.ordersList.collectAsState()
     val isLoading by managerViewModel.isOrdersLoad.collectAsState()
 

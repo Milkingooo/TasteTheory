@@ -73,92 +73,96 @@ fun AccountScreen(
     if (editProfile){
         SimpleBottomSheet(
             state = editProfile,
-        ) {
-            var newName by remember { mutableStateOf("") }
-            var newEmail by remember { mutableStateOf("") }
-            val textFieldState = rememberTextFieldState()
+            onDismiss = {
 
-            Text(
-                text = "Редактирование профиля",
-                color = colorScheme.onBackground,
-                fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
-                fontSize = 26.sp,
-                textAlign = TextAlign.Center
-            )
+            },
+            content = {
+                var newName by remember { mutableStateOf("") }
+                var newEmail by remember { mutableStateOf("") }
+                val textFieldState = rememberTextFieldState()
 
-            TextFieldWithName(
-                title = "Новое имя",
-                value = newName,
-                exitValue = {
-                    newName = it
-                },
-                isInCorrect = isInCorrectName,
-                placeholder = "Введите имя",
-                modifier = Modifier.fillMaxWidth(),
-                enabled = true
-            )
-
-            TextFieldWithName(
-                title = "Новая почта",
-                value = newEmail,
-                exitValue = {
-                    newEmail = it
-                },
-                isInCorrect = isInCorrectName,
-                placeholder = "Введите новую почту",
-                modifier = Modifier.fillMaxWidth(),
-                enabled = true
-            )
-
-            PasswordField(
-                keyboardActions = {},
-                isInCorrect = textFieldState.text.trim().length > 6,
-                state = textFieldState,
-                enable = true
-            )
-
-            BaseButton(
-                title = "Сохранить",
-                click = {
-                    enterPassword = true
-                },
-                color = ButtonDefaults.buttonColors(colorScheme.secondary),
-                enabled = (newName.isNotEmpty() || newEmail.isNotEmpty() || textFieldState.text.trim().isNotEmpty())
-            )
-
-            Spacer(Modifier.height(16.dp))
-
-            Text(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                text = "Удалить аккаунт",
-                style = Typography.bodySmallEmphasized,
-                textAlign = TextAlign.Center,
-                color = colorScheme.error
-            )
-
-            if (enterPassword) {
-                PasswordAlertDialog(
-                    onDismissRequest = {
-                        enterPassword  = false
-                    },
-                    onConfirmation = {
-                        enterPassword  = false
-                        loginVm.updateUserProfile(
-                            newEmail = newEmail.trim(),
-                            newPassword = textFieldState.text.trim().toString(),
-                            newName = newName.trim(),
-                            oldPassword = oldPassword
-                        )
-                        editProfile = false
-                    },
-                    output = {
-                        oldPassword = it
-                    }
+                Text(
+                    text = "Редактирование профиля",
+                    color = colorScheme.onBackground,
+                    fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
+                    fontSize = 26.sp,
+                    textAlign = TextAlign.Center
                 )
-            }
 
-        }
+                TextFieldWithName(
+                    title = "Новое имя",
+                    value = newName,
+                    exitValue = {
+                        newName = it
+                    },
+                    isInCorrect = isInCorrectName,
+                    placeholder = "Введите имя",
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = true
+                )
+
+                TextFieldWithName(
+                    title = "Новая почта",
+                    value = newEmail,
+                    exitValue = {
+                        newEmail = it
+                    },
+                    isInCorrect = isInCorrectName,
+                    placeholder = "Введите новую почту",
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = true
+                )
+
+                PasswordField(
+                    keyboardActions = {},
+                    isInCorrect = textFieldState.text.trim().length > 6,
+                    state = textFieldState,
+                    enable = true
+                )
+
+                BaseButton(
+                    title = "Сохранить",
+                    click = {
+                        enterPassword = true
+                    },
+                    color = ButtonDefaults.buttonColors(colorScheme.secondary),
+                    enabled = (newName.isNotEmpty() || newEmail.isNotEmpty() || textFieldState.text.trim()
+                        .isNotEmpty())
+                )
+
+                Spacer(Modifier.height(16.dp))
+
+                Text(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    text = "Удалить аккаунт",
+                    style = Typography.bodySmallEmphasized,
+                    textAlign = TextAlign.Center,
+                    color = colorScheme.error
+                )
+
+                if (enterPassword) {
+                    PasswordAlertDialog(
+                        onDismissRequest = {
+                            enterPassword = false
+                        },
+                        onConfirmation = {
+                            enterPassword = false
+                            loginVm.updateUserProfile(
+                                newEmail = newEmail.trim(),
+                                newPassword = textFieldState.text.trim().toString(),
+                                newName = newName.trim(),
+                                oldPassword = oldPassword
+                            )
+                            editProfile = false
+                        },
+                        output = {
+                            oldPassword = it
+                        }
+                    )
+                }
+            }
+        )
     }
 
     CoffeeVibeTheme(context2 = LocalContext.current,content = {

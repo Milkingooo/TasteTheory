@@ -230,36 +230,36 @@ fun ProductsAdmin(
 //                       Spacer(modifier = Modifier.height(4.dp))
 //                    }
 //                }
-                ProductsFilters(
-                            selectedId =
-                                if (nameDecreasing) 2
-                                else if (nameIncreasing) 1
-                                else 0
-                            ,
-                            filterId = { id ->
-                               when (id) {
-                                   0 -> {
-                                       nameIncreasing = false
-                                       nameDecreasing = false
-                                       searchQuery = ""
-                                   }
-                                   1 -> {
-                                       nameIncreasing = true
-                                       nameDecreasing = false
-                                       searchQuery = ""
-                                   }
-                                   2 -> {
-                                       nameIncreasing = false
-                                       nameDecreasing = true
-                                       searchQuery = ""
-                                   }
-                               }
-                            },
-                    searchQueryInput = searchQuery,
-                    searchQueryOutput = {
-                        searchQuery = it
-                    }
-                )
+//                ProductsFilters(
+//                            selectedId =
+//                                if (nameDecreasing) 2
+//                                else if (nameIncreasing) 1
+//                                else 0
+//                            ,
+//                            filterId = { id ->
+//                               when (id) {
+//                                   0 -> {
+//                                       nameIncreasing = false
+//                                       nameDecreasing = false
+//                                       searchQuery = ""
+//                                   }
+//                                   1 -> {
+//                                       nameIncreasing = true
+//                                       nameDecreasing = false
+//                                       searchQuery = ""
+//                                   }
+//                                   2 -> {
+//                                       nameIncreasing = false
+//                                       nameDecreasing = true
+//                                       searchQuery = ""
+//                                   }
+//                               }
+//                            },
+//                    searchQueryInput = searchQuery,
+//                    searchQueryOutput = {
+//                        searchQuery = it
+//                    }
+//                )
                 Spacer(Modifier.height(16.dp))
                 MaterialList(
                     title = "Настройки приложения",

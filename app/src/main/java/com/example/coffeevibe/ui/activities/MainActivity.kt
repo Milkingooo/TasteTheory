@@ -13,6 +13,7 @@ import com.example.coffeevibe.repository.CartRepository
 import com.example.coffeevibe.ui.theme.CoffeeVibeTheme
 import com.example.coffeevibe.ui.ui.MainScreen
 import com.example.coffeevibe.viewmodel.LoginViewModel
+import com.example.coffeevibe.viewmodel.ManagerViewModel
 import com.example.coffeevibe.viewmodel.MenuViewModel
 import com.example.coffeevibe.viewmodel.OrderViewModel
 import com.google.firebase.FirebaseApp
@@ -34,6 +35,7 @@ class MainActivity : ComponentActivity() {
                 val orderViewModel = OrderViewModel(repository, applicationContext)
                 val loginVm = LoginViewModel(applicationContext)
                 val menuVm = MenuViewModel(context = applicationContext)
+                val managerVm = ManagerViewModel()
                 val userRole = loginVm.userRole.collectAsState()
 
 //                if (userRole.value == 1) {
@@ -50,7 +52,8 @@ class MainActivity : ComponentActivity() {
                     },
                     menuViewModel = menuVm,
                     orderViewModel = orderViewModel,
-                    loginVm = loginVm
+                    loginVm = loginVm,
+                    managerVm = managerVm
                 )
             }
         }

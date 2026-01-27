@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.coffeevibe.model.CreateOrderItem
 import com.example.coffeevibe.model.Location
 import com.example.coffeevibe.model.MenuItem
-import com.example.coffeevibe.model.OrderManagerItem
 import com.example.coffeevibe.model.OrderManagerOrderItem
 import com.example.coffeevibe.model.UserOrder
 import com.example.coffeevibe.utils.AuthUtils
@@ -15,8 +14,8 @@ import com.google.firebase.Firebase
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.firestore
+import com.google.firebase.firestore.toObject
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -369,5 +368,72 @@ class MenuViewModel(val context: Context) : ViewModel() {
                 Log.d("MyViewModel", "Order cancelled successfully")
             } catch (e: Exception) { }
         }
+    }
+
+    //Управление позициями в админке
+    fun getProductInfoById(id: Int?, callback: (MenuItem) -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val snapshot = firestore.collection("Good")
+                    .whereEqualTo("Id", id)
+                    .get()
+                    .await()
+
+                val product = snapshot.documents.firstNotNullOf { item ->
+                    try {
+                        MenuItem(
+                            id = item.data?.get("Id").toString().toInt(),
+                            name = item.data?.get("Name").toString(),
+                            price = item.data?.get("Price").toString().toInt(),
+                            discountPrice = item.data?.get("DiscountPrice").toString().toInt(),
+                            category = item.data?.get("Category").toString(),
+                            description = item.data?.get("Description").toString(),
+                            image = item.data?.get("Image").toString(),
+                            status = item.data?.get("Status").toString(),
+                            composition = item.data?.get("Dairy").toString(),
+                            kbju = item.data?.get("KBJU").toString()
+
+                        )
+                    } catch (e: Exception) {
+                        Log.e("GetProduct", "Error loading data", e)
+                        null
+                    }
+                }
+                Log.e("GetProduct", product.toString())
+                callback(product)
+            } catch (e: Exception) {
+                Log.e("GetProduct", "Error loading data", e)
+            }
+        }
+    }
+
+    fun getOrderDetails(id: Int, callback: (List<OrderManagerOrderItem>) -> Unit, isLoading: (Boolean) -> Unit) {
+        isLoading(true)
+        Log.d("GetDetails", "ID: $id")
+
+        viewModelScope.launch {
+            val snapshot = firestore
+                .collection("OrderItem")
+                .whereEqualTo("IdOrder", id)
+                .get()
+                .await()
+
+            val items = snapshot.documents.map { itemDoc ->
+                OrderManagerOrderItem(
+                    idGood = itemDoc.getLong("IdGood")?.toInt() ?: 0,
+                    name = getItemNameById(itemDoc.getLong("IdGood")?.toInt()),
+                    quantity = itemDoc.getLong("Quantity")?.toInt() ?: 0
+                )
+            }
+            Log.d("GetDetails", items.toString())
+            isLoading(false)
+            callback(items)
+        }
+    }
+
+    private suspend fun getItemNameById(id: Any?): String{
+        val snapshot = firestore.collection("Good").whereEqualTo("Id", id).get().await()
+        val itemName = snapshot.documents.firstOrNull()?.data?.get("Name").toString()
+        return itemName
     }
 }

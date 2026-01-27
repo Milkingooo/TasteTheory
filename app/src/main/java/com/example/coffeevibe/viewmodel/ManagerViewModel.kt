@@ -1,6 +1,7 @@
 package com.example.coffeevibe.viewmodel
 
 import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.coffeevibe.model.CreateOrderItem
@@ -19,6 +20,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import kotlin.collections.orEmpty
 
 class ManagerViewModel : ViewModel() {
     private val firestore = Firebase.firestore
@@ -108,7 +110,10 @@ class ManagerViewModel : ViewModel() {
 
     fun updateOrderState(orderId: Int, state: Int) {
         viewModelScope.launch {
-            firestore.collection("Order").document(orderId.toString()).update("Status", state)
+            firestore
+                .collection("Order")
+                .document(orderId.toString()).
+                update("Status", state)
                 .await()
             recombine()
         }

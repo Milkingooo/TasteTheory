@@ -25,7 +25,8 @@ import com.example.coffeevibe.ui.theme.CoffeeVibeTheme
 @Composable
 fun SimpleBottomSheet(
     state: Boolean = false,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
+    onDismiss: (Boolean) -> Unit
 ){
     val sheetState = rememberModalBottomSheetState(true)
     var showBottomSheet by remember { mutableStateOf(state) }
@@ -35,6 +36,7 @@ fun SimpleBottomSheet(
             ModalBottomSheet(
                 onDismissRequest = {
                     showBottomSheet = !showBottomSheet
+                    onDismiss(false)
                 },
                 sheetState = sheetState,
                 containerColor = colorScheme.background,

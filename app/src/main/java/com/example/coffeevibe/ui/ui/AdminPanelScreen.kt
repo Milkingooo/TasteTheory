@@ -76,6 +76,7 @@ import com.example.coffeevibe.ui.theme.CoffeeVibeTheme
 import com.example.coffeevibe.ui.ui.adminPanel.HomeAdmin
 import com.example.coffeevibe.ui.ui.adminPanel.OrdersAdmin
 import com.example.coffeevibe.ui.ui.adminPanel.ProductsAdmin
+import com.example.coffeevibe.viewmodel.ManagerViewModel
 import com.example.coffeevibe.viewmodel.MenuViewModel
 
 enum class Destination(
@@ -84,11 +85,11 @@ enum class Destination(
     val icon: ImageVector,
     val contentDescription: String
 ) {
-    MAIN("main", "Главная", Icons.Default.Star, "Main"),
+    //MAIN("main", "Главная", Icons.Default.Star, "Main"),
     PRODUCTS("products", "Товары", Icons.Default.Fastfood, "Products"),
     ORDERS("orders", "Заказы", Icons.Default.List, "Orders"),
     CONTENT("content", "Контент", Icons.Default.Share, "Content"),
-    USERS("users", "Пользователи", Icons.Default.People, "Users"),
+    //USERS("users", "Пользователи", Icons.Default.People, "Users"),
     //SAFETY("safety", "Безопасность", Icons.Default.Security, "Safety"),
     SUPPORT("support", "Поддержка", Icons.Default.ContactSupport, "Support")
 }
@@ -100,23 +101,27 @@ data class TabItems(
 )
 
 val tabItems = listOf(
-    TabItems(
-        title = "Главная",
-        unSelectedIcon = Icons.Outlined.Home,
-        selectedIcon = Icons.Filled.Home,
-        screen = { HomeAdmin() }
-    ),
+//    TabItems(
+//        title = "Главная",
+//        unSelectedIcon = Icons.Outlined.Home,
+//        selectedIcon = Icons.Filled.Home,
+//        screen = { HomeAdmin() }
+//    ),
     TabItems(
         title = "Товары",
         unSelectedIcon = Icons.Outlined.Fastfood,
         selectedIcon = Icons.Filled.Fastfood,
-        screen = {  }
+        screen = {
+            ProductsAdmin()
+        }
     ),
     TabItems(
         title = "Заказы",
         unSelectedIcon = Icons.Outlined.ShoppingCart,
         selectedIcon = Icons.Filled.ShoppingCart,
-        screen = { }
+        screen = {
+            OrdersAdmin()
+        }
     ),
     TabItems(
         title = "Контент",
@@ -124,12 +129,12 @@ val tabItems = listOf(
         selectedIcon = Icons.Filled.Money,
         screen = { }
     ),
-    TabItems(
-        title = "Пользователи",
-        unSelectedIcon = Icons.Outlined.People,
-        selectedIcon = Icons.Filled.People,
-        screen = { }
-    ),
+//    TabItems(
+//        title = "Пользователи",
+//        unSelectedIcon = Icons.Outlined.People,
+//        selectedIcon = Icons.Filled.People,
+//        screen = { }
+//    ),
     TabItems(
         title = "Поддержка",
         unSelectedIcon = Icons.Outlined.SupportAgent,
@@ -149,13 +154,14 @@ fun AppNavHost(
         Destination.entries.forEach { destination ->
             composable(destination.route) {
                 when (destination) {
-                    Destination.MAIN -> HomeAdmin()
-                    Destination.USERS -> TODO()
+                    //Destination.MAIN -> HomeAdmin()
+                    //Destination.USERS -> TODO()
                     Destination.ORDERS -> OrdersAdmin()
                     Destination.PRODUCTS -> ProductsAdmin()
                     Destination.CONTENT -> TODO()
                     //Destination.SAFETY -> TODO()
                     Destination.SUPPORT -> TODO()
+                    else -> {}
                 }
             }
         }
@@ -167,6 +173,7 @@ fun AppNavHost(
 fun AdminPanelScreen(
     onBackPressed: () -> Unit,
     menuVm: MenuViewModel,
+    managerVm: ManagerViewModel
 ) {
     CoffeeVibeTheme(context2 = LocalContext.current,content = {
         Scaffold(
@@ -258,9 +265,8 @@ fun AdminPanelScreen(
                         .weight(1f)
                 ) { index ->
                     when (index) {
-                        0 -> HomeAdmin()
-                        1 -> ProductsAdmin(menuVm= menuVm)
-                        2 -> OrdersAdmin()
+                        0 -> ProductsAdmin(menuVm= menuVm)
+                        1 -> OrdersAdmin(managerVm = managerVm)
                     }
                 }
             }
@@ -273,7 +279,7 @@ fun AdminPanelScreen(
 @Composable
 fun NavigationTabExample(modifier: Modifier = Modifier) {
     val navController = rememberNavController()
-    val startDestination = Destination.MAIN
+    val startDestination = Destination.PRODUCTS
     var selectedDestination by rememberSaveable { mutableIntStateOf(startDestination.ordinal) }
 
     Scaffold(modifier = modifier) { contentPadding ->
