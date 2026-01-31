@@ -45,6 +45,7 @@ class MainActivity : ComponentActivity() {
 //                else {
                 MainScreen(
                     onLogin = {
+                        finish()
                         startActivity(Intent(this, LoginActivity::class.java))
                     },
                     inFinishOrder = {
@@ -53,7 +54,12 @@ class MainActivity : ComponentActivity() {
                     menuViewModel = menuVm,
                     orderViewModel = orderViewModel,
                     loginVm = loginVm,
-                    managerVm = managerVm
+                    managerVm = managerVm,
+                    inProductActivity = {
+                        val intent = Intent(this, ProductEditActivity::class.java)
+                        intent.putExtra("id", it)
+                        this.startActivity(intent)
+                    }
                 )
             }
         }

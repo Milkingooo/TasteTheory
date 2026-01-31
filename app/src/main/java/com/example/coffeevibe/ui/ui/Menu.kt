@@ -127,6 +127,14 @@ import com.example.coffeevibe.viewmodel.OrderViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+data class AboutSheetData(
+    var name: String = "",
+    var description: String = "",
+    var image: String = "",
+    var composition: String = "",
+    var kbju: String = ""
+)
+
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun MenuScreen(
@@ -140,16 +148,9 @@ fun MenuScreen(
     var searchQuery by rememberSaveable { mutableStateOf("") }
     var isSearching by rememberSaveable { mutableStateOf(false) }
     var showSheet by remember { mutableStateOf(false) }
-    var filtersMenuOpen by remember { mutableStateOf(false) }
     var onlyDiscount by rememberSaveable { mutableStateOf(false) }
     var priceDecreasing  by rememberSaveable { mutableStateOf(false) }
     var priceIncreasing by rememberSaveable { mutableStateOf(false) }
-
-    var selectedName by remember { mutableStateOf("") }
-    var selectedDescription by remember { mutableStateOf("") }
-    var selectedImage by remember { mutableStateOf("") }
-    var selectedComposition by remember { mutableStateOf("") }
-    var selectedKbju by remember { mutableStateOf("") }
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val listState2 = rememberLazyGridState()
@@ -215,14 +216,16 @@ fun MenuScreen(
         itemIndex += items.size + 1
     }
 
+    val aboutSheetData by remember { mutableStateOf(AboutSheetData()) }
+
     if (showSheet) {
         AboutItemSheet(
             showSheet,
-            description = selectedDescription,
-            image = selectedImage,
-            name = selectedName,
-            composition = selectedComposition,
-            kbju = selectedKbju,
+            description = aboutSheetData.description,
+            image = aboutSheetData.image,
+            name = aboutSheetData.name,
+            composition = aboutSheetData.composition,
+            kbju = aboutSheetData.kbju,
         ) {
             showSheet = false
         }
@@ -425,11 +428,11 @@ fun MenuScreen(
                                             discountPrice = item.discountPrice,
                                             image = item.image,
                                             onInfo = {
-                                                selectedName = item.name
-                                                selectedDescription = item.description
-                                                selectedImage = item.image
-                                                selectedKbju = item.kbju
-                                                selectedComposition = item.composition
+                                                aboutSheetData.name = item.name
+                                                aboutSheetData.description = item.description
+                                                aboutSheetData.image = item.image
+                                                aboutSheetData.kbju = item.kbju
+                                                aboutSheetData.composition = item.composition
                                                 showSheet = true
                                             },
                                             onAdd = {
@@ -539,20 +542,20 @@ fun ListItem2(
                         contentScale = ContentScale.Crop,
                     )
 
-                    if (discountPrice != 0){
-                    Text(
-                        "Хит",
-                        color = colorScheme.background,
-                        modifier = Modifier
-                            .width(60.dp)
-                            .padding(4.dp)
-                            .offset(x = (-10).dp, y = -(10).dp)
-                            .clip(Shapes.medium)
-                            .background(colorScheme.primary)
-                            .align(Alignment.TopStart),
-                        textAlign = TextAlign.Center
-                    )
-                        }
+                    if (discountPrice != 0) {
+                        Text(
+                            "Хит",
+                            color = colorScheme.background,
+                            modifier = Modifier
+                                .width(60.dp)
+                                .padding(4.dp)
+                                .offset(x = (-10).dp, y = -(10).dp)
+                                .clip(Shapes.medium)
+                                .background(colorScheme.primary)
+                                .align(Alignment.TopStart),
+                            textAlign = TextAlign.Center
+                        )
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(4.dp))
@@ -581,6 +584,7 @@ fun ListItem2(
                             color = colorScheme.onBackground,
                             textAlign = TextAlign.Center,
                             textDecoration = TextDecoration.LineThrough,
+                            fontSize = 18.sp
                         )
                     } else {
                         if (discountPrice == 0) {
@@ -660,7 +664,6 @@ fun PageIndicator(
     defaultColor: Color = Color.Gray,
     defaultRadius: Dp = 8.dp,
     selectedLength: Dp = 25.dp,
-    space: Dp = 4.dp,
     modifier: Modifier = Modifier
 ) {
     Row(

@@ -58,7 +58,8 @@ fun MainScreen(
     menuViewModel: MenuViewModel,
     orderViewModel: OrderViewModel,
     loginVm: LoginViewModel,
-    managerVm: ManagerViewModel
+    managerVm: ManagerViewModel,
+    inProductActivity: (Int?) -> Unit
 ) {
     val navController = rememberNavController()
 
@@ -122,7 +123,10 @@ fun MainScreen(
                 ){ AdminPanelScreen(
                     onBackPressed = { navController.popBackStack() },
                     menuVm = menuViewModel,
-                    managerVm = managerVm
+                    managerVm = managerVm,
+                    inProductActivity = {
+                        inProductActivity(it)
+                    }
                 )
                 }
 
@@ -168,21 +172,15 @@ fun MainScreen(
                 composable(Screen.Testing.route,
                     enterTransition = { slideInHorizontally(tween(durationMillis = 500)) + fadeIn(tween(durationMillis = 500)) },
                     exitTransition = { slideOutHorizontally(tween(durationMillis = 500)) + fadeOut(tween(durationMillis = 500))}
-                ) {
-//                    TestScreen(
-//                        onBackPressed = { navController.popBackStack() }
-//                    )
-                    AddEditProductScreen(
-                        menuViewModel = menuViewModel
-                    )
-                }
+                ) {}
 
                 composable(Screen.ErrorSend.route,
                     enterTransition = { slideInHorizontally(tween(durationMillis = 500)) + fadeIn(tween(durationMillis = 500)) },
                     exitTransition = { slideOutHorizontally(tween(durationMillis = 500)) + fadeOut(tween(durationMillis = 500))}
                 ) {
                     ErrorTicketSendScreen(
-                        onBackPressed = { navController.popBackStack() }
+                        onBackPressed = { navController.popBackStack() },
+                        loginVm = loginVm
                     )
                 }
             }

@@ -67,6 +67,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -99,7 +100,8 @@ import kotlinx.coroutines.selects.select
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductsAdmin(
-    menuVm: MenuViewModel? = null
+    menuVm: MenuViewModel? = null,
+    inProductActivity: (Int?) -> Unit
 ){
 
     val menuViewModel: MenuViewModel = menuVm ?: MenuViewModel(LocalContext.current)
@@ -113,6 +115,8 @@ fun ProductsAdmin(
     var nameDecreasing  by rememberSaveable { mutableStateOf(false) }
     var nameIncreasing by rememberSaveable { mutableStateOf(false) }
 
+    var selectedProductId by remember { mutableIntStateOf(0) }
+
     val newProducts = mutableListOf<MaterialListItem>()
 
     products.forEach {
@@ -122,7 +126,10 @@ fun ProductsAdmin(
                 subtitle = it.status,
                 iconTint = colorScheme.onBackground,
                 iconBackground = colorScheme.secondaryContainer,
-                action = {}
+                action = {
+                    selectedProductId = it.id
+                    inProductActivity(it.id)
+                }
             )
         )
     }
@@ -161,7 +168,7 @@ fun ProductsAdmin(
                 FloatingActionButton(
                     onClick = {
                         scope.launch {
-
+                            inProductActivity(null)
                         }
                     },
                     containerColor = colorScheme.tertiary,
@@ -262,7 +269,7 @@ fun ProductsAdmin(
 //                )
                 Spacer(Modifier.height(16.dp))
                 MaterialList(
-                    title = "Настройки приложения",
+                    title = "Products",
                     items = filteredProducts,
                     backgroundColor = colorScheme.secondaryContainer,
                     textColor = colorScheme.onBackground

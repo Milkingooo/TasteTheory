@@ -112,8 +112,8 @@ class ManagerViewModel : ViewModel() {
         viewModelScope.launch {
             firestore
                 .collection("Order")
-                .document(orderId.toString()).
-                update("Status", state)
+                .document(orderId.toString())
+                .update("Status", state)
                 .await()
             recombine()
         }

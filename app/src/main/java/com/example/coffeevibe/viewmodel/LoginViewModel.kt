@@ -6,6 +6,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.coffeevibe.ui.ui.settings.Ticket
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthException
@@ -22,6 +23,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.util.UUID
+import kotlin.random.Random
 
 class LoginViewModel(val context: Context) : ViewModel() {
     private val auth = FirebaseAuth.getInstance()
@@ -258,6 +260,33 @@ class LoginViewModel(val context: Context) : ViewModel() {
             else -> {
 
             }
+        }
+    }
+
+    fun addTicketInDb(ticket: Ticket, callback: (Boolean) -> Unit){
+        val id = Random.nextInt(0, 9999)
+
+        viewModelScope.launch {
+            db.collection("Ticket")
+                .document(id.toString())
+                .set(
+                    hashMapOf(
+                        "IdClient" to auth.currentUser?.uid,
+                        "Date" to ticket.date,
+                        "Email" to ticket.email,
+                        "Category" to ticket.category,
+                        "Description" to ticket.description,
+                        "State" to ticket.state,
+                    )
+                )
+                .addOnSuccessListener {
+                    callback(true)
+                    Toast.makeText(context, "Заявка отправлена!", Toast.LENGTH_SHORT).show()
+                }
+                .addOnFailureListener {
+                    callback(false)
+                    Toast.makeText(context, "Ошибка отправки, попробуйте позже!", Toast.LENGTH_SHORT).show()
+                }
         }
     }
     private fun catchException(e: Exception) {

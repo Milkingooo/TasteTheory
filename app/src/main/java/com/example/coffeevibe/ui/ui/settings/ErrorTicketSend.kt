@@ -53,11 +53,23 @@ import com.example.coffeevibe.ui.ui.customUi.DropdownMenuWithName
 import com.example.coffeevibe.ui.ui.other.BaseButton
 import com.example.coffeevibe.ui.ui.other.TextAreaWithName
 import com.example.coffeevibe.ui.ui.other.TextFieldWithName
+import com.example.coffeevibe.viewmodel.LoginViewModel
+import com.google.firebase.Timestamp
 
+data class Ticket(
+    val id: Int,
+    val idClient: String,
+    val state: String,
+    val category: String,
+    val email: String,
+    val date: String,
+    val description: String
+)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ErrorTicketSendScreen(
-    onBackPressed: () -> Unit
+    onBackPressed: () -> Unit,
+    loginVm: LoginViewModel
 ){
     var errorDescription by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
@@ -103,7 +115,8 @@ fun ErrorTicketSendScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(paddingValues),
+                    .padding(paddingValues)
+                    .padding(8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 val boxes = listOf(
@@ -172,7 +185,7 @@ fun ErrorTicketSendScreen(
                     },
                     isInCorrect = false,
                     placeholder = "Опишите подробно вашу проблему...",
-                    keyboardType = KeyboardType.Email,
+                    keyboardType = KeyboardType.Text,
                     modifier = Modifier.fillMaxWidth(),
                     enabled = true
                 )
@@ -184,19 +197,24 @@ fun ErrorTicketSendScreen(
                     ),
                     click = {
                         if (email.isNotEmpty() && errorCategory.isNotEmpty() && errorDescription.isNotEmpty()){
-                            TODO()
+                            loginVm.addTicketInDb(Ticket(
+                                id = 0,
+                                idClient = "",
+                                state = "Создан",
+                                category = errorCategory,
+                                email = email,
+                                date = Timestamp.now().toString(),
+                                description = errorDescription
+                            )){
+                                if (it) {
+                                    email = ""
+                                    errorDescription = ""
+                                }
+                            }
                         }
                     }
                 )
             }
         }
     })
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewTicket(){
-    ErrorTicketSendScreen {
-
-    }
 }

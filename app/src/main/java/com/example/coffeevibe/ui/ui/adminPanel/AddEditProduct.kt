@@ -2,7 +2,6 @@ package com.example.coffeevibe.ui.ui.adminPanel
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -44,13 +43,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import coil.imageLoader
 import coil.request.ImageRequest
 import coil.transform.RoundedCornersTransformation
 import com.example.coffeevibe.R
 import com.example.coffeevibe.model.MenuItem
+import com.example.coffeevibe.model.ProductAdmin
 import com.example.coffeevibe.ui.theme.CoffeeVibeTheme
 import com.example.coffeevibe.ui.theme.Shapes
 import com.example.coffeevibe.ui.ui.other.BaseButton
@@ -58,17 +57,16 @@ import com.example.coffeevibe.ui.ui.other.TextAreaWithName
 import com.example.coffeevibe.ui.ui.other.TextFieldWithName
 import com.example.coffeevibe.utils.CashApplication
 import com.example.coffeevibe.viewmodel.MenuViewModel
-import kotlinx.coroutines.delay
 
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun AddEditProductScreen(
     menuViewModel: MenuViewModel,
-    id: Int? = 15
+    id: Int?
 ) {
 
-    var product by remember { mutableStateOf(MenuItem()) }
+    var product by remember { mutableStateOf(ProductAdmin()) }
 
     LaunchedEffect(Unit) {
         if (id != null) {
@@ -77,6 +75,7 @@ fun AddEditProductScreen(
             }
         }
     }
+
     var selectedUri by remember { mutableStateOf<String?>(null) }
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
@@ -262,7 +261,7 @@ fun AddEditProductScreen(
                 )
 
                 TextFieldWithName(
-                    title = "Статус",
+                    title = "Статус (Доступен/Недоступен)",
                     value = product.status,
                     exitValue = {
                         product.status = it
@@ -276,7 +275,7 @@ fun AddEditProductScreen(
                 BaseButton(
                     title = "Сохранить",
                     click = {
-
+                        menuViewModel.updateProductById(product.id, product)
                     },
                     color = ButtonDefaults.buttonColors(colorScheme.primary),
                 )

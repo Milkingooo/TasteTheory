@@ -43,7 +43,9 @@ import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.PrimaryScrollableTabRow
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults.contentWindowInsets
+import androidx.compose.material3.SecondaryTabRow
 import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -101,18 +103,11 @@ data class TabItems(
 )
 
 val tabItems = listOf(
-//    TabItems(
-//        title = "Главная",
-//        unSelectedIcon = Icons.Outlined.Home,
-//        selectedIcon = Icons.Filled.Home,
-//        screen = { HomeAdmin() }
-//    ),
     TabItems(
         title = "Товары",
         unSelectedIcon = Icons.Outlined.Fastfood,
         selectedIcon = Icons.Filled.Fastfood,
         screen = {
-            ProductsAdmin()
         }
     ),
     TabItems(
@@ -123,12 +118,12 @@ val tabItems = listOf(
             OrdersAdmin()
         }
     ),
-    TabItems(
-        title = "Контент",
-        unSelectedIcon = Icons.Outlined.Money,
-        selectedIcon = Icons.Filled.Money,
-        screen = { }
-    ),
+//    TabItems(
+//        title = "Контент",
+//        unSelectedIcon = Icons.Outlined.Money,
+//        selectedIcon = Icons.Filled.Money,
+//        screen = { }
+//    ),
 //    TabItems(
 //        title = "Пользователи",
 //        unSelectedIcon = Icons.Outlined.People,
@@ -154,12 +149,10 @@ fun AppNavHost(
         Destination.entries.forEach { destination ->
             composable(destination.route) {
                 when (destination) {
-                    //Destination.MAIN -> HomeAdmin()
-                    //Destination.USERS -> TODO()
                     Destination.ORDERS -> OrdersAdmin()
-                    Destination.PRODUCTS -> ProductsAdmin()
-                    Destination.CONTENT -> TODO()
-                    //Destination.SAFETY -> TODO()
+                    Destination.PRODUCTS -> ProductsAdmin(){}
+                    //Destination.CONTENT -> TODO()
+                    //Destination.USERS -> TODO()
                     Destination.SUPPORT -> TODO()
                     else -> {}
                 }
@@ -173,7 +166,8 @@ fun AppNavHost(
 fun AdminPanelScreen(
     onBackPressed: () -> Unit,
     menuVm: MenuViewModel,
-    managerVm: ManagerViewModel
+    managerVm: ManagerViewModel,
+    inProductActivity: (Int?) -> Unit
 ) {
     CoffeeVibeTheme(context2 = LocalContext.current,content = {
         Scaffold(
@@ -218,7 +212,7 @@ fun AdminPanelScreen(
                     .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                var selectedTabIndex by remember { mutableStateOf(0) }
+                var selectedTabIndex by remember { mutableIntStateOf(0) }
                 val pagerState = rememberPagerState { tabItems.size }
 
                 LaunchedEffect(selectedTabIndex) { pagerState.animateScrollToPage(selectedTabIndex) }
@@ -228,10 +222,9 @@ fun AdminPanelScreen(
                     }
                 }
 
-                PrimaryScrollableTabRow(
+                TabRow(
                     selectedTabIndex = selectedTabIndex,
-                    containerColor = colorScheme.background,
-                    edgePadding = 0.dp) {
+                    containerColor = colorScheme.background) {
                     tabItems.fastForEachIndexed { index, item ->
                         Tab(
                             selected = index == selectedTabIndex,
@@ -265,7 +258,10 @@ fun AdminPanelScreen(
                         .weight(1f)
                 ) { index ->
                     when (index) {
-                        0 -> ProductsAdmin(menuVm= menuVm)
+                        0 -> ProductsAdmin(
+                            menuVm= menuVm){
+                            inProductActivity(it)
+                        }
                         1 -> OrdersAdmin(managerVm = managerVm)
                     }
                 }

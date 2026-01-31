@@ -140,21 +140,3 @@ fun ColumnWithShapeAndBackground(
         content()
     }
 }
-
-@Preview(showBackground = true)
-@Composable
-fun ColumnPreview(){
-    ColumnWithShapeAndBackground(
-        content = {
-            SimpleSearchBarSample()
-            BaseTextBlockWithBackground(
-                """Hi, this is testing maket
-                    |You can sent me message in Telegram
-                    |@Milkingooo
-                """.trimMargin()
-            )
-        },
-        background = colorScheme.primary,
-        padding = 16.dp
-    )
-}

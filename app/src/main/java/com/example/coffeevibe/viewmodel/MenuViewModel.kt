@@ -2,19 +2,21 @@ package com.example.coffeevibe.viewmodel
 
 import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.coffeevibe.model.CreateOrderItem
 import com.example.coffeevibe.model.Location
 import com.example.coffeevibe.model.MenuItem
 import com.example.coffeevibe.model.OrderManagerOrderItem
+import com.example.coffeevibe.model.ProductAdmin
 import com.example.coffeevibe.model.UserOrder
 import com.example.coffeevibe.utils.AuthUtils
 import com.google.firebase.Firebase
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.ListenerRegistration
+import com.google.firebase.firestore.auth.User
 import com.google.firebase.firestore.firestore
-import com.google.firebase.firestore.toObject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -22,6 +24,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+
 
 class MenuViewModel(val context: Context) : ViewModel() {
     private val firestore = Firebase.firestore
@@ -371,7 +374,49 @@ class MenuViewModel(val context: Context) : ViewModel() {
     }
 
     //Управление позициями в админке
-    fun getProductInfoById(id: Int?, callback: (MenuItem) -> Unit) {
+
+    fun updateProductById(id: Int, newProduct: ProductAdmin) {
+        viewModelScope.launch {
+            val products = firestore
+                .collection("Good")
+                .whereEqualTo("Id", id)
+                .get()
+                .await()
+
+            val pr: MutableMap<String?, Any> =  mutableMapOf()
+            pr["Name"] = newProduct.name
+            pr["Description"] = newProduct.description
+            pr["Price"] = newProduct.price.toString()
+            pr["DiscountPrice"] = newProduct.discountPrice.toString()
+            pr["Category"] = newProduct.category
+            pr["Dairy"] = newProduct.composition
+            pr["Image"] = newProduct.image
+            pr["Status"] = newProduct.status
+            pr["KBJU"] = newProduct.kbju
+
+            try {
+                firestore
+                    .collection("Good")
+                    .document(extractDocumentId(products.documents.toString()))
+                    .update(pr)
+                    .addOnSuccessListener {
+                        Toast.makeText(context,"Данные успешно сохранены", Toast.LENGTH_SHORT).show()
+                    }
+                    .addOnFailureListener {
+                        Toast.makeText(context,"Ошибка! Данные не сохранены", Toast.LENGTH_SHORT).show()
+                    }
+            } catch (e: Exception) {
+                Toast.makeText(context,"Ошибка! Данные не сохранены", Toast.LENGTH_SHORT).show()
+                Log.e("SaveNewProduct", "Error: ${e.stackTrace}")
+
+            }
+        }
+    }
+    //[DocumentSnapshot{key=Good/1YquY7aOiGoCtrdWyBaZ, metadata=SnapshotMetadata{hasPendingWrites=false, isFromCache=false}
+    fun extractDocumentId(doc: String) : String{
+        return doc.split('/')[1].split(',')[0]
+    }
+    fun getProductInfoById(id: Int?, callback: (ProductAdmin) -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val snapshot = firestore.collection("Good")
@@ -379,28 +424,28 @@ class MenuViewModel(val context: Context) : ViewModel() {
                     .get()
                     .await()
 
+                val prod = ProductAdmin()
+
                 val product = snapshot.documents.firstNotNullOf { item ->
                     try {
-                        MenuItem(
-                            id = item.data?.get("Id").toString().toInt(),
-                            name = item.data?.get("Name").toString(),
-                            price = item.data?.get("Price").toString().toInt(),
-                            discountPrice = item.data?.get("DiscountPrice").toString().toInt(),
-                            category = item.data?.get("Category").toString(),
-                            description = item.data?.get("Description").toString(),
-                            image = item.data?.get("Image").toString(),
-                            status = item.data?.get("Status").toString(),
-                            composition = item.data?.get("Dairy").toString(),
-                            kbju = item.data?.get("KBJU").toString()
+                        prod.id = item.data?.get("Id").toString().toInt()
+                        prod.name = item.data?.get("Name").toString()
+                        prod.price = item.data?.get("Price").toString().toInt()
+                        prod.discountPrice = item.data?.get("DiscountPrice").toString().toInt()
+                        prod.category = item.data?.get("Category").toString()
+                        prod.description = item.data?.get("Description").toString()
+                        prod.image = item.data?.get("Image").toString()
+                        prod.status = item.data?.get("Status").toString()
+                        prod.composition = item.data?.get("Dairy").toString()
+                        prod.kbju = item.data?.get("KBJU").toString()
 
-                        )
                     } catch (e: Exception) {
                         Log.e("GetProduct", "Error loading data", e)
                         null
                     }
                 }
                 Log.e("GetProduct", product.toString())
-                callback(product)
+                callback(prod)
             } catch (e: Exception) {
                 Log.e("GetProduct", "Error loading data", e)
             }
