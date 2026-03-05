@@ -149,12 +149,6 @@ fun SettingsScreen(
                     title = "Язык"
                 )
 
-                SettingsSubCategory(
-                    "Условиями обработки персональных данных",
-                    icon = Icons.Filled.Info,
-                    action = { }
-                )
-
                 HorizontalDivider(
                     modifier = Modifier.padding(8.dp).padding(horizontal = 24.dp),
                 )

@@ -1,16 +1,18 @@
 package com.example.coffeevibe.ui.activities
 
-class TestActivity : android.window.SplashScreen {
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import com.example.coffeevibe.navigation.BottomNavigationRoute
 
-    override fun clearOnExitAnimationListener() {
-        TODO("Not yet implemented")
-    }
+class TestActivity : ComponentActivity() {
 
-    override fun setOnExitAnimationListener(p0: android.window.SplashScreen.OnExitAnimationListener) {
-        TODO("Not yet implemented")
-    }
-
-    override fun setSplashScreenTheme(p0: Int) {
-        TODO("Not yet implemented")
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+        setContent {
+            BottomNavigationRoute()
+        }
     }
 }

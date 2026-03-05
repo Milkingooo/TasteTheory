@@ -9,6 +9,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import com.example.coffeevibe.database.CartDatabase
+import com.example.coffeevibe.navigation.BottomNavigationRoute
 import com.example.coffeevibe.repository.CartRepository
 import com.example.coffeevibe.ui.theme.CoffeeVibeTheme
 import com.example.coffeevibe.ui.ui.MainScreen
@@ -59,6 +60,9 @@ class MainActivity : ComponentActivity() {
                         val intent = Intent(this, ProductEditActivity::class.java)
                         intent.putExtra("id", it)
                         this.startActivity(intent)
+                    },
+                    inTestActivity = {
+                        startActivity(Intent(this, TestActivity::class.java))
                     }
                 )
             }

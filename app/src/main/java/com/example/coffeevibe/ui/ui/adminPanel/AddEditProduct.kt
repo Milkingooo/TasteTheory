@@ -39,6 +39,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -215,6 +216,7 @@ fun AddEditProductScreen(
                         exitValue = {
                             product.price = it.toInt()
                         },
+                        keyboardType = KeyboardType.Number,
                         isInCorrect = false,
                         placeholder = "Цена продукта",
                         modifier = Modifier.weight(1f),
@@ -227,6 +229,7 @@ fun AddEditProductScreen(
                         exitValue = {
                             product.discountPrice = it.toInt()
                         },
+                        keyboardType = KeyboardType.Number,
                         isInCorrect = false,
                         placeholder = "Цена продукта по скидке",
                         modifier = Modifier.weight(1f),

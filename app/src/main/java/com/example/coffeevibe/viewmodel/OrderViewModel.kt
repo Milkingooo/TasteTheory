@@ -58,10 +58,6 @@ class OrderViewModel(private val repository: CartRepository, context: Context) :
         }
     }
 
-    fun getCartItemsCount(): Int {
-        return itemList.value.count()
-    }
-
     fun getItemsCount() {
         viewModelScope.launch {
             _itemsCount.value = cartDao.getCartItemsCount()

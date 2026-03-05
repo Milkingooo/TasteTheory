@@ -130,12 +130,12 @@ val tabItems = listOf(
 //        selectedIcon = Icons.Filled.People,
 //        screen = { }
 //    ),
-    TabItems(
-        title = "Поддержка",
-        unSelectedIcon = Icons.Outlined.SupportAgent,
-        selectedIcon = Icons.Filled.SupportAgent,
-        screen = { }
-    ),
+//    TabItems(
+//        title = "Поддержка",
+//        unSelectedIcon = Icons.Outlined.SupportAgent,
+//        selectedIcon = Icons.Filled.SupportAgent,
+//        screen = { }
+//    ),
 )
 @Composable
 fun AppNavHost(
@@ -153,7 +153,7 @@ fun AppNavHost(
                     Destination.PRODUCTS -> ProductsAdmin(){}
                     //Destination.CONTENT -> TODO()
                     //Destination.USERS -> TODO()
-                    Destination.SUPPORT -> TODO()
+                        //Destination.SUPPORT -> TODO()
                     else -> {}
                 }
             }

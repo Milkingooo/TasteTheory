@@ -1,5 +1,6 @@
 package com.example.coffeevibe.ui.ui.customUi
 
+import android.graphics.drawable.Icon
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -20,6 +21,7 @@ import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.TextObfuscationMode
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Password
 import androidx.compose.material.icons.outlined.FilterAlt
@@ -44,7 +46,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -256,4 +260,46 @@ fun PasswordField(
             }
         }
     }
+}
+
+@Composable
+fun MyTextField(
+    value: String,
+    onTextChanged: (String) -> Unit,
+    keyboardActions: KeyboardActions,
+    isInCorrect: Boolean,
+    keyboardOptions: KeyboardOptions,
+    placeholderText: String,
+    icon: ImageVector
+){
+    OutlinedTextField(
+        value = value,
+        onValueChange = { onTextChanged(it) },
+        textStyle = TextStyle(
+            fontSize = 20.sp,
+            fontFamily = FontFamily(Font(R.font.roboto_condensed_black))
+        ),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = colorScheme.onBackground,   // Основной цвет для акцентов
+            unfocusedBorderColor = colorScheme.onSurface, // Цвет границ для неактивного состояния
+            unfocusedPlaceholderColor = colorScheme.onBackground,
+            focusedTextColor = colorScheme.onBackground,
+            unfocusedTextColor = colorScheme.onBackground,
+        ),
+        keyboardActions = keyboardActions,
+        keyboardOptions = keyboardOptions,
+        placeholder = { Text(placeholderText, color = colorScheme.onSurface) },
+        isError = isInCorrect,
+        singleLine = true,
+        leadingIcon = {
+            Icon(
+                icon,
+                contentDescription = "",
+                tint = colorScheme.onBackground
+            )
+        },
+        modifier = Modifier
+            .clip(Shapes.small)
+            .fillMaxWidth()
+    )
 }

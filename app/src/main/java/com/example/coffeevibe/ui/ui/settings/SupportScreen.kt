@@ -96,12 +96,12 @@ fun SupportScreen(
                     }
                 )
 
-                SettingsSubCategory("Сообщить об ошибке",
-                    icon = Icons.Filled.ReportProblem,
-                    action = {
-                        sendTicket()
-                    }
-                )
+//                SettingsSubCategory("Сообщить об ошибке",
+//                    icon = Icons.Filled.ReportProblem,
+//                    action = {
+//                        sendTicket()
+//                    }
+//                )
 
             }
         }

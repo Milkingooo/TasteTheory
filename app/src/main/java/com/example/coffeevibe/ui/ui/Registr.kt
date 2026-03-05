@@ -55,6 +55,7 @@ import androidx.compose.ui.unit.sp
 import com.example.coffeevibe.R
 import com.example.coffeevibe.ui.theme.CoffeeVibeTheme
 import com.example.coffeevibe.ui.theme.Shapes
+import com.example.coffeevibe.ui.ui.customUi.MyTextField
 import com.example.coffeevibe.ui.ui.customUi.PasswordField
 import com.example.coffeevibe.viewmodel.LoginViewModel
 
@@ -107,36 +108,16 @@ fun Registr(
 
                 Spacer(modifier = Modifier.height(10.dp))
 
-                OutlinedTextField(
+                MyTextField(
                     value = name,
-                    onValueChange = { name = it },
-                    textStyle = TextStyle(
-                        fontSize = 20.sp,
-                        fontFamily = FontFamily(Font(R.font.roboto_condensed_black))
-                    ),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = colorScheme.onBackground,   // Основной цвет для акцентов
-                        unfocusedBorderColor = colorScheme.onSurface, // Цвет границ для неактивного состояния
-                        unfocusedPlaceholderColor = colorScheme.onBackground,
-                        focusedTextColor = colorScheme.onBackground,
-                        unfocusedTextColor = colorScheme.onBackground,
-                    ),
+                    onTextChanged = { name = it },
                     keyboardActions = KeyboardActions {
                         focusManager.moveFocus(FocusDirection.Next)
                     },
-                    placeholder = { Text("Введите имя", color = colorScheme.onSurface) },
-                    isError = isInCorrect,
-                    singleLine = true,
-                    leadingIcon = {
-                        Icon(
-                            Icons.Filled.AccountCircle,
-                            contentDescription = "Login",
-                            tint = colorScheme.onBackground
-                        )
-                    },
-                    modifier = Modifier
-                        .clip(Shapes.small)
-                        .fillMaxWidth()
+                    isInCorrect = isInCorrect,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                    placeholderText = "Введите имя",
+                    icon = Icons.Filled.AccountCircle
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -173,38 +154,18 @@ fun Registr(
 
                 Spacer(modifier = Modifier.height(10.dp))
 
-                OutlinedTextField(
+                MyTextField(
                     value = email,
-                    onValueChange = { email = it },
-                    textStyle = TextStyle(
-                        fontSize = 20.sp,
-                        fontFamily = FontFamily(Font(R.font.roboto_condensed_black))
-                    ),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = colorScheme.onBackground,
-                        unfocusedBorderColor = colorScheme.onSurface,
-                        unfocusedPlaceholderColor = colorScheme.onBackground,
-                        focusedTextColor = colorScheme.onBackground,
-                        unfocusedTextColor = colorScheme.onBackground,
-                    ),
+                    onTextChanged = { email = it },
                     keyboardActions = KeyboardActions {
                         focusManager.clearFocus()
                     },
+                    isInCorrect = isInCorrect,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                    placeholder = { Text("xyz@gmail.com", color = colorScheme.onSurface) },
-                    isError = isInCorrect,
-                    singleLine = true,
-                    leadingIcon = {
-                        Icon(
-                            Icons.Filled.Email,
-                            contentDescription = "Email",
-                            tint = colorScheme.onBackground
-                        )
-                    },
-                    modifier = Modifier
-                        .clip(Shapes.small)
-                        .fillMaxWidth()
+                    placeholderText = "xyz@gmail.com",
+                    icon = Icons.Filled.Email
                 )
+
                 Spacer(modifier = Modifier.height(6.dp))
 
                 Row(
@@ -250,13 +211,13 @@ fun Registr(
                                 Toast.LENGTH_SHORT
                             ).show()
                         } else {
+                            progressState = true
+
                             loginVm.signUp(
                                 email = email,
                                 password = textFieldState.text.toString().trim(),
                                 name = name
                             ) {
-                                progressState = true
-
                                 if (it) {
                                     isInCorrect = false
                                     inLogin()

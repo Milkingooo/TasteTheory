@@ -1,5 +1,6 @@
 package com.example.coffeevibe.ui.ui
 
+import android.annotation.SuppressLint
 import android.widget.Space
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
@@ -58,6 +59,7 @@ import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.OutlinedTextField
@@ -75,6 +77,7 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.material3.rememberTooltipState
 import androidx.compose.material3.rememberTopAppBarState
+import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -106,6 +109,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import androidx.graphics.shapes.RoundedPolygon
 import androidx.navigation.NavController
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
@@ -115,6 +119,7 @@ import coil.transform.RoundedCornersTransformation
 import com.example.coffeevibe.R
 import com.example.coffeevibe.ui.theme.CoffeeVibeTheme
 import com.example.coffeevibe.ui.theme.Shapes
+import com.example.coffeevibe.ui.ui.customUi.CategoryRow
 import com.example.coffeevibe.ui.ui.customUi.MenuTopBar
 import com.example.coffeevibe.ui.ui.other.AssistChipMenu
 import com.example.coffeevibe.ui.ui.other.IndeterminateCircularIndicator
@@ -135,6 +140,7 @@ data class AboutSheetData(
     var kbju: String = ""
 )
 
+@SuppressLint("MutableCollectionMutableState")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun MenuScreen(
@@ -339,14 +345,14 @@ fun MenuScreen(
                             stickyHeader() {
                                 Row(
                                     modifier = Modifier
-                                        .padding(top = 8.dp)
+                                        .padding(top = 4.dp)
                                         .shadow(
                                             4.dp,
-                                            Shapes.large,
+                                            Shapes.extraLarge,
                                             spotColor = colorScheme.secondary
                                         )
                                         .fillMaxWidth()
-                                        .clip(Shapes.large)
+                                        .clip(Shapes.extraLarge)
                                         .background(colorScheme.background),
                                     horizontalArrangement = Arrangement.SpaceAround
                                 )
@@ -453,6 +459,16 @@ fun MenuScreen(
                                             available = item.status
                                         )
                                     }
+                                    item(span = { GridItemSpan(2) }) {
+                                        Text(
+                                            text = "Это конец!",
+                                            color = colorScheme.onBackground,
+                                            fontFamily = FontFamily(Font(R.font.roboto_condensed_black)),
+                                            fontSize = 20.sp,
+                                            textAlign = TextAlign.Left,
+                                            modifier = Modifier.height(30.dp)
+                                        )
+                                    }
                                 }
 
                             }
@@ -465,6 +481,7 @@ fun MenuScreen(
     })
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ListItem2(
     name: String,
@@ -630,9 +647,8 @@ fun ListItem2(
                             }
                         },
                         modifier = Modifier
-                            .width(45.dp)
-                            .height(45.dp)
-                            .clip(shape = RoundedCornerShape(16.dp))
+                            .size(50.dp)
+                            .clip(shape = (MaterialShapes.Pill).toShape())
                             .background(color = if (available == "Недоступен") Color.LightGray else colorScheme.secondaryContainer),
                         enabled = available != "Недоступен"
                     ) {

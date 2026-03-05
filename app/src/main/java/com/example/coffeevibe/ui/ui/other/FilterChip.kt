@@ -2,12 +2,17 @@ package com.example.coffeevibe.ui.ui.other
 
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
+import androidx.compose.material3.InputChip
+import androidx.compose.material3.InputChipDefaults
 import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.SuggestionChip
+import androidx.compose.material3.SuggestionChipDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import com.example.coffeevibe.R
+import com.example.coffeevibe.ui.theme.Shapes
 
 @Composable
 fun AssistChipMenu(
@@ -28,6 +33,8 @@ fun AssistChipMenu(
         colors = AssistChipDefaults.assistChipColors(
             containerColor = colorScheme.secondaryContainer,
             labelColor = colorScheme.onSecondaryContainer,
-        )
+        ),
+        shape = Shapes.extraLarge
     )
+
 }

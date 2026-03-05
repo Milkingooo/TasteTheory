@@ -17,6 +17,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Password
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -52,6 +53,7 @@ import com.example.coffeevibe.R
 import com.example.coffeevibe.ui.theme.CoffeeVibeTheme
 import com.example.coffeevibe.ui.theme.Shapes
 import com.example.coffeevibe.ui.ui.customUi.MyPasswordTextField
+import com.example.coffeevibe.ui.ui.customUi.MyTextField
 import com.example.coffeevibe.ui.ui.customUi.PasswordField
 import com.example.coffeevibe.viewmodel.LoginViewModel
 import kotlinx.coroutines.MainScope
@@ -106,37 +108,16 @@ fun LoginScreen(
 
                 Spacer(modifier = Modifier.height(10.dp))
 
-                OutlinedTextField(
+                MyTextField(
                     value = email,
-                    onValueChange = { email = it },
-                    textStyle = TextStyle(
-                        fontSize = 20.sp,
-                        fontFamily = FontFamily(Font(R.font.roboto_condensed_black))
-                    ),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = colorScheme.onBackground,   // Основной цвет для акцентов
-                        unfocusedBorderColor = colorScheme.onSurface, // Цвет границ для неактивного состояния
-                        unfocusedPlaceholderColor = colorScheme.onBackground,
-                        focusedTextColor = colorScheme.onBackground,
-                        unfocusedTextColor = colorScheme.onBackground,
-                    ),
+                    onTextChanged = { email = it },
                     keyboardActions = KeyboardActions {
                         focusManager.moveFocus(FocusDirection.Next)
                     },
+                    isInCorrect = isInCorrect,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                    placeholder = { Text("xyz@gmail.com", color = colorScheme.onSurface) },
-                    isError = isInCorrect,
-                    singleLine = true,
-                    leadingIcon = {
-                        Icon(
-                            Icons.Filled.AccountCircle,
-                            contentDescription = "Login",
-                            tint = colorScheme.onBackground
-                        )
-                    },
-                    modifier = Modifier
-                        .clip(Shapes.small)
-                        .fillMaxWidth()
+                    placeholderText = "xyz@gmail.com",
+                    icon = Icons.Filled.Email
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -203,12 +184,12 @@ fun LoginScreen(
                                 Toast.LENGTH_SHORT
                             ).show()
                         } else {
+                            progressState = true
+
                             loginVm.login(
                                 login = email,
                                 password = textFieldState.text.toString().trim(),
                                 isLogin = { login, role ->
-                                    progressState = true
-
                                     when {
                                         login && (role == 0) -> {
                                             isInCorrect = false

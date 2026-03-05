@@ -17,6 +17,7 @@ compose = "1.0.0-beta01"
 media3CommonKtx = "1.5.1"
 coilCompose = "2.7.0"
 firebaseAuth = "23.1.0"
+mockk = "1.14.9"
 navigationRuntimeKtx = "2.8.6"
 navigationCompose = "2.8.6"
 landscapistCoil3 = "2.4.6"
@@ -34,6 +35,7 @@ material3 = "1.5.0-alpha09"
 appcompat = "1.7.1"
 activity = "1.12.0"
 constraintlayout = "2.2.1"
+mockkAndroid = "1.14.9"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -77,6 +79,8 @@ material3 = { group = "androidx.compose.material3", name = "material3", version.
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
+mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
+mockk-android = { group = "io.mockk", name = "mockk-android", version.ref = "mockkAndroid" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

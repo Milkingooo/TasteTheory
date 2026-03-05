@@ -40,11 +40,11 @@ class LoginViewModel(val context: Context) : ViewModel() {
 
     init {
         if (auth.currentUser != null ) {
-            getNameAndStatus()
+            getNameAndStatus{}
         }
     }
 
-    fun getNameAndStatus() {
+    fun getNameAndStatus(loaded: () -> Unit) {
         _isUserLogin.value = isLogin()
 
         db.collection("Client")
@@ -58,9 +58,18 @@ class LoginViewModel(val context: Context) : ViewModel() {
                     val isManager = document.getBoolean("IsManager") ?: false
 
                     when {
-                        !isAdmin && !isManager -> _userRole.value = 2
-                        isAdmin -> _userRole.value = 0
-                        else -> _userRole.value = 1
+                        !isAdmin && !isManager -> {
+                            _userRole.value = 2
+                            loaded()
+                        }
+                        isAdmin -> {
+                            _userRole.value = 0
+                            loaded()
+                        }
+                        else -> {
+                            _userRole.value = 1
+                            loaded()
+                        }
                     }
 
                     Log.e("CHECK_ROLES", "ROLE: ${_userRole.value}")
@@ -83,10 +92,10 @@ class LoginViewModel(val context: Context) : ViewModel() {
                 auth.signInWithEmailAndPassword(login, password)
                     .addOnSuccessListener {
                         viewModelScope.launch {
-                            getNameAndStatus()
-                            delay(400)
-                            isLogin(true, _userRole.value)
-                        Toast.makeText(context, "Авторизация прошла успешно", Toast.LENGTH_SHORT).show()
+                            getNameAndStatus{
+                                isLogin(true, _userRole.value)
+                                Toast.makeText(context, "Авторизация прошла успешно", Toast.LENGTH_SHORT).show()
+                            }
                         }
                     }
                     .addOnFailureListener { e ->
@@ -113,7 +122,6 @@ class LoginViewModel(val context: Context) : ViewModel() {
                         addUserInDb(
                             id = auth.currentUser?.uid.toString(),
                             email = email,
-                            password = password,
                             name = name
                         )
                         Toast.makeText(context, "Регистрация прошла успешно", Toast.LENGTH_SHORT).show()
@@ -129,7 +137,7 @@ class LoginViewModel(val context: Context) : ViewModel() {
         }
     }
 
-    private fun addUserInDb(name: String, email: String, password: String, id: String) {
+    private fun addUserInDb(name: String, email: String, id: String) {
         viewModelScope.launch {
             db.collection("Client")
                 .document(id) // Используем UID как ID документа

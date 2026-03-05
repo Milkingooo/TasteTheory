@@ -7,6 +7,7 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Fastfood
@@ -19,11 +20,13 @@ import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemColors
+import androidx.compose.material3.Shapes
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -37,6 +40,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.coffeevibe.ui.activities.ui.theme.Typography
 import com.example.coffeevibe.ui.theme.CoffeeVibeTheme
+import com.example.coffeevibe.ui.theme.Shapes
 import com.example.coffeevibe.ui.ui.adminPanel.AddEditProductScreen
 import com.example.coffeevibe.ui.ui.other.ProfileScreen
 import com.example.coffeevibe.ui.ui.settings.TestScreen
@@ -59,7 +63,8 @@ fun MainScreen(
     orderViewModel: OrderViewModel,
     loginVm: LoginViewModel,
     managerVm: ManagerViewModel,
-    inProductActivity: (Int?) -> Unit
+    inProductActivity: (Int?) -> Unit,
+    inTestActivity: () -> Unit
 ) {
     val navController = rememberNavController()
 
@@ -172,7 +177,12 @@ fun MainScreen(
                 composable(Screen.Testing.route,
                     enterTransition = { slideInHorizontally(tween(durationMillis = 500)) + fadeIn(tween(durationMillis = 500)) },
                     exitTransition = { slideOutHorizontally(tween(durationMillis = 500)) + fadeOut(tween(durationMillis = 500))}
-                ) {}
+                ) {
+//                    TestScreen {
+//                        navController.popBackStack()
+//                    }
+                    inTestActivity()
+                }
 
                 composable(Screen.ErrorSend.route,
                     enterTransition = { slideInHorizontally(tween(durationMillis = 500)) + fadeIn(tween(durationMillis = 500)) },
