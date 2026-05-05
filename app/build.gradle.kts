@@ -92,4 +92,5 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
     ksp(libs.androidx.room.compiler.v250)
+    implementation(libs.aws.s3)
 }

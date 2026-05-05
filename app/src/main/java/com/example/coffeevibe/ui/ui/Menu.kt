@@ -459,20 +459,8 @@ fun MenuScreen(
                                             available = item.status
                                         )
                                     }
-                                    item(span = { GridItemSpan(2) }) {
-                                        Text(
-                                            text = "Это конец!",
-                                            color = colorScheme.onBackground,
-                                            fontFamily = FontFamily(Font(R.font.roboto_condensed_black)),
-                                            fontSize = 20.sp,
-                                            textAlign = TextAlign.Left,
-                                            modifier = Modifier.height(30.dp)
-                                        )
-                                    }
                                 }
-
                             }
-
                         }
                     }
                 }
