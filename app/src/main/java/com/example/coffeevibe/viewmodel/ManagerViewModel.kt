@@ -51,7 +51,7 @@ class ManagerViewModel : ViewModel() {
 
         // --- 1. LISTENER на таблицу Order ---
         ordersListener = firestore.collection("Order")
-            .whereEqualTo("IdLocation", locationId)
+            //.whereEqualTo("IdLocation", locationId)
             .addSnapshotListener { snapshot, e ->
                 currentOrders = snapshot?.documents ?: emptyList()
                 recombine()

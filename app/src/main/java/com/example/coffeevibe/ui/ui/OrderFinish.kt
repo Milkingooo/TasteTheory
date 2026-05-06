@@ -4,6 +4,7 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -84,20 +85,9 @@ fun OrderFinish(
     var success by rememberSaveable { mutableStateOf(false) }
     var progressState by remember { mutableStateOf(false) }
     val isUserAuth = AuthUtils.isUserAuth()
-    val timestamp = Timestamp.from(Instant.now())
     val totalPrice by orderVm.total.collectAsState()
-    val context = LocalContext.current
-    val navController = rememberNavController()
 
     menuVm.getLocations { locations = it }
-
-    val pickupTimeText = when (pickupTime){
-        0 -> Timestamp.from(timestamp.toInstant().plusSeconds(5 * 60))
-        1 -> Timestamp.from(timestamp.toInstant().plusSeconds(15 * 60))
-        2 -> Timestamp.from(timestamp.toInstant().plusSeconds(30 * 60))
-        3 -> Timestamp.from(timestamp.toInstant().plusSeconds(60 * 60))
-        else -> timestamp.toInstant()
-    }
 
     CoffeeVibeTheme(context2 = LocalContext.current,content = {
         Scaffold(
@@ -295,7 +285,7 @@ fun OrderFinish(
                         Spacer(modifier = Modifier.height(16.dp))
 
                         Text(
-                            text = "Оплата при получении",
+                            text = "Оплата ${ if (paymentType == 0) "сразу" else "при получении"}",
                             color = colorScheme.onBackground,
                             fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
                             fontSize = 16.sp,
@@ -318,21 +308,6 @@ fun OrderFinish(
                             onClick = {
                                 if (placeSelected != 0) {
                                     showInfo = true
-//                                    progressState = true
-//
-//                                    orderFinishVm.createOrder(
-//                                        idUser = AuthUtils.getUserId()!!,
-//                                        idAddress = placeSelected,
-//                                        totalPrice = totalPrice,
-//                                        items = items,
-//                                        idPickupTime = pickupTime
-//                                    ){
-//                                        progressState = false
-//                                    }
-//                                    Toast.makeText(context, "Заказ оформлен", Toast.LENGTH_SHORT).show()
-//                                    menuVm.updateOrderWas()
-//                                    orderVm.deleteAllItems()
-//                                    onBackPressed()
                                 }
 
                             },
@@ -384,7 +359,6 @@ fun OrderFinish(
             }
 
             if (showInfo) {
-                //val locName = locations[placeSelected].address
                 val coroutineScope = rememberCoroutineScope()
                 var placeName by remember { mutableStateOf("Cucumber") }
 
@@ -412,13 +386,11 @@ fun OrderFinish(
                                 ) {
                                     progressState = false
                                 }
-                                //Toast.makeText(context, "Заказ оформлен", Toast.LENGTH_SHORT).show()
                                 menuVm.updateOrderWas(true)
                                 menuVm.loadMenu()
                                 menuVm.loadOrders()
                                 orderVm.deleteAllItems()
                                 orderVm.getItemsCount()
-
                                 success = true
                             }
                         }
@@ -488,9 +460,10 @@ fun OrderPlaced(
                 expanded = !expanded
             }
             .height(if (expanded) 180.dp else 55.dp)
+            .border(if (selectedPlace != "Выбрать место получения") 1.dp else 0.dp, colorScheme.primary, Shapes.medium)
             .clip(Shapes.medium),
         colors = if (selectedPlace == "Выбрать место получения") CardDefaults.cardColors(containerColor = colorScheme.secondaryContainer)
-        else CardDefaults.cardColors(containerColor = colorScheme.primary)
+        else CardDefaults.cardColors(containerColor = colorScheme.secondaryContainer)
     ) {
         Column(
             modifier = Modifier
@@ -505,7 +478,7 @@ fun OrderPlaced(
             ) {
                 Text(
                     text = selectedPlace,
-                    color = if (selectedPlace == "Выбрать место получения") colorScheme.error else colorScheme.background,
+                    color = if (selectedPlace == "Выбрать место получения") colorScheme.error else colorScheme.onSecondaryContainer,
                     fontFamily = FontFamily(Font(R.font.roboto_condensed_black)),
                     fontSize = 16.sp
                 )
@@ -513,7 +486,7 @@ fun OrderPlaced(
                 Icon(
                     Icons.Filled.ArrowDropDown,
                     contentDescription = "Login",
-                    tint = if (selectedPlace == "Выбрать место получения") colorScheme.onBackground else colorScheme.background
+                    tint = if (selectedPlace == "Выбрать место получения") colorScheme.onBackground else colorScheme.onSecondaryContainer
                 )
             }
             if (expanded) {
@@ -537,7 +510,7 @@ fun OrderPlaced(
                         ) {
                             Text(
                                 text = it.address,
-                                color = colorScheme.background,
+                                color = colorScheme.onSecondaryContainer,
                                 fontSize = 20.sp,
                                 fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
                             )
@@ -545,7 +518,7 @@ fun OrderPlaced(
                             Icon(
                                 Icons.Filled.Place,
                                 contentDescription = "Login",
-                                tint = colorScheme.background,
+                                tint = colorScheme.onSecondaryContainer,
                                 modifier = Modifier
                                     .width(20.dp)
                                     .height(20.dp)
