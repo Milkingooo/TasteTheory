@@ -189,27 +189,15 @@ fun LoginScreen(
                             loginVm.login(
                                 login = email,
                                 password = textFieldState.text.toString().trim(),
-                                isLogin = { login, role ->
-                                    when {
-                                        login && (role == 0) -> {
-                                            isInCorrect = false
-                                            progressState = false
-                                            onLogin()
-                                        }
-                                        login && (role == 2) -> {
-                                            isInCorrect = false
-                                            progressState = false
-                                            onLogin()
-                                        }
-                                        login && (role == 1) -> {
-                                            isInCorrect = false
-                                            progressState = false
-                                            inManager()
-                                        }
-                                        else -> {
-                                            isInCorrect = true
-                                            progressState = false
-                                        }
+                                isLogin = { login ->
+                                    if (!login) {
+                                        isInCorrect = true
+                                        progressState = false
+                                        return@login
+                                    } else {
+                                        isInCorrect = false
+                                        progressState = false
+                                        onLogin()
                                     }
                                 }
                             )

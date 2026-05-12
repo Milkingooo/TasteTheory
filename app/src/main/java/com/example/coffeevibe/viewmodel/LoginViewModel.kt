@@ -55,36 +55,25 @@ class LoginViewModel(val context: Context) : ViewModel() {
                     _username.value = document.getString("Name").toString()
 
                     val isAdmin = document.getBoolean("IsAdmin") ?: false
-                    val isManager = document.getBoolean("IsManager") ?: false
 
-                    when {
-                        !isAdmin && !isManager -> {
-                            _userRole.value = 2
-                            loaded()
-                        }
-                        isAdmin -> {
-                            _userRole.value = 0
-                            loaded()
-                        }
-                        else -> {
-                            _userRole.value = 1
-                            loaded()
-                        }
+                    if (!isAdmin){
+                        _userRole.value = 1
+                        loaded()
+                    } else {
+                        _userRole.value = 0
+                        loaded()
                     }
-
-                    Log.e("CHECK_ROLES", "ROLE: ${_userRole.value}")
                     break
                 }
             }
             .addOnFailureListener {
                 _username.value = "Ошибка"
-                _userRole.value = 2
-                Log.e("CHECK_ROLES", "ERROR")
+                _userRole.value = 1
             }
     }
-    fun login(login: String, password: String, isLogin: (Boolean, Int) -> Unit) {
+    fun login(login: String, password: String, isLogin: (Boolean) -> Unit) {
         if (auth.currentUser != null) {
-            isLogin(true, _userRole.value)
+            isLogin(true)
         }
 
         try {
@@ -93,22 +82,22 @@ class LoginViewModel(val context: Context) : ViewModel() {
                     .addOnSuccessListener {
                         viewModelScope.launch {
                             getNameAndStatus{
-                                isLogin(true, _userRole.value)
+                                isLogin(true)
                                 Toast.makeText(context, "Авторизация прошла успешно", Toast.LENGTH_SHORT).show()
                             }
                         }
                     }
                     .addOnFailureListener { e ->
-                        isLogin(false, _userRole.value)
+                        isLogin(false)
                         catchException(e)
                         Log.d("Login", e.message.toString())
                     }
             } else {
-                isLogin(false, _userRole.value)
+                isLogin(false)
                 Toast.makeText(context, "Заполните все поля", Toast.LENGTH_SHORT).show()
             }
         } catch (e: Exception) {
-            isLogin(false, _userRole.value)
+            isLogin(false)
             catchException(e)
         }
     }
@@ -147,7 +136,6 @@ class LoginViewModel(val context: Context) : ViewModel() {
                         "Email" to email,
                         "Id" to id,
                         "IsAdmin" to false,
-                        "IsManager" to false,
                         "CreatedAt" to FieldValue.serverTimestamp(),
                     )
                 )
