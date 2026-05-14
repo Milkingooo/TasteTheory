@@ -14,7 +14,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.coffeevibe.database.CartDatabase
 import com.example.coffeevibe.repository.CartRepository
-import com.example.coffeevibe.ui.activities.ui.theme.CoffeeVibeTheme
 import com.example.coffeevibe.ui.ui.OrderFinish
 import com.example.coffeevibe.viewmodel.MenuViewModel
 import com.example.coffeevibe.viewmodel.OrderFinishViewModel

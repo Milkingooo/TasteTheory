@@ -12,18 +12,13 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
-import com.example.coffeevibe.utils.ThemeManager
+import com.example.coffeevibe.utils.ThemeMode
+import com.example.coffeevibe.utils.ThemeState
 
 private val lightScheme = lightColorScheme(
     primary = primaryLight, //Основной цвет приложения, который определяет общий визуальный стиль.
@@ -113,36 +108,34 @@ private val darkScheme = darkColorScheme(
 @Composable
 fun CoffeeVibeTheme(
     context2: Context,
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = false, //для палитры системы true
     content: @Composable() () -> Unit
 ) {
-    val themeManager = ThemeManager(context2)
-    var dynamicColor by remember { mutableStateOf(dynamicColor) }
+    val themeMode = ThemeState.currentTheme
 
-    dynamicColor = themeManager.isDynamicTheme()
-    val isSystemTheme = themeManager.isSystemTheme()
-    val isDarkTheme = themeManager.isDarkTheme()
+    val isDark = when (themeMode) {
+        ThemeMode.SYSTEM, ThemeMode.DYNAMIC -> isSystemInDarkTheme()
+        ThemeMode.DARK -> true
+        ThemeMode.LIGHT -> false
+    }
 
-  val colorScheme = when {
-      dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-          val context = LocalContext.current
-          if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-      }
-      isSystemTheme -> {
-          if (darkTheme) darkScheme else lightScheme
-      }
-      isDarkTheme -> darkScheme
-      else -> lightScheme
-  }
+    val colorScheme = when {
+        themeMode == ThemeMode.DYNAMIC && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+            val context = LocalContext.current
+            if (isDark) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+        }
+        themeMode == ThemeMode.SYSTEM -> {
+            if (isDark) darkScheme else lightScheme
+        }
+        themeMode == ThemeMode.DARK -> darkScheme
+        else -> lightScheme
+    }
 
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
             window.statusBarColor = colorScheme.primary.toArgb()
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = isDark
         }
     }
 

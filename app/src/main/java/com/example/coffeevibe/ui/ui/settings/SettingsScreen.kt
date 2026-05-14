@@ -39,6 +39,8 @@ import com.example.coffeevibe.ui.ui.customUi.DropdownMenuWithName
 import com.example.coffeevibe.ui.ui.other.SegmentedButtonSingleSelectSample
 import com.example.coffeevibe.ui.ui.other.SettingsSubCategory
 import com.example.coffeevibe.utils.ThemeManager
+import com.example.coffeevibe.utils.ThemeMode
+import com.example.coffeevibe.utils.ThemeState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -101,6 +103,7 @@ fun SettingsScreen(
                             themeManager.setIsSystemTheme(true)
                             themeManager.setIsDarkTheme(false)
                             themeManager.setIsDynamicTheme(false)
+                            ThemeState.currentTheme = ThemeMode.SYSTEM
                         }
                     ),
                     BoxDropdownMenuItem(
@@ -110,6 +113,7 @@ fun SettingsScreen(
                             themeManager.setIsDarkTheme(false)
                             themeManager.setIsDynamicTheme(false)
                             themeManager.setIsSystemTheme(false)
+                            ThemeState.currentTheme = ThemeMode.LIGHT
                         }
                     ),
                     BoxDropdownMenuItem(
@@ -119,6 +123,7 @@ fun SettingsScreen(
                             themeManager.setIsDarkTheme(true)
                             themeManager.setIsSystemTheme(false)
                             themeManager.setIsDynamicTheme(false)
+                            ThemeState.currentTheme = ThemeMode.DARK
                         }
                     ),
                     BoxDropdownMenuItem(
@@ -128,6 +133,7 @@ fun SettingsScreen(
                             themeManager.setIsDynamicTheme(true)
                             themeManager.setIsDarkTheme(false)
                             themeManager.setIsSystemTheme(false)
+                            ThemeState.currentTheme = ThemeMode.DYNAMIC
                         }
                     ),
                 )
