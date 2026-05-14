@@ -55,7 +55,6 @@ class MenuViewModel(val context: Context) : ViewModel() {
 
 
     init {
-        loadData()
         isUserSingleOrder()
         getOrderNumAndPrice()
         subscribeToOrders()
@@ -111,36 +110,40 @@ class MenuViewModel(val context: Context) : ViewModel() {
     }
 
     private fun subscribeToMenu() {
-            listenerRegistration = firestore
-                .collection("Good")
-                .addSnapshotListener { snapshot, error ->
-                    if (error != null) {
-                        Log.e("MyViewModel", "Error loading menu", error)
-                        return@addSnapshotListener
+        _isMenuLoad.value = true
+        listenerRegistration = firestore
+            .collection("Good")
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    Log.e("MyViewModel", "Error loading menu", error)
+                    return@addSnapshotListener
+                }
+                val items = snapshot?.documents?.mapNotNull { item ->
+                    try {
+                        MenuItem(
+                            id = item.data?.get("Id").toString().toInt(),
+                            name = item.data?.get("Name").toString(),
+                            price = item.data?.get("Price").toString().toInt(),
+                            discountPrice = item.data?.get("DiscountPrice").toString().toInt(),
+                            category = item.data?.get("Category").toString(),
+                            description = item.data?.get("Description").toString(),
+                            image = item.data?.get("Image").toString(),
+                            status = item.data?.get("Status").toString(),
+                            composition = item.data?.get("Dairy").toString(),
+                            kbju = item.data?.get("KBJU").toString()
+                        )
+                    } catch (e: Exception) {
+                        Log.e("MyViewModel", "Error loading data", e)
+                        null
                     }
-                    val items = snapshot?.documents?.mapNotNull { item ->
-                        try {
-                            MenuItem(
-                                id = item.data?.get("Id").toString().toInt(),
-                                name = item.data?.get("Name").toString(),
-                                price = item.data?.get("Price").toString().toInt(),
-                                category = item.data?.get("Category").toString(),
-                                description = item.data?.get("Description").toString(),
-                                image = item.data?.get("Image").toString(),
-                                status = item.data?.get("Status").toString(),
-                            )
-                        } catch (e: Exception) {
-                            Log.e("MyViewModel", "Error loading data", e)
-                            null
-                        }
-                    }
-                    Log.d("MyViewModel", "Loaded data: $items")
+                }
+                Log.d("MyViewModel", "Loaded data: $items")
 
-                        if (!items?.let { _dataList.value.containsAll(it) }!! || _dataList.value.size != items.size) {
-                            _dataList.value = items
-                        }
+                _isMenuLoad.value = false
 
-
+                if (items != null && (_dataList.value.size != items.size || _dataList.value.map { it.id } != items.map { it.id })) {
+                    _dataList.value = items
+                }
         }
     }
 

@@ -5,13 +5,13 @@ import androidx.compose.runtime.Stable
 @Stable
 data class MenuItem(
     val id: Int = 0,
-    var name: String = "",
-    var price: Int = 0,
-    var discountPrice: Int = 0,
+    val name: String = "",
+    val price: Int = 0,
+    val discountPrice: Int = 0,
     val image: String = "",
-    var description: String = "",
-    var category: String = "",
-    var composition: String = "",
-    var status: String = "",
-    var kbju: String = ""
+    val description: String = "",
+    val category: String = "",
+    val composition: String = "",
+    val status: String = "",
+    val kbju: String = ""
 )

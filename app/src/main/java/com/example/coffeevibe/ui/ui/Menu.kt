@@ -1,17 +1,10 @@
 package com.example.coffeevibe.ui.ui
 
 import android.annotation.SuppressLint
-import android.widget.Space
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
-import androidx.compose.animation.expandHorizontally
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -83,7 +76,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -91,7 +83,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
@@ -109,9 +100,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
-import androidx.graphics.shapes.RoundedPolygon
-import androidx.navigation.NavController
-import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import coil.imageLoader
 import coil.request.ImageRequest
@@ -165,6 +153,7 @@ fun MenuScreen(
     val orderWas by menuViewModel.isOrderWas.collectAsState()
     val isLoading by menuViewModel.isMenuLoad.collectAsState()
     val cartItems by orderVm.itemList.collectAsState()
+    val selectedIds by remember { derivedStateOf { cartItems.map { it.idItem }.toSet() } }
     val scope = rememberCoroutineScope()
 
     var isRefreshing by remember { mutableStateOf(false) }
@@ -213,13 +202,19 @@ fun MenuScreen(
         }
     }
 
-    val categories = filteredGoods.groupBy { it.category }.toSortedMap()
-    val categoryIndexMap = remember { mutableStateMapOf<String, Int>() }
-    var itemIndex = 0
-
-    categories.forEach { (category, items) ->
-        categoryIndexMap[category] = itemIndex
-        itemIndex += items.size + 1
+    val categories by remember(filteredGoods) {
+        derivedStateOf { filteredGoods.groupBy { it.category }.toSortedMap() }
+    }
+    val categoryIndexMap by remember(categories) {
+        derivedStateOf {
+            val map = mutableMapOf<String, Int>()
+            var index = 0
+            categories.forEach { (category, items) ->
+                map[category] = index
+                index += items.size + 1
+            }
+            map
+        }
     }
 
     val aboutSheetData by remember { mutableStateOf(AboutSheetData()) }
@@ -366,11 +361,11 @@ fun MenuScreen(
                                                         categoryIndexMap[category] ?: 0
                                                     listState2.animateScrollToItem(index)
                                                 }
-                                            }
-                                        )
+                                            })
                                     }
                                 }
                             }
+
 
                             if (filteredGoods.isNotEmpty()) {
                                 if (isOrderHas) {
@@ -383,7 +378,9 @@ fun MenuScreen(
                                         Column {
                                             HorizontalPager(
                                                 state = pagerState,
-                                                contentPadding = if (numAndPrice.size > 1) PaddingValues(end = 16.dp) else PaddingValues(0.dp),
+                                                contentPadding = if (numAndPrice.size > 1) PaddingValues(
+                                                    end = 16.dp
+                                                ) else PaddingValues(0.dp),
                                                 pageSpacing = 6.dp,
                                                 modifier = Modifier.animateItem()
                                             ) {
@@ -453,9 +450,7 @@ fun MenuScreen(
                                             onDelete = {
                                                 orderVm.deleteItemById(item.id)
                                             },
-                                            isSelected = cartItems.any { cartItem ->
-                                                cartItem.idItem == item.id
-                                            },
+                                            isSelected = item.id in selectedIds,
                                             available = item.status
                                         )
                                     }
@@ -483,7 +478,6 @@ fun ListItem2(
     available: String
 ) {
 
-    CoffeeVibeTheme(context2 = LocalContext.current,content = {
         Card(
             modifier = Modifier
                 .width(175.dp)
@@ -526,10 +520,6 @@ fun ListItem2(
                         .build(),
                     imageLoader = imageLoader
                 )
-                val state = painter.state
-                val transition by animateFloatAsState(
-                    targetValue = if (state is AsyncImagePainter.State.Success) 1f else 0f
-                )
 
                 Box(
                     modifier = Modifier
@@ -542,7 +532,6 @@ fun ListItem2(
                         modifier = Modifier
                             .size(140.dp)
                             .clip(shape = Shapes.medium)
-                            .alpha(transition)
                             .align(Alignment.Center),
                         contentScale = ContentScale.Crop,
                     )
@@ -570,8 +559,6 @@ fun ListItem2(
                     style = MaterialTheme.typography.bodyMedium,
                     color = colorScheme.onBackground,
                     textAlign = TextAlign.Left,
-                    modifier = Modifier
-                        .animateContentSize(),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
@@ -657,7 +644,6 @@ fun ListItem2(
                 }
             }
         }
-    })
 }
 
 @Composable
