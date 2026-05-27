@@ -44,7 +44,6 @@ import com.example.coffeevibe.ui.ui.customUi.BoxDropdownMenuItem
 import com.example.coffeevibe.ui.ui.customUi.DropdownMenuWithName
 import com.example.coffeevibe.ui.ui.other.SwitchWithThumbIconSample
 import com.example.coffeevibe.utils.AppearanceManager
-import com.example.coffeevibe.utils.LanguageManager
 import com.example.coffeevibe.utils.ThemeManager
 import com.example.coffeevibe.utils.ThemeMode
 import com.example.coffeevibe.utils.ThemeState
@@ -153,7 +152,6 @@ fun SettingsScreen(
                 )
 
                 val appearanceManager = AppearanceManager(LocalContext.current)
-                val langManager = LanguageManager(LocalContext.current)
 
                 val viewModeBoxes = listOf(
                     BoxDropdownMenuItem(

@@ -5,6 +5,7 @@ import android.net.Uri
 import android.util.Log
 import aws.sdk.kotlin.services.s3.S3Client
 import aws.sdk.kotlin.services.s3.deleteObject
+import aws.sdk.kotlin.services.s3.model.ObjectCannedAcl
 import aws.sdk.kotlin.services.s3.model.PutObjectRequest
 import aws.smithy.kotlin.runtime.content.ByteStream
 import aws.smithy.kotlin.runtime.net.url.Url
@@ -54,6 +55,7 @@ object VkCloudStorage {
                 key = key2
                 body = ByteStream.fromBytes(byteArray)
                 contentType = getContentType(extension)
+                acl = ObjectCannedAcl.PublicRead
             }
 
             getS3Client().use { client ->
