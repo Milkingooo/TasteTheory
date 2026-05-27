@@ -1,7 +1,9 @@
 package com.example.coffeevibe.ui.ui.settings
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -10,7 +12,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.ViewList
 import androidx.compose.material.icons.outlined.ColorLens
 import androidx.compose.material.icons.outlined.DarkMode
 import androidx.compose.material.icons.outlined.LightMode
@@ -21,10 +25,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.Font
@@ -36,19 +42,19 @@ import com.example.coffeevibe.R
 import com.example.coffeevibe.ui.theme.CoffeeVibeTheme
 import com.example.coffeevibe.ui.ui.customUi.BoxDropdownMenuItem
 import com.example.coffeevibe.ui.ui.customUi.DropdownMenuWithName
-import com.example.coffeevibe.ui.ui.other.SegmentedButtonSingleSelectSample
-import com.example.coffeevibe.ui.ui.other.SettingsSubCategory
+import com.example.coffeevibe.ui.ui.other.SwitchWithThumbIconSample
+import com.example.coffeevibe.utils.AppearanceManager
+import com.example.coffeevibe.utils.LanguageManager
 import com.example.coffeevibe.utils.ThemeManager
 import com.example.coffeevibe.utils.ThemeMode
 import com.example.coffeevibe.utils.ThemeState
+import com.example.coffeevibe.utils.ViewModeState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
     onBackPressed: () -> Unit,
 ) {
-    val options = listOf("Русский", "English")
-
     CoffeeVibeTheme(context2 = LocalContext.current, content = {
         Scaffold(
             contentWindowInsets = WindowInsets(0, 0, 0, 0),
@@ -90,9 +96,6 @@ fun SettingsScreen(
                     .background(colorScheme.background)
                     .padding(innerPadding)
             ) {
-
-                //SwitchWithThumbIconSample("Уведомления", actions = {})
-
                 val themeManager = ThemeManager(LocalContext.current)
 
                 val boxes = listOf(
@@ -149,11 +152,45 @@ fun SettingsScreen(
                     isExpanded = false
                 )
 
-                SegmentedButtonSingleSelectSample(
-                    segments = options,
-                    actions = {},
-                    title = "Язык"
+                val appearanceManager = AppearanceManager(LocalContext.current)
+                val langManager = LanguageManager(LocalContext.current)
+
+                val viewModeBoxes = listOf(
+                    BoxDropdownMenuItem(
+                        title = "Сетка",
+                        icon = Icons.Filled.GridView,
+                        action = { appearanceManager.setViewMode("grid") }
+                    ),
+                    BoxDropdownMenuItem(
+                        title = "Список",
+                        icon = Icons.Filled.ViewList,
+                        action = { appearanceManager.setViewMode("list") }
+                    ),
                 )
+                DropdownMenuWithName(
+                    title = "Вид списка",
+                    current = if (ViewModeState.currentView == "grid") "Сетка" else "Список",
+                    items = viewModeBoxes,
+                    isExpanded = false
+                )
+                Row(
+                    modifier = Modifier.padding(8.dp).fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = "Анимации",
+                        textAlign = TextAlign.Left,
+                        fontSize = 20.sp,
+                        color = colorScheme.onBackground,
+                        fontFamily = FontFamily(Font(R.font.roboto_condensed_bold))
+                    )
+                    Switch(
+                        checked = ViewModeState.animationsEnabled,
+                        onCheckedChange = { appearanceManager.setAnimationsEnabled(it) }
+                    )
+                }
+
 
                 HorizontalDivider(
                     modifier = Modifier.padding(8.dp).padding(horizontal = 24.dp),

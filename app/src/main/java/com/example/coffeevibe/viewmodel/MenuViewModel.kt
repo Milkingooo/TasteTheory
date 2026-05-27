@@ -378,7 +378,7 @@ class MenuViewModel(val context: Context) : ViewModel() {
 
     //Управление позициями в админке
 
-    fun updateProductById(id: Int, newProduct: ProductAdmin) {
+    fun updateProductById(id: Int, newProduct: ProductAdmin, onResult: ((Boolean) -> Unit)? = null) {
         viewModelScope.launch {
             val products = firestore
                 .collection("Good")
@@ -404,14 +404,16 @@ class MenuViewModel(val context: Context) : ViewModel() {
                     .update(pr)
                     .addOnSuccessListener {
                         Toast.makeText(context,"Данные успешно сохранены", Toast.LENGTH_SHORT).show()
+                        onResult?.invoke(true)
                     }
                     .addOnFailureListener {
                         Toast.makeText(context,"Ошибка! Данные не сохранены", Toast.LENGTH_SHORT).show()
+                        onResult?.invoke(false)
                     }
             } catch (e: Exception) {
                 Toast.makeText(context,"Ошибка! Данные не сохранены", Toast.LENGTH_SHORT).show()
                 Log.e("SaveNewProduct", "Error: ${e.stackTrace}")
-
+                onResult?.invoke(false)
             }
         }
     }

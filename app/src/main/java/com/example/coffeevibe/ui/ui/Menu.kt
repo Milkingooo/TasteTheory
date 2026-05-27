@@ -93,6 +93,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
@@ -105,9 +107,11 @@ import coil.imageLoader
 import coil.request.ImageRequest
 import coil.transform.RoundedCornersTransformation
 import com.example.coffeevibe.R
+import com.example.coffeevibe.model.MenuItem
 import com.example.coffeevibe.ui.theme.CoffeeVibeTheme
 import com.example.coffeevibe.ui.theme.Shapes
 import com.example.coffeevibe.ui.ui.customUi.CategoryRow
+import com.example.coffeevibe.ui.ui.customUi.MenuItemText
 import com.example.coffeevibe.ui.ui.customUi.MenuTopBar
 import com.example.coffeevibe.ui.ui.other.AssistChipMenu
 import com.example.coffeevibe.ui.ui.other.IndeterminateCircularIndicator
@@ -115,6 +119,7 @@ import com.example.coffeevibe.ui.ui.other.OrderCard
 import com.example.coffeevibe.ui.ui.other.UserOrderItem
 import com.example.coffeevibe.utils.CashApplication
 import com.example.coffeevibe.utils.NetworkUtils
+import com.example.coffeevibe.utils.ViewModeState
 import com.example.coffeevibe.viewmodel.MenuViewModel
 import com.example.coffeevibe.viewmodel.OrderViewModel
 import kotlinx.coroutines.delay
@@ -329,7 +334,7 @@ fun MenuScreen(
                         },
                     ) {
                         LazyVerticalGrid(
-                            columns = GridCells.Adaptive(minSize = 128.dp),
+                                columns = if (ViewModeState.currentView == "grid") GridCells.Adaptive(minSize = 128.dp) else GridCells.Fixed(1),
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(horizontal = 16.dp),
@@ -368,9 +373,9 @@ fun MenuScreen(
 
 
                             if (filteredGoods.isNotEmpty()) {
-                                if (isOrderHas) {
-                                    item(span = { GridItemSpan(2) }) {
-                                        Spacer(modifier = Modifier.height(24.dp))
+                                    if (isOrderHas) {
+                                        item(span = { if (ViewModeState.currentView == "grid") GridItemSpan(2) else GridItemSpan(1) }) {
+                                            Spacer(modifier = Modifier.height(24.dp))
 
                                         val pagerState = rememberPagerState(pageCount = {
                                             numAndPrice.size
@@ -414,7 +419,7 @@ fun MenuScreen(
 
                                 categories.forEach { (category, filteredGoods) ->
 
-                                    item(span = { GridItemSpan(2) }, key = category) {
+                                    item(span = { if (ViewModeState.currentView == "grid") GridItemSpan(2) else GridItemSpan(1) }, key = category) {
                                         Text(
                                             text = category,
                                             color = colorScheme.onBackground,
@@ -424,35 +429,32 @@ fun MenuScreen(
                                         )
                                     }
 
-                                    items(filteredGoods, key = { it.id }) { item ->
-                                        ListItem2(
-                                            name = item.name,
-                                            price = item.price,
-                                            discountPrice = item.discountPrice,
-                                            image = item.image,
-                                            onInfo = {
-                                                aboutSheetData.name = item.name
-                                                aboutSheetData.description = item.description
-                                                aboutSheetData.image = item.image
-                                                aboutSheetData.kbju = item.kbju
-                                                aboutSheetData.composition = item.composition
-                                                showSheet = true
-                                            },
-                                            onAdd = {
-                                                orderVm.addItem(
-                                                    id = item.id,
-                                                    name = item.name,
-                                                    price = if (item.discountPrice == 0) item.price else item.discountPrice,
-                                                    image = item.image,
-                                                    quantity = 1
-                                                )
-                                            },
-                                            onDelete = {
-                                                orderVm.deleteItemById(item.id)
-                                            },
-                                            isSelected = item.id in selectedIds,
-                                            available = item.status
-                                        )
+                                        items(filteredGoods, key = { it.id }) { item ->
+                                            ListItem2(
+                                                product = item,
+                                                onInfo = {
+                                                    aboutSheetData.name = item.name
+                                                    aboutSheetData.description = item.description
+                                                    aboutSheetData.image = item.image
+                                                    aboutSheetData.kbju = item.kbju
+                                                    aboutSheetData.composition = item.composition
+                                                    showSheet = true
+                                                },
+                                                onAdd = {
+                                                    orderVm.addItem(
+                                                        id = item.id,
+                                                        name = item.name,
+                                                        price = if (item.discountPrice == 0) item.price else item.discountPrice,
+                                                        image = item.image,
+                                                        quantity = 1
+                                                    )
+                                                },
+                                                onDelete = {
+                                                    orderVm.deleteItemById(item.id)
+                                                },
+                                                isSelected = item.id in selectedIds,
+                                                modifier = if (ViewModeState.currentView == "list") Modifier.fillMaxWidth() else Modifier.width(175.dp)
+                                            )
                                     }
                                 }
                             }
@@ -467,21 +469,29 @@ fun MenuScreen(
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ListItem2(
-    name: String,
-    price: Int,
-    discountPrice: Int,
-    image: String,
+    product: MenuItem,
     onInfo: () -> Unit,
     onAdd: () -> Unit,
     isSelected: Boolean = false,
     onDelete: () -> Unit,
-    available: String
+    modifier: Modifier = Modifier.width(175.dp)
 ) {
+    val imageLoader = (LocalContext.current.applicationContext as CashApplication).imageLoader
 
+    val painter = rememberAsyncImagePainter(
+        ImageRequest.Builder(LocalContext.current)
+            .data(data = product.image)
+            .crossfade(true)
+            .memoryCacheKey(product.image)
+            .diskCacheKey(product.image)
+            .transformations(RoundedCornersTransformation(10f))
+            .error(R.drawable.error_load)
+            .build(),
+        imageLoader = imageLoader
+    )
         Card(
-            modifier = Modifier
-                .width(175.dp)
-                .height(270.dp)
+            modifier = modifier
+                .height(260.dp)
                 //.shadow(4.dp, Shapes.large)
                 .shadow(
                     4.dp,
@@ -504,64 +514,75 @@ fun ListItem2(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(16.dp),
+                    .padding(12.dp)
             ) {
-
-                val imageLoader = (LocalContext.current.applicationContext as CashApplication).imageLoader
-
-                val painter = rememberAsyncImagePainter(
-                    ImageRequest.Builder(LocalContext.current)
-                        .data(data = image)
-                        .crossfade(true)
-                        .memoryCacheKey(image)
-                        .diskCacheKey(image)
-                        .transformations(RoundedCornersTransformation(10f))
-                        .error(R.drawable.error_load)
-                        .build(),
-                    imageLoader = imageLoader
-                )
-
-                Box(
-                    modifier = Modifier
-                        .size(150.dp)
-                )
-                {
-                    Image(
-                        painter = painter,
-                        contentDescription = null,
+                Row() {
+                    Box(
                         modifier = Modifier
-                            .size(140.dp)
-                            .clip(shape = Shapes.medium)
-                            .align(Alignment.Center),
-                        contentScale = ContentScale.Crop,
+                            .size(150.dp)
                     )
-
-                    if (discountPrice != 0) {
-                        Text(
-                            "Хит",
-                            color = colorScheme.background,
+                    {
+                        Image(
+                            painter = painter,
+                            contentDescription = null,
                             modifier = Modifier
-                                .width(60.dp)
-                                .padding(4.dp)
-                                .offset(x = (-10).dp, y = -(10).dp)
-                                .clip(Shapes.medium)
-                                .background(colorScheme.primary)
-                                .align(Alignment.TopStart),
-                            textAlign = TextAlign.Center
+                                .size(140.dp)
+                                .clip(shape = Shapes.medium)
+                                .align(Alignment.Center),
+                            contentScale = ContentScale.Crop,
                         )
+
+                        if (product.discountPrice != 0) {
+                            Text(
+                                "Хит",
+                                color = colorScheme.background,
+                                modifier = Modifier
+                                    .width(60.dp)
+                                    .padding(4.dp)
+                                    .offset(x = (-10).dp, y = -(10).dp)
+                                    .clip(Shapes.medium)
+                                    .background(colorScheme.primary)
+                                    .align(Alignment.TopStart),
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    }
+
+                    if (ViewModeState.currentView != "grid") {
+                        Column{
+                        MenuItemText(
+                            text = product.name,
+                            color = colorScheme.onBackground,
+                            alignment = TextAlign.Left,
+                            padding = 12.dp,
+                            maxLines = 2,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 18.sp
+                        )
+                        MenuItemText(
+                            text = product.description,
+                            color = colorScheme.onBackground,
+                            alignment = TextAlign.Left,
+                            padding = 12.dp,
+                            maxLines = 3,
+                            fontSize = 16.sp
+                        )
+                            }
                     }
                 }
 
                 Spacer(modifier = Modifier.height(4.dp))
 
-                Text(
-                    text = name,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = colorScheme.onBackground,
-                    textAlign = TextAlign.Left,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
+                if (ViewModeState.currentView == "grid") {
+                    Text(
+                        text = product.name,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = colorScheme.onBackground,
+                        textAlign = TextAlign.Left,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -570,18 +591,18 @@ fun ListItem2(
                     horizontalArrangement = Arrangement.SpaceBetween
                 )
                 {
-                    if (available == "Недоступен") {
+                    if (product.status == "Недоступен") {
                         Text(
-                            text = "$price руб.",
+                            text = "${product.price}₽",
                             color = colorScheme.onBackground,
                             textAlign = TextAlign.Center,
                             textDecoration = TextDecoration.LineThrough,
                             fontSize = 18.sp
                         )
                     } else {
-                        if (discountPrice == 0) {
+                        if (product.discountPrice == 0) {
                             Text(
-                                text = "$price₽",
+                                text = "${product.price}₽",
                                 color = colorScheme.onBackground,
                                 textAlign = TextAlign.Center,
                                 fontSize = 18.sp
@@ -592,14 +613,14 @@ fun ListItem2(
                                 modifier = Modifier.height(75.dp)
                             ){
                                 Text(
-                                    text = "$price₽",
+                                    text = "${product.price}₽",
                                     color = colorScheme.onBackground,
                                     textAlign = TextAlign.Right,
                                     textDecoration = TextDecoration.LineThrough,
                                     fontSize = 16.sp
                                 )
                                 Text(
-                                    text = "$discountPrice₽",
+                                    text = "${product.discountPrice}₽",
                                     color = Color.Black,
                                     textAlign = TextAlign.Left,
                                     fontSize = 18.sp,
@@ -624,8 +645,8 @@ fun ListItem2(
                         modifier = Modifier
                             .size(50.dp)
                             .clip(shape = (MaterialShapes.Pill).toShape())
-                            .background(color = if (available == "Недоступен") Color.LightGray else colorScheme.secondaryContainer),
-                        enabled = available != "Недоступен"
+                            .background(color = if (product.status == "Недоступен") Color.LightGray else colorScheme.secondaryContainer),
+                        enabled = product.status != "Недоступен"
                     ) {
                         if (!isSelected) {
                             Icon(

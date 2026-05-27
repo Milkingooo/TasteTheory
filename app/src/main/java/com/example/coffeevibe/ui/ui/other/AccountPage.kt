@@ -22,6 +22,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.AdminPanelSettings
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.SupportAgent
 import androidx.compose.material.icons.filled.Terminal
 import androidx.compose.material.icons.outlined.ArrowDropDown
@@ -79,7 +80,6 @@ import com.example.coffeevibe.viewmodel.LoginViewModel
 @Composable
 fun ProfileScreen(
     logOut: () -> Unit,
-    inAboutScreen: () -> Unit,
     inTestScreen: () -> Unit,
     inAccountPage: () -> Unit,
     inAdminPanelScreen: () -> Unit,
@@ -129,15 +129,6 @@ fun ProfileScreen(
                     .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-//                // Имя
-//                Text(
-//                    text = name,
-//                    fontSize = 24.sp,
-//                    fontWeight = FontWeight.Bold,
-//                    color = colorScheme.onBackground,
-//                    textAlign = TextAlign.Center,
-//                    modifier = Modifier.fillMaxWidth()
-//                )
                 Spacer(modifier = Modifier.height(24.dp))
 
                 val tabsWithoutLogin = listOf(
@@ -160,6 +151,16 @@ fun ProfileScreen(
                         icon = Icons.Filled.SupportAgent,
                         iconTint = colorScheme.secondaryContainer,
                         iconBackground = colorScheme.primary
+                    ),
+                    MaterialListItem(
+                        title = "Приведи друга",
+                        subtitle = "",
+                        action = {
+
+                        },
+                        icon = Icons.Filled.Share,
+                        iconTint = colorScheme.secondaryContainer,
+                        iconBackground = colorScheme.primary
                     )
                 )
 
@@ -173,18 +174,17 @@ fun ProfileScreen(
                         icon = Icons.Filled.AdminPanelSettings,
                         iconTint = colorScheme.secondaryContainer,
                         iconBackground = colorScheme.primary
-                    )
-                    ,
-                    MaterialListItem(
-                        title = "Тестирование",
-                        subtitle = "",
-                        action = {
-                            inTestScreen()
-                        },
-                        icon = Icons.Filled.Terminal,
-                        iconTint = colorScheme.secondaryContainer,
-                        iconBackground = colorScheme.error
-                    )
+                    ),
+//                    MaterialListItem(
+//                        title = "Тестирование",
+//                        subtitle = "",
+//                        action = {
+//                            inTestScreen()
+//                        },
+//                        icon = Icons.Filled.Terminal,
+//                        iconTint = colorScheme.secondaryContainer,
+//                        iconBackground = colorScheme.error
+//                    )
                 )
 
                 val tabs = mutableListOf<MaterialListItem>()

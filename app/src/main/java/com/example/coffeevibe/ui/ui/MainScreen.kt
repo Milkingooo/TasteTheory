@@ -50,6 +50,8 @@ import com.example.coffeevibe.ui.ui.other.UserOrdersScreen
 import com.example.coffeevibe.ui.ui.settings.AccountScreen
 import com.example.coffeevibe.ui.ui.settings.ErrorTicketSendScreen
 import com.example.coffeevibe.ui.ui.settings.Faqs
+import com.example.coffeevibe.utils.AppearanceManager
+import com.example.coffeevibe.utils.ViewModeState
 import com.example.coffeevibe.viewmodel.LoginViewModel
 import com.example.coffeevibe.viewmodel.ManagerViewModel
 import com.example.coffeevibe.viewmodel.MenuViewModel
@@ -67,6 +69,8 @@ fun MainScreen(
     inTestActivity: () -> Unit
 ) {
     val navController = rememberNavController()
+
+    AppearanceManager(LocalContext.current)
 
     CoffeeVibeTheme(context2 = LocalContext.current,content = {
         Column{
@@ -94,9 +98,6 @@ fun MainScreen(
                 {
                     ProfileScreen(
                         logOut = { onLogin() },
-                        inAboutScreen = {
-                            navController.navigate("about")
-                        },
                         loginVm = loginVm,
                         inAdminPanelScreen = {
                             navController.navigate("admin")
@@ -117,14 +118,9 @@ fun MainScreen(
                 }
                 composable(Screen.Orders.route){ UserOrdersScreen(menuViewModel = menuViewModel) }
 
-                composable(Screen.About.route,
-                    enterTransition = { slideInHorizontally(tween(durationMillis = 500)) + fadeIn(tween(durationMillis = 500)) },
-                    exitTransition = { slideOutHorizontally(tween(durationMillis = 500)) + fadeOut(tween(durationMillis = 500))}
-                ){ AboutAppScreen( onBackPressed = { navController.popBackStack() }) }
-
                 composable(Screen.Admin.route,
-                    enterTransition = { slideInHorizontally(tween(durationMillis = 500)) + fadeIn(tween(durationMillis = 500)) },
-                    exitTransition = { slideOutHorizontally(tween(durationMillis = 500)) + fadeOut(tween(durationMillis = 500))}
+                    enterTransition = { if (ViewModeState.animationsEnabled) { slideInHorizontally(tween(durationMillis = 500)) + fadeIn(tween(durationMillis = 500)) } else { null } },
+                    exitTransition = { if (ViewModeState.animationsEnabled) { slideOutHorizontally(tween(durationMillis = 500)) + fadeOut(tween(durationMillis = 500)) } else { null } }
                 ){ AdminPanelScreen(
                     onBackPressed = { navController.popBackStack() },
                     menuVm = menuViewModel,
@@ -136,8 +132,8 @@ fun MainScreen(
                 }
 
                 composable(Screen.AccountSettings.route,
-                    enterTransition = { slideInHorizontally(tween(durationMillis = 500)) + fadeIn(tween(durationMillis = 500)) },
-                    exitTransition = { slideOutHorizontally(tween(durationMillis = 500)) + fadeOut(tween(durationMillis = 500))}
+                    enterTransition = { if (ViewModeState.animationsEnabled) { slideInHorizontally(tween(durationMillis = 500)) + fadeIn(tween(durationMillis = 500)) } else { null } },
+                    exitTransition = { if (ViewModeState.animationsEnabled) { slideOutHorizontally(tween(durationMillis = 500)) + fadeOut(tween(durationMillis = 500)) } else { null } }
                 ){
                     AccountScreen(
                         onBackPressed = { navController.popBackStack() },
@@ -146,8 +142,8 @@ fun MainScreen(
                 }
 
                 composable(Screen.Settings.route,
-                    enterTransition = { slideInHorizontally(tween(durationMillis = 500)) + fadeIn(tween(durationMillis = 500)) },
-                    exitTransition = { slideOutHorizontally(tween(durationMillis = 500)) + fadeOut(tween(durationMillis = 500))}
+                    enterTransition = { if (ViewModeState.animationsEnabled) { slideInHorizontally(tween(durationMillis = 500)) + fadeIn(tween(durationMillis = 500)) } else { null } },
+                    exitTransition = { if (ViewModeState.animationsEnabled) { slideOutHorizontally(tween(durationMillis = 500)) + fadeOut(tween(durationMillis = 500)) } else { null } }
                 ) {
                     SettingsScreen(
                         onBackPressed = { navController.popBackStack() },
@@ -155,8 +151,8 @@ fun MainScreen(
                 }
 
                 composable(Screen.Support.route,
-                    enterTransition = { slideInHorizontally(tween(durationMillis = 500)) + fadeIn(tween(durationMillis = 500)) },
-                    exitTransition = { slideOutHorizontally(tween(durationMillis = 500)) + fadeOut(tween(durationMillis = 500))}
+                    enterTransition = { if (ViewModeState.animationsEnabled) { slideInHorizontally(tween(durationMillis = 500)) + fadeIn(tween(durationMillis = 500)) } else { null } },
+                    exitTransition = { if (ViewModeState.animationsEnabled) { slideOutHorizontally(tween(durationMillis = 500)) + fadeOut(tween(durationMillis = 500)) } else { null } }
                 ) {
                     SupportScreen(
                         onBackPressed = { navController.popBackStack() },
@@ -166,8 +162,8 @@ fun MainScreen(
                 }
 
                 composable(Screen.Faqs.route,
-                    enterTransition = { slideInHorizontally(tween(durationMillis = 500)) + fadeIn(tween(durationMillis = 500)) },
-                    exitTransition = { slideOutHorizontally(tween(durationMillis = 500)) + fadeOut(tween(durationMillis = 500))}
+                    enterTransition = { if (ViewModeState.animationsEnabled) { slideInHorizontally(tween(durationMillis = 500)) + fadeIn(tween(durationMillis = 500)) } else { null } },
+                    exitTransition = { if (ViewModeState.animationsEnabled) { slideOutHorizontally(tween(durationMillis = 500)) + fadeOut(tween(durationMillis = 500)) } else { null } }
                 ) {
                     Faqs(
                         onBackPressed = { navController.popBackStack() }
@@ -175,8 +171,8 @@ fun MainScreen(
                 }
 
                 composable(Screen.Testing.route,
-                    enterTransition = { slideInHorizontally(tween(durationMillis = 500)) + fadeIn(tween(durationMillis = 500)) },
-                    exitTransition = { slideOutHorizontally(tween(durationMillis = 500)) + fadeOut(tween(durationMillis = 500))}
+                    enterTransition = { if (ViewModeState.animationsEnabled) { slideInHorizontally(tween(durationMillis = 500)) + fadeIn(tween(durationMillis = 500)) } else { null } },
+                    exitTransition = { if (ViewModeState.animationsEnabled) { slideOutHorizontally(tween(durationMillis = 500)) + fadeOut(tween(durationMillis = 500)) } else { null } }
                 ) {
 //                    TestScreen {
 //                        navController.popBackStack()
@@ -185,8 +181,8 @@ fun MainScreen(
                 }
 
                 composable(Screen.ErrorSend.route,
-                    enterTransition = { slideInHorizontally(tween(durationMillis = 500)) + fadeIn(tween(durationMillis = 500)) },
-                    exitTransition = { slideOutHorizontally(tween(durationMillis = 500)) + fadeOut(tween(durationMillis = 500))}
+                    enterTransition = { if (ViewModeState.animationsEnabled) { slideInHorizontally(tween(durationMillis = 500)) + fadeIn(tween(durationMillis = 500)) } else { null } },
+                    exitTransition = { if (ViewModeState.animationsEnabled) { slideOutHorizontally(tween(durationMillis = 500)) + fadeOut(tween(durationMillis = 500)) } else { null } }
                 ) {
                     ErrorTicketSendScreen(
                         onBackPressed = { navController.popBackStack() },
@@ -312,11 +308,9 @@ sealed class Screen(val route: String) {
     object Orders : Screen("orders")
     object Account : Screen("account")
     object AccountSettings : Screen("accountSettings")
-    object About : Screen("about")
     object Admin : Screen("admin")
     object Settings : Screen("settings")
     object Support : Screen("support")
-    object Splash : Screen("splashScreen")
     object Faqs: Screen("faqs")
     object Testing: Screen("testing")
     object ErrorSend: Screen("errorSend")
