@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.count
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -42,7 +43,11 @@ class OrderViewModel(private val repository: CartRepository, context: Context) :
 
     init {
         loadCartItems()
-        getItemsCount()
+        viewModelScope.launch {
+            cartDao.getCartItemsCount().collect { count ->
+                _itemsCount.value = count
+            }
+        }
     }
 
     private fun loadCartItems() {
@@ -60,7 +65,9 @@ class OrderViewModel(private val repository: CartRepository, context: Context) :
 
     fun getItemsCount() {
         viewModelScope.launch {
-            _itemsCount.value = cartDao.getCartItemsCount()
+            cartDao.getCartItemsCount().first().let { count ->
+                _itemsCount.value = count
+            }
         }
     }
 

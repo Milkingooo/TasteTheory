@@ -29,7 +29,10 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
@@ -152,7 +155,8 @@ fun MenuScreen(
     var priceIncreasing by rememberSaveable { mutableStateOf(false) }
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
-    val listState2 = rememberLazyGridState()
+    val gridState = rememberLazyGridState()
+    val listState = rememberLazyListState()
     val isOrderHas by menuViewModel.isOrderHas.collectAsState()
     val numAndPrice by menuViewModel.orderNP.collectAsState()
     val orderWas by menuViewModel.isOrderWas.collectAsState()
@@ -252,13 +256,19 @@ fun MenuScreen(
                 .nestedScroll(scrollBehavior.nestedScrollConnection),
             contentWindowInsets = WindowInsets(0, 0, 0, 0),
             floatingActionButton = {
-                val displayButton by remember { derivedStateOf { listState2.firstVisibleItemIndex > 4 } }
+                val displayButton by remember {
+                    derivedStateOf {
+                        if (ViewModeState.currentView == "grid") gridState.firstVisibleItemIndex > 4
+                        else listState.firstVisibleItemIndex > 4
+                    }
+                }
 
                 AnimatedVisibility(visible = displayButton) {
                     FloatingActionButton(
                         onClick = {
                             scope.launch {
-                                listState2.animateScrollToItem(0)
+                                if (ViewModeState.currentView == "grid") gridState.animateScrollToItem(0)
+                                else listState.animateScrollToItem(0)
                             }
                         },
                         containerColor = colorScheme.primary,
@@ -333,103 +343,102 @@ fun MenuScreen(
                             )
                         },
                     ) {
-                        LazyVerticalGrid(
-                                columns = if (ViewModeState.currentView == "grid") GridCells.Adaptive(minSize = 128.dp) else GridCells.Fixed(1),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp),
-                            verticalArrangement = Arrangement.spacedBy(16.dp),
-                            horizontalArrangement = Arrangement.spacedBy(16.dp),
-                            state = listState2,
-                        ) {
-                            stickyHeader() {
-                                Row(
-                                    modifier = Modifier
-                                        .padding(top = 4.dp)
-                                        .shadow(
-                                            4.dp,
-                                            Shapes.extraLarge,
-                                            spotColor = colorScheme.secondary
-                                        )
-                                        .fillMaxWidth()
-                                        .clip(Shapes.extraLarge)
-                                        .background(colorScheme.background),
-                                    horizontalArrangement = Arrangement.SpaceAround
-                                )
-                                {
-                                    categories.keys.forEach { category ->
-                                        AssistChipMenu(
-                                            name = category,
-                                            click = {
-                                                scope.launch {
-                                                    val index =
-                                                        categoryIndexMap[category] ?: 0
-                                                    listState2.animateScrollToItem(index)
-                                                }
-                                            })
-                                    }
-                                }
-                            }
-
-
-                            if (filteredGoods.isNotEmpty()) {
-                                    if (isOrderHas) {
-                                        item(span = { if (ViewModeState.currentView == "grid") GridItemSpan(2) else GridItemSpan(1) }) {
-                                            Spacer(modifier = Modifier.height(24.dp))
-
-                                        val pagerState = rememberPagerState(pageCount = {
-                                            numAndPrice.size
-                                        })
-                                        Column {
-                                            HorizontalPager(
-                                                state = pagerState,
-                                                contentPadding = if (numAndPrice.size > 1) PaddingValues(
-                                                    end = 16.dp
-                                                ) else PaddingValues(0.dp),
-                                                pageSpacing = 6.dp,
-                                                modifier = Modifier.animateItem()
-                                            ) {
-                                                OrderCard(
-                                                    number = numAndPrice[it].number,
-                                                    price = numAndPrice[it].price,
-                                                    pickupTime = numAndPrice[it].pickupTime,
-                                                    state = numAndPrice[it].state,
-                                                    cancelOrder = {
-                                                        menuViewModel.cancelOrder(numAndPrice[it].id)
-                                                    },
-                                                    orderDate = numAndPrice[it].date
-                                                )
-                                            }
-                                            Spacer(modifier = Modifier.height(6.dp))
-
-                                            PageIndicator(
-                                                numberOfPages = pagerState.pageCount,
-                                                selectedPage = pagerState.currentPage,
-                                                modifier = Modifier
-                                                    .wrapContentHeight()
-                                                    .fillMaxWidth()
-                                                    .align(Alignment.CenterHorizontally)
-                                                    .padding(bottom = 8.dp),
-                                                defaultColor = colorScheme.secondaryContainer,
-                                                selectedColor = colorScheme.onSecondaryContainer
+                        if (ViewModeState.currentView == "grid") {
+                            LazyVerticalGrid(
+                                columns = GridCells.Fixed(2),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp),
+                                verticalArrangement = Arrangement.spacedBy(16.dp),
+                                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                                state = gridState,
+                            ) {
+                                stickyHeader() {
+                                    Row(
+                                        modifier = Modifier
+                                            .padding(top = 4.dp)
+                                            .shadow(
+                                                4.dp,
+                                                Shapes.extraLarge,
+                                                spotColor = colorScheme.secondary
                                             )
+                                            .fillMaxWidth()
+                                            .clip(Shapes.extraLarge)
+                                            .background(colorScheme.background),
+                                        horizontalArrangement = Arrangement.SpaceAround
+                                    )
+                                    {
+                                        categories.keys.forEach { category ->
+                                            AssistChipMenu(
+                                                name = category,
+                                                click = {
+                                                    scope.launch {
+                                                        val index =
+                                                            categoryIndexMap[category] ?: 0
+                                                        gridState.animateScrollToItem(index)
+                                                    }
+                                                })
                                         }
                                     }
                                 }
 
-                                categories.forEach { (category, filteredGoods) ->
+                                if (filteredGoods.isNotEmpty()) {
+                                    if (isOrderHas) {
+                                        item(span = { GridItemSpan(maxLineSpan) }) {
+                                            Spacer(modifier = Modifier.height(24.dp))
 
-                                    item(span = { if (ViewModeState.currentView == "grid") GridItemSpan(2) else GridItemSpan(1) }, key = category) {
-                                        Text(
-                                            text = category,
-                                            color = colorScheme.onBackground,
-                                            fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
-                                            fontSize = 28.sp,
-                                            textAlign = TextAlign.Left,
-                                        )
+                                            val pagerState = rememberPagerState(pageCount = {
+                                                numAndPrice.size
+                                            })
+                                            Column {
+                                                HorizontalPager(
+                                                    state = pagerState,
+                                                    contentPadding = if (numAndPrice.size > 1) PaddingValues(
+                                                        end = 16.dp
+                                                    ) else PaddingValues(0.dp),
+                                                    pageSpacing = 6.dp,
+                                                    modifier = Modifier.animateItem()
+                                                ) {
+                                                    OrderCard(
+                                                        number = numAndPrice[it].number,
+                                                        price = numAndPrice[it].price,
+                                                        pickupTime = numAndPrice[it].pickupTime,
+                                                        state = numAndPrice[it].state,
+                                                        cancelOrder = {
+                                                            menuViewModel.cancelOrder(numAndPrice[it].id)
+                                                        },
+                                                        orderDate = numAndPrice[it].date
+                                                    )
+                                                }
+                                                Spacer(modifier = Modifier.height(6.dp))
+
+                                                PageIndicator(
+                                                    numberOfPages = pagerState.pageCount,
+                                                    selectedPage = pagerState.currentPage,
+                                                    modifier = Modifier
+                                                        .wrapContentHeight()
+                                                        .fillMaxWidth()
+                                                        .align(Alignment.CenterHorizontally)
+                                                        .padding(bottom = 8.dp),
+                                                    defaultColor = colorScheme.secondaryContainer,
+                                                    selectedColor = colorScheme.onSecondaryContainer
+                                                )
+                                            }
+                                        }
                                     }
 
-                                        items(filteredGoods, key = { it.id }) { item ->
+                                    categories.forEach { (category, categoryItems) ->
+                                        item(span = { GridItemSpan(maxLineSpan) }, key = category) {
+                                            Text(
+                                                text = category,
+                                                color = colorScheme.onBackground,
+                                                fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
+                                                fontSize = 28.sp,
+                                                textAlign = TextAlign.Left,
+                                            )
+                                        }
+
+                                        items(categoryItems, key = { it.id }) { item ->
                                             ListItem2(
                                                 product = item,
                                                 onInfo = {
@@ -453,8 +462,135 @@ fun MenuScreen(
                                                     orderVm.deleteItemById(item.id)
                                                 },
                                                 isSelected = item.id in selectedIds,
-                                                modifier = if (ViewModeState.currentView == "list") Modifier.fillMaxWidth() else Modifier.width(175.dp)
+                                                modifier = Modifier.width(175.dp)
                                             )
+                                        }
+                                        item(span = { GridItemSpan(maxLineSpan) }) {
+                                            Spacer(modifier = Modifier.height(26.dp))
+                                        }
+                                    }
+                                }
+                            }
+                        } else {
+                            LazyColumn(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp),
+                                verticalArrangement = Arrangement.spacedBy(16.dp),
+                                state = listState,
+                            ) {
+                                item {
+                                    Row(
+                                        modifier = Modifier
+                                            .padding(top = 4.dp)
+                                            .shadow(
+                                                4.dp,
+                                                Shapes.extraLarge,
+                                                spotColor = colorScheme.secondary
+                                            )
+                                            .fillMaxWidth()
+                                            .clip(Shapes.extraLarge)
+                                            .background(colorScheme.background),
+                                        horizontalArrangement = Arrangement.SpaceAround
+                                    )
+                                    {
+                                        categories.keys.forEach { category ->
+                                            AssistChipMenu(
+                                                name = category,
+                                                click = {
+                                                    scope.launch {
+                                                        val index =
+                                                            categoryIndexMap[category] ?: 0
+                                                        listState.animateScrollToItem(index)
+                                                    }
+                                                })
+                                        }
+                                    }
+                                }
+
+                                if (filteredGoods.isNotEmpty()) {
+                                    if (isOrderHas) {
+                                        item {
+                                            Spacer(modifier = Modifier.height(24.dp))
+
+                                            val pagerState = rememberPagerState(pageCount = {
+                                                numAndPrice.size
+                                            })
+                                            Column {
+                                                HorizontalPager(
+                                                    state = pagerState,
+                                                    contentPadding = if (numAndPrice.size > 1) PaddingValues(
+                                                        end = 16.dp
+                                                    ) else PaddingValues(0.dp),
+                                                    pageSpacing = 6.dp,
+                                                    modifier = Modifier.animateItem()
+                                                ) {
+                                                    OrderCard(
+                                                        number = numAndPrice[it].number,
+                                                        price = numAndPrice[it].price,
+                                                        pickupTime = numAndPrice[it].pickupTime,
+                                                        state = numAndPrice[it].state,
+                                                        cancelOrder = {
+                                                            menuViewModel.cancelOrder(numAndPrice[it].id)
+                                                        },
+                                                        orderDate = numAndPrice[it].date
+                                                    )
+                                                }
+                                                Spacer(modifier = Modifier.height(6.dp))
+
+                                                PageIndicator(
+                                                    numberOfPages = pagerState.pageCount,
+                                                    selectedPage = pagerState.currentPage,
+                                                    modifier = Modifier
+                                                        .wrapContentHeight()
+                                                        .fillMaxWidth()
+                                                        .align(Alignment.CenterHorizontally)
+                                                        .padding(bottom = 8.dp),
+                                                    defaultColor = colorScheme.secondaryContainer,
+                                                    selectedColor = colorScheme.onSecondaryContainer
+                                                )
+                                            }
+                                        }
+                                    }
+
+                                    categories.forEach { (category, categoryItems) ->
+                                        item(key = category) {
+                                            Text(
+                                                text = category,
+                                                color = colorScheme.onBackground,
+                                                fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
+                                                fontSize = 28.sp,
+                                                textAlign = TextAlign.Left,
+                                            )
+                                        }
+
+                                        items(categoryItems, key = { it.id }) { item ->
+                                            ListItem2(
+                                                product = item,
+                                                onInfo = {
+                                                    aboutSheetData.name = item.name
+                                                    aboutSheetData.description = item.description
+                                                    aboutSheetData.image = item.image
+                                                    aboutSheetData.kbju = item.kbju
+                                                    aboutSheetData.composition = item.composition
+                                                    showSheet = true
+                                                },
+                                                onAdd = {
+                                                    orderVm.addItem(
+                                                        id = item.id,
+                                                        name = item.name,
+                                                        price = if (item.discountPrice == 0) item.price else item.discountPrice,
+                                                        image = item.image,
+                                                        quantity = 1
+                                                    )
+                                                },
+                                                onDelete = {
+                                                    orderVm.deleteItemById(item.id)
+                                                },
+                                                isSelected = item.id in selectedIds,
+                                                modifier = Modifier.fillMaxWidth()
+                                            )
+                                        }
                                     }
                                 }
                             }
@@ -484,6 +620,7 @@ fun ListItem2(
             .crossfade(true)
             .memoryCacheKey(product.image)
             .diskCacheKey(product.image)
+            .size(300)
             .transformations(RoundedCornersTransformation(10f))
             .error(R.drawable.error_load)
             .build(),

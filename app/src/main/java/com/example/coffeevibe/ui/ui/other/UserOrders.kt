@@ -79,13 +79,12 @@ fun UserOrdersScreen(
         orders
     ) {
         orders.sortedByDescending {
-            TimeUtils.convertToDateWithFormat(it.date, "EEE, dd MMM yyyy")
+            TimeUtils.convertToMills(it.date)
         }
     }
 
     val ordersByDate =
         sortedOrders.groupBy { TimeUtils.convertToDateWithFormat(it.date, "EEE, dd MMM yyyy") }
-            .toSortedMap(reverseOrder())
 
 
     var isRefreshing by remember { mutableStateOf(false) }

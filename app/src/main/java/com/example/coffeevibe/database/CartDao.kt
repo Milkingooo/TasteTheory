@@ -33,5 +33,5 @@ interface CartDao {
     fun getItemById(id: Int): CartEntity
 
     @Query("SELECT COUNT(DISTINCT id) AS unique_items_count FROM cartItems;")
-    suspend fun getCartItemsCount() : Int
+    fun getCartItemsCount() : Flow<Int>
 }

@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -61,17 +62,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.foundation.Image
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.coffeevibe.R
 import com.example.coffeevibe.ui.theme.CoffeeVibeTheme
 import com.example.coffeevibe.ui.theme.Shapes
 import com.example.coffeevibe.ui.ui.customUi.BoxDropdownMenuItem
+import com.example.coffeevibe.ui.ui.customUi.SimpleBottomSheet
 import com.example.coffeevibe.ui.ui.customUi.MaterialList
 import com.example.coffeevibe.ui.ui.customUi.MaterialListItem
 import com.example.coffeevibe.viewmodel.LoginViewModel
@@ -90,6 +95,7 @@ fun ProfileScreen(
     val name by loginVm.username.collectAsState()
     val userRole by loginVm.userRole.collectAsState()
     val isUserLoggedIn = loginVm.isUserLogin.collectAsState()
+    var showQrSheet by remember { mutableStateOf(false) }
 
     CoffeeVibeTheme(context2 = LocalContext.current, content = {
         Scaffold(
@@ -156,7 +162,7 @@ fun ProfileScreen(
                         title = "Приведи друга",
                         subtitle = "",
                         action = {
-
+                            showQrSheet = true
                         },
                         icon = Icons.Filled.Share,
                         iconTint = colorScheme.secondaryContainer,
@@ -263,6 +269,36 @@ fun ProfileScreen(
             }
         }
 
+        if (showQrSheet) {
+            SimpleBottomSheet(
+                state = showQrSheet,
+                onDismiss = { showQrSheet = false },
+                content = {
+                    Text(
+                        text = "Приведи друга",
+                        color = colorScheme.onBackground,
+                        fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
+                        fontSize = 26.sp,
+                        textAlign = TextAlign.Center
+                    )
+
+                    Image(
+                        painter = painterResource(R.drawable.placeholder),
+                        contentDescription = "QR код для скачивания",
+                        modifier = Modifier.size(250.dp),
+                        contentScale = ContentScale.Fit
+                    )
+
+                    Text(
+                        text = "Скачай приложение",
+                        color = colorScheme.onBackground,
+                        fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
+                        fontSize = 18.sp,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            )
+        }
     })
 }
 

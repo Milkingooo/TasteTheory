@@ -30,7 +30,10 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckBox
 import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.filled.Receipt
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material.icons.outlined.DeleteOutline
 import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material3.AlertDialog
@@ -1211,87 +1214,138 @@ fun ManagerOrdersListItem(
     onUpdate: (Int) -> Unit,
     state: Int
 ) {
-    val parts = order.pickupTime.toString().split("=") // Разбиваем строку на части
-    val seconds = parts[1].split(",")[0].toLong() // Извлекаем секунды
-    val nanoseconds = parts[2].split(")")[0].toLong() // Извлекаем наносекунды
-    val milliseconds = seconds * 1000 + nanoseconds / 1_000_000
-    val date = Date(milliseconds)
-    val format = SimpleDateFormat("HH:mm")
-    val timeString = format.format(date)
+    val timeString = TimeUtils.convertToDateWithFormat(order.pickupTime.toString(), "HH:mm")
+    val dateString = TimeUtils.convertToDateWithFormat(order.pickupTime.toString(), "dd MMM")
+    var showItems by remember { mutableStateOf(false) }
+    var statusExpanded by remember { mutableStateOf(false) }
+    val statusText = ConvertOrderState.convertOrderStateToString(state)
+
+    val statusColor = when (state) {
+        1 -> Color(0xFF9E9E9E)
+        2 -> Color(0xFFFFC107)
+        3 -> Color(0xFF4CAF50)
+        4 -> Color(0xFF2196F3)
+        5 -> Color(0xFFF44336)
+        else -> Color(0xFF9E9E9E)
+    }
+
+    val statusItems = listOf(
+        "создан" to 1,
+        "готовится" to 2,
+        "готов" to 3,
+        "выдан" to 4,
+        "отменен" to 5
+    )
 
     OutlinedCard(
-        onClick = { /* Do something */ },
+        onClick = { },
         modifier = Modifier
             .fillMaxWidth()
-            .shadow(4.dp, Shapes.medium, spotColor = colorScheme.background)
-            .wrapContentHeight()
-            .animateContentSize(),
+            .shadow(4.dp, Shapes.medium, spotColor = statusColor)
+            .wrapContentHeight(),
         colors = CardDefaults.cardColors(containerColor = colorScheme.secondaryContainer),
         shape = Shapes.medium,
-
-        ) {
+        border = BorderStroke(2.dp, statusColor)
+    ) {
         Column(
-            modifier = Modifier.padding(10.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+            modifier = Modifier.padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight(),
+                modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceAround
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Column {
                     Text(
-                        text = "Заберут к  $timeString",
+                        text = "$timeString · $dateString",
                         color = colorScheme.onBackground,
                         fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
-                        fontSize = 20.sp
+                        fontSize = 18.sp
                     )
                     Text(
-                        text = "К оплате: ${order.totalPrice}₽",
+                        text = order.clientName,
                         color = colorScheme.onBackground,
                         fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
-                        fontSize = 20.sp
+                        fontSize = 16.sp
                     )
                 }
+                Column(horizontalAlignment = Alignment.End) {
+                    Text(
+                        text = "№${order.id}",
+                        color = colorScheme.onBackground,
+                        fontFamily = FontFamily(Font(R.font.roboto_condensed_black)),
+                        fontSize = 24.sp
+                    )
+                    Text(
+                        text = "${order.totalPrice}₽",
+                        color = colorScheme.onBackground,
+                        fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
+                        fontSize = 18.sp
+                    )
+                }
+            }
+
+            Box {
+                OutlinedButton(
+                    onClick = { statusExpanded = true },
+                    modifier = Modifier.fillMaxWidth(),
+                    border = BorderStroke(1.dp, statusColor)
+                ) {
+                    Text(
+                        text = statusText.replaceFirstChar { it.uppercase() },
+                        color = statusColor,
+                        fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
+                        fontSize = 16.sp
+                    )
+                    Spacer(Modifier.weight(1f))
+                    Icon(
+                        Icons.Filled.KeyboardArrowDown,
+                        contentDescription = null,
+                        tint = statusColor
+                    )
+                }
+
+                DropdownMenu(
+                    expanded = statusExpanded,
+                    onDismissRequest = { statusExpanded = false }
+                ) {
+                    statusItems.forEach { (label, value) ->
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    text = label.replaceFirstChar { it.uppercase() },
+                                    color = if (value == state) statusColor else colorScheme.onBackground,
+                                    fontFamily = FontFamily(Font(R.font.roboto_condensed_medium))
+                                )
+                            },
+                            onClick = {
+                                statusExpanded = false
+                                if (value != state) onUpdate(value)
+                            }
+                        )
+                    }
+                }
+            }
+
+            OutlinedButton(
+                onClick = { showItems = !showItems },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Icon(
+                    if (showItems) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
+                    contentDescription = null
+                )
+                Spacer(Modifier.width(8.dp))
                 Text(
-                    text = order.id.toString(),
-                    color = colorScheme.onBackground,
-                    fontFamily = FontFamily(Font(R.font.roboto_condensed_black)),
-                    fontSize = 36.sp
+                    text = "Состав (${order.orderItems.size})",
+                    fontFamily = FontFamily(Font(R.font.roboto_condensed_medium)),
+                    fontSize = 16.sp
                 )
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
-
-            val buttons = listOf("Создан", "Готовится", "Готов", "Выдан", "Отменен")
-            SegmentedButtonSingleSelectSample(
-                title = "Выберите действие",
-                segments = buttons,
-                actions = {
-                        onUpdate(
-                            when (it) {
-                                0 -> 1
-                                1 -> 2
-                                2 -> 3
-                                3 -> 4
-                                4 -> 5
-                                else -> 1
-                            }
-                        )
-                },
-                orientationHorizontal = false,
-                inputIndex = state - 1
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-//            Log.d("OrderDetails", "Order items: ${order.orderItems}")
-//            //[]
-
-            order.orderItems.forEach { item ->
+            if (showItems) {
+                order.orderItems.forEach { item ->
                     ListItem(
                         headlineContent = {
                             Text(
@@ -1312,18 +1366,17 @@ fun ManagerOrdersListItem(
                         leadingContent = {
                             Icon(
                                 Icons.Filled.Receipt,
-                                contentDescription = "Localized description",
+                                contentDescription = null,
                                 tint = colorScheme.onBackground
                             )
                         },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(10.dp)
                             .clip(Shapes.small),
-                        colors = ListItemDefaults.colors(containerColor = colorScheme.surface),
+                        colors = ListItemDefaults.colors(containerColor = colorScheme.surface)
                     )
-                    HorizontalDivider(modifier = Modifier.padding(10.dp))
                 }
-             }
+            }
+        }
     }
 }
